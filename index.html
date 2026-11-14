@@ -220,6 +220,9 @@ linear-gradient(145deg,#a0ba77 0%,#76a068 47%,#4d8058 100%)}
 .plot.locked-land small{color:#f0e6b9;background:#3c4f3bd9}
 #expandLand{background:#476e4a;color:#f7f0c9;border:1px solid #adc795}
 
+.asset.chemicals .roof{background:linear-gradient(130deg,#d5b885,#7a9972)}
+.asset.chemicals .walls{background:linear-gradient(90deg,#c0c7a3,#7c9b85)}
+.asset.chemicals .detail-art{left:5px;top:2px;width:18px;height:45px;border-radius:50% 50% 7px 7px;background:linear-gradient(90deg,#f0e2c8,#699d91);border:2px solid #7a907d;box-shadow:57px 10px 0 -5px #c7d8b7}
 </style></head><body>
 <div id="rotate" class="rotate"><div>📱↻<h2>Поверните телефон горизонтально</h2><p>Вся военная база помещается на одном экране.</p></div></div>
 <div class="game" id="game">
@@ -353,7 +356,7 @@ function save(manual=false){data.version=100;
 function capacity(){return 2000+(data.storageLevel-1)*1000}
 function hqCost(level){return {metal:Math.floor(50+level*15),...(level>=10?{parts:Math.floor((level-9)*3)}:{}),...(level>=30?{fuel:Math.floor((level-29)*2)}:{})}}
 function storageCost(level){return {metal:Math.floor(100+level*80),...(level>=4?{parts:level*10}:{})}}
-function costLabel(cost){return Object.entries(cost).map(([k,v])=>format(v)+" "+({metal:"🔩",parts:"⚙️",fuel:"🛢️",electronics:"🔌",coins:"🪙"}[k]||k)).join(" + ")}
+function costLabel(cost){return Object.entries(cost).map(([k,v])=>format(v)+" "+({metal:"🔩",parts:"⚙️",fuel:"🛢️",electronics:"🔌",chemicals:"🧪",coins:"🪙"}[k]||k)).join(" + ")}
 function timeLeft(job,now=Date.now()){return Math.max(0,Math.ceil((job.endsAt-now)/1000))}
 function clock(secs){const m=Math.floor(secs/60),s=secs%60;return m+":"+String(s).padStart(2,"0")}
 const facilityDefs={garage:{name:"Гараж",icon:"🚙",purpose:"Наземная техника",baseCost:100},hangar:{name:"Ангар",icon:"🚁",purpose:"Воздушная техника",baseCost:160}};
@@ -380,15 +383,16 @@ function finishJobs(now=Date.now()){
  if(facilityDone.length)data.facilityJobs=data.facilityJobs.filter(j=>j.endsAt>now);
  return completed.length+facilityDone.length;
 }
+function factoryUnlocked(id){const d=definitions.find(x=>x.id===id);return !!d&&data.baseLevel>=d.unlock}
+function industryOverview(){const net=connectedRoads();return definitions.map(d=>({name:d.title,required:d.unlock,available:factoryUnlocked(d.id),built:data.factories[d.id],rate:d.rate*factoryActiveLevels(d.id,net)}))}
 function accrue(now=Date.now()){
 const elapsed=Math.max(0,Math.min(MAX_OFFLINE,Math.floor((now-data.lastProduction)/MINUTE)));
 if(!elapsed)return 0;
 let made=0;
 const network=connectedRoads();
-for(const def of definitions){
- const old=data.resources[def.resource];
- data.resources[def.resource]=Math.min(capacity(),old+elapsed*def.rate*factoryActiveLevels(def.id,network));made+=data.resources[def.resource]-old;
-}
+const additions={};
+for(const def of definitions)additions[def.resource]=(additions[def.resource]||0)+elapsed*def.rate*factoryActiveLevels(def.id,network);
+for(const [resource,amount] of Object.entries(additions)){const old=data.resources[resource];data.resources[resource]=Math.min(capacity(),old+amount);made+=data.resources[resource]-old}
 data.lastProduction=(now-data.lastProduction)>MAX_OFFLINE*MINUTE ? now : data.lastProduction+elapsed*MINUTE;
 return made;
 }
@@ -396,12 +400,13 @@ function canAfford(cost){return Object.entries(cost).every(([k,v])=>k==="coins"?
 function spend(cost){for(const [k,v]of Object.entries(cost)){if(k==="coins")data.coins-=v;else data.resources[k]-=v}}
 function build(id,slot=null){
 advance();const def=definitions.find(x=>x.id===id);if(!def)return;
+if(!factoryUnlocked(id)&&!data.factories[id]){status("Нужен штаб "+def.unlock+" уровня для "+def.title);return}
 const level=data.factories[id];
 if(level>=999)return;
 if(data.construction.some(j=>j.id===id)){status("Завод этого типа уже строится или улучшается");return}
 if(slot!==null&&(!plotUnlocked(slot)||data.placements.some(p=>p.slot===slot)||data.construction.some(p=>p.slot===slot)||facilityAt(slot))){status("Участок занят");return}
 if(slot===null&&level===0){const free=Array.from({length:accessiblePlots()},(_,i)=>i).find(i=>!data.placements.some(p=>p.slot===i)&&!data.construction.some(p=>p.slot===i)&&!facilityAt(i));if(free===undefined){status("Нет свободных участков");return}slot=free}
-const price=Object.fromEntries(Object.entries(def.cost).map(([k,v])=>[k,Math.round(v*(1+level*.85))]));
+const price=factoryCost(id);
 if(!canAfford(price)){status("Недостаточно материалов для "+def.title);render();return}
 spend(price);
 const duration=slot!==null?45:Math.min(180,60+level*15);
@@ -572,7 +577,7 @@ function moveFactory(toSlot){
  status("🏗️ Завод перемещён · "+(newActive?"✅ дорога подключена":"🚫 нужна дорога от штаба"));
  save();render();
 }
-function factoryCost(id){const d=definitions.find(x=>x.id===id);const level=data.factories[id];return Object.fromEntries(Object.entries(d.cost).map(([k,v])=>[k,Math.round(v*(1+level*.85))]))}
+function factoryCost(id){const d=definitions.find(x=>x.id===id),level=data.factories[id];if(!d)return {};const cost=Object.fromEntries(Object.entries(d.cost).map(([k,v])=>[k,Math.round(v*(1+level*.85))]));if(id==="electronics"&&level>=2)cost.chemicals=10*level;return cost}
 function openCard(type,slot=null,id=null){activeCard={type,slot,id};showCard()}
 function closeCard(){$("overlay").hidden=true;activeCard=null}
 function showCard(){
@@ -595,7 +600,7 @@ function showCard(){
  } else if(type==="hq"){
  title="🏛️ Командный штаб";
  const price=hqCost(data.baseLevel),max=data.baseLevel>=1000;
- html='<p>Уровень: <b>'+data.baseLevel+' / 1000</b> · Облик '+Math.min(34,Math.floor((data.baseLevel-1)/30)+1)+'/34</p><p>Следующее улучшение: '+(max?"достигнут максимум":costLabel(price))+'</p><p class="muted">Новый этап внешнего вида каждые 30 уровней</p>'+button(max?"Максимальный уровень":"⬆️ Улучшить штаб",max||!canAfford(price));
+ html='<p>Уровень: <b>'+data.baseLevel+' / 1000</b> · Облик '+Math.min(34,Math.floor((data.baseLevel-1)/30)+1)+'/34</p><p>Следующее улучшение: '+(max?"достигнут максимум":costLabel(price))+'</p><p class="muted">Новый этап внешнего вида каждые 30 уровней</p><p>🏭 Заводы: топливо — штаб 3, химикаты — 5, детали — 6, электроника — 10.</p>'+button(max?"Максимальный уровень":"⬆️ Улучшить штаб",max||!canAfford(price));
  act=()=>upgradeHQ();
  } else if(type==="storage"){
  title="📦 Склад";
@@ -616,7 +621,7 @@ function showCard(){
  html='<p>Идёт строительство</p><p>Осталось: <b>'+clock(timeLeft(job))+'</b></p><p class="muted">После завершения здание появится на карте.</p>';
  } else if(type==="empty"){
  title="🏗️ Строительство · участок "+(slot+1);
- const choices=definitions.map(d=>'<option value="'+d.id+'">'+d.icon+' '+d.title+' · '+costLabel(factoryCost(d.id))+'</option>').join("");
+ const choices=definitions.map(d=>'<option value="'+d.id+'" '+(!factoryUnlocked(d.id)&&!data.factories[d.id]?'disabled':'')+'>'+d.icon+' '+d.title+(!factoryUnlocked(d.id)&&!data.factories[d.id]?' 🔒 штаб '+d.unlock:' · '+costLabel(factoryCost(d.id)))+'</option>').join("");
  html='<p>Выберите завод для этого участка:</p><select id="cardChoice">'+choices+'</select><p class="muted" id="choiceCost"></p>'+button("🏗️ Начать строительство");
  act=()=>build($("cardChoice").value,slot);
  }
@@ -651,7 +656,7 @@ function showCard(){
  }
  if(type==="empty"){
  const choice=$("cardChoice");
- const refresh=()=>{const id=choice.value,job=data.construction.some(j=>j.id===id),cost=factoryCost(id);$("choiceCost").textContent="Цена: "+costLabel(cost)+(job?" · уже строится":"");$("cardAction").disabled=job||!canAfford(cost)};
+ const refresh=()=>{const id=choice.value,def=definitions.find(d=>d.id===id);if(!def){$("cardAction").disabled=true;return}const job=data.construction.some(j=>j.id===id),cost=factoryCost(id),locked=!factoryUnlocked(id)&&!data.factories[id];$("choiceCost").textContent=locked?"Откроется на уровне штаба "+def.unlock:"Цена: "+costLabel(cost)+(job?" · уже строится":"");$("cardAction").disabled=locked||job||!canAfford(cost)};
  choice.onchange=refresh;refresh();
  }
 }
@@ -710,7 +715,7 @@ function render(){
  $("cancelMove").hidden=!(movingFactory||movingFacility);
  $("roadMode").setAttribute("aria-pressed",String(roadMode));
  $("roadHelp").hidden=!roadMode;
- $("resources").innerHTML=definitions.map(def=>'<div class="card"><b>'+labels[def.resource]+'</b><div class="symbol">'+format(data.resources[def.resource])+'</div><div class="detail">из '+format(capacity())+'</div></div>').join("");
+ $("resources").innerHTML=Object.keys(data.resources).map(res=>'<div class="card"><b>'+labels[res]+'</b><div class="symbol">'+format(data.resources[res])+'</div><div class="detail">из '+format(capacity())+'</div></div>').join("")+'<div class="card"><b>🏭 Промышленность</b>'+industryOverview().map(v=>'<p>'+(v.available?'✅':'🔒')+' '+v.name+' · '+(v.available?'+'+v.rate+'/мин':'штаб '+v.required)+'</p>').join("")+'</div>';
  for(const id of ["garage","hangar"]){const job=data.facilityJobs.find(j=>j.id===id);$(id+"Info").textContent=facilityDefs[id].icon+" "+facilityDefs[id].name+" · уровень "+data.facilities[id]+(job?" · строится "+clock(timeLeft(job)):"");}
  if(activeCard&&$("overlay").hidden===false&&(activeCard.type==="construction"||activeCard.type==="facility"&&data.facilityJobs.some(j=>j.id===activeCard.id)))showCard();
 }
