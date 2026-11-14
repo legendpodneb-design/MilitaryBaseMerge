@@ -1,149 +1,113 @@
 <!doctype html>
-<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#142820"><title>Военная база: Merge 0.5</title>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#172e25">
+<title>Военная база — 0.6 Заводы</title>
 <style>
-:root{--ink:#eef5df;--muted:#b6cbb0;--lime:#d6e994;--border:#516d4c;--sand:#ddba75}
-*{box-sizing:border-box}html{background:#102218}body{margin:0;color:var(--ink);background:radial-gradient(ellipse at 48% 0%,#426044 0%,#1e3829 38%,#0f2118 85%);font:15px system-ui,-apple-system,sans-serif}button{font:inherit;touch-action:manipulation}
-main{width:min(100%,650px);margin:auto;padding:12px 12px calc(18px + env(safe-area-inset-bottom))}
-header{text-align:center;margin:0 0 10px}header .eyebrow{font-weight:800;letter-spacing:.23em;color:#b9d6a4;font-size:10px}h1{margin:3px 0;font-size:clamp(23px,5.5vw,33px);line-height:1.1;text-shadow:0 2px 8px #102418}header .sub{font-size:11px;color:#c9d8c2}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:9px}.stat{border:1px solid #66815c;background:linear-gradient(150deg,#3b5940,#253b2e);padding:8px 3px;border-radius:13px;text-align:center;box-shadow:0 4px 10px #0b150e60}.stat small{display:block;font-size:10px;letter-spacing:.08em;color:#c0d4b7}.stat strong{font-size:21px;color:#f4e9b9}
-.panel{background:linear-gradient(175deg,#2d4836,#192d22);border:1px solid #587353;border-radius:16px;padding:11px;margin:9px 0;box-shadow:0 5px 16px #0a191185}
-.paneltitle{display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:7px}.paneltitle b{font-size:14px}.pill{background:#6c7844;color:#f4f0c8;border:1px solid #899666;padding:3px 7px;border-radius:12px;font-size:10px;white-space:nowrap}
-.base{height:112px;overflow:hidden;position:relative;border-radius:12px;border:2px solid #76875a;background:repeating-linear-gradient(45deg,transparent 0 22px,#d7cb9b0b 22px 24px),linear-gradient(165deg,#879766,#556e48);display:flex;justify-content:space-evenly;align-items:end;padding:8px 5px 13px}
-.base:before{content:"";position:absolute;inset:auto -10% -26px;background:#c6b88b;height:39px;transform:rotate(-4deg);border-top:3px dashed #dfd5af}
-.building{z-index:1;text-align:center;position:relative;width:31%;max-width:130px;filter:drop-shadow(3px 5px 2px #2d3d2c66)}.building svg{width:100%;height:67px}.building span{display:inline-block;background:#1a3024dd;border:1px solid #9fa77a;border-radius:5px;padding:2px 5px;font-size:10px;font-weight:700;position:relative;top:-6px}.flag{position:absolute;right:9px;top:7px;font-size:10px;color:#e7edb6;font-weight:800}
-.board{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;margin-top:8px}.cell{width:100%;aspect-ratio:1;border:1px solid #748862;border-radius:10px;background:linear-gradient(155deg,#58704c,#3b513c);display:flex;align-items:center;justify-content:center;position:relative;cursor:pointer;padding:2px;min-width:0;color:#e5eddb;box-shadow:inset 0 -3px #223e31,0 2px 2px #102017}.cell.empty{background:#223829;border:1px dashed #63785c;box-shadow:inset 0 2px 5px #101d15}.cell.empty .plus{font-size:23px;color:#6f916f}.cell.selected{outline:3px solid #f5d177;outline-offset:0;background:#75834e}.cell svg{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 3px 1px #182419a8)}.cell .lv{position:absolute;right:2px;bottom:2px;background:#132c24de;color:#f5eed3;font-size:9px;padding:1px 4px;border-radius:6px}.cell.justmerged{animation:pop .48s ease-out}.cell.justmerged:after{content:"✦";position:absolute;top:-12px;right:-6px;font-size:25px;color:#ffe5a4;pointer-events:none;animation:spark .55s ease-out both}@keyframes pop{0%{transform:scale(.7);filter:brightness(1.9)}65%{transform:scale(1.14);filter:brightness(1.4)}100%{transform:scale(1);filter:brightness(1)}}@keyframes spark{0%{opacity:0;transform:translateY(12px) scale(.4)}35%{opacity:1}100%{opacity:0;transform:translateY(-15px) scale(1.2)}}
-.hint{font-size:11px;color:var(--muted);line-height:1.35}.message{font-size:12px;color:#e9d58e;min-height:30px;display:flex;align-items:center;margin-top:5px}
-.actions{display:grid;grid-template-columns:1.5fr 1fr;gap:7px}.action{border:0;background:linear-gradient(#d8e39a,#98b968);color:#23341f;border-radius:11px;padding:12px 5px;font-size:13px;font-weight:800;box-shadow:inset 0 -3px #68894b}.action.secondary{background:linear-gradient(#4d6850,#314b3a);color:#ecf2de;box-shadow:inset 0 -3px #1f3428;border:1px solid #769073}.action:disabled{opacity:.45}
-.basecontrols{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px}.basecontrols .hint{flex:1}.upgrade{background:#dfc77d;color:#2a3320;border:0;border-radius:9px;padding:9px 12px;font-size:12px;font-weight:800}.upgrade:disabled{opacity:.5}.base.level2{background-color:#809965}.base.level3{border-color:#d5c177}.base.level4{box-shadow:inset 0 0 0 3px #a2c886}.base.level5{border-color:#ead995;box-shadow:0 0 13px #e5d07d65}.base.level3 .building:first-child,.base.level4 .building:first-child,.base.level5 .building:first-child{transform:scale(1.12);transform-origin:bottom}.hqprogress{height:7px;background:#172d24;border-radius:8px;overflow:hidden;margin-top:9px;border:1px solid #58704f}.hqprogress>div{height:100%;width:0%;background:linear-gradient(90deg,#a5c879,#f5d57e);transition:width .25s}.hqmeta{margin-top:4px}.base.visual-1{background:linear-gradient(140deg,#829c67,#516f43)}.base.visual-2{background:linear-gradient(140deg,#78947a,#3b6354);border-color:#9fba92}.base.visual-3{background:linear-gradient(140deg,#718d86,#355852);border-color:#d5c18e}.base.visual-2 .building:first-child{transform:scale(1.1);transform-origin:bottom}.base.visual-3 .building:first-child{transform:scale(1.2);transform-origin:bottom;filter:drop-shadow(0 0 8px #f5d68190)}.nextwrap{display:flex;align-items:center;justify-content:space-between;padding:2px}.nextitem{display:flex;align-items:center;gap:8px}.nextitem svg{width:64px;height:43px;background:#486348;border-radius:9px;padding:2px}.collection{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.collect{background:#304b39;border-radius:8px;border:1px solid #557450;text-align:center;padding:3px 1px}.collect svg{width:100%;height:36px}.collect small{display:block;font-size:9px;color:#b5c8ae}.collect.locked{opacity:.42}footer{text-align:center;color:#91aa90;font-size:10px;margin:10px 0}
-@media(min-width:600px){main{padding-top:23px}.base{height:145px}.building svg{height:90px}.board{gap:9px}.cell{border-radius:13px}.collect svg{height:52px}}
-@media(max-height:750px){main{padding-top:7px}.base{height:92px}.building svg{height:54px}header{margin-bottom:6px}.panel{margin:7px 0;padding:9px}}
-.bottomnav{position:sticky;bottom:0;z-index:20;background:#152b20f2;border:1px solid #617851;box-shadow:0 -3px 14px #0818109c;display:grid;grid-template-columns:repeat(5,1fr);gap:3px;border-radius:13px;padding:5px;margin:12px 0 4px;backdrop-filter:blur(7px)}.navbtn{border:0;color:#bbd1b5;background:transparent;padding:7px 0;font-size:10px;min-width:0;border-radius:9px;cursor:pointer}.navbtn .ico{display:block;font-size:21px}.navbtn.active{color:#fff7c5;background:#476349}.navbtn:focus-visible,.action:focus-visible{outline:2px solid #ffdd80}.subview{min-height:220px}.subview[hidden]{display:none}.storage{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:10px 0}.storecard{padding:11px;border:1px solid #617856;background:#2a4434;border-radius:12px}.storecard strong{display:block;font-size:20px}.state{font-weight:bold;color:#d9d89c}.muted{opacity:.83}.savebar{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:9px}.savebar button{padding:8px 11px;font-size:12px}.savebar small{color:#b9d2b1;flex:1;min-width:140px}@media(max-width:430px){.navbtn{font-size:9px}.panel{padding:9px}.base{height:100px}.building svg{height:57px}}
-</style></head>
-<body><main>
-<header><div class="eyebrow">TACTICAL MERGE • 0.5</div><h1>🪖 ВОЕННАЯ БАЗА</h1><div class="sub">Объединяй технику — развивай свою базу</div></header>
-<div class="stats"><div class="stat"><small>🪙 МОНЕТЫ</small><strong id="coins">120</strong></div><div class="stat"><small>⭐ ОЧКИ</small><strong id="score">0</strong></div><div class="stat"><small>🏆 РЕКОРД</small><strong id="best">0</strong></div></div>
-<div id="view-base" class="subview"><section class="panel"><div class="paneltitle"><b>🏕️ Твоя военная база</b><span class="pill" id="hqlevel">Штаб • 1/1000</span></div><div class="base" id="base">
-<div class="building"><svg viewBox="0 0 100 75"><path d="M11 30L51 10 90 29 50 49Z" fill="#65775b" stroke="#253e2a" stroke-width="3"/><path d="M11 30v27l39 16V49Z" fill="#84916b"/><path d="M90 29v29L50 73V49Z" fill="#506a52"/><path d="M60 52l21-9v18l-21 8Z" fill="#243f33"/><path d="M20 42l19 8v13l-19-8Z" fill="#c5d2a4"/></svg><span>ШТАБ</span></div>
-<div class="building"><svg viewBox="0 0 100 75"><path d="M9 32L51 9 93 32 51 50Z" fill="#7a8260" stroke="#344631" stroke-width="3"/><path d="M9 32v30l42 12V50Z" fill="#c0ba8e"/><path d="M93 32v30L51 74V50Z" fill="#7b8763"/><path d="M62 51l24-10v20L62 69Z" fill="#283e33"/></svg><span>ГАРАЖ</span></div>
-<div class="building"><svg viewBox="0 0 100 75"><path d="M10 33L48 12 91 32 50 53Z" fill="#70815f" stroke="#354934" stroke-width="3"/><path d="M10 33v29l40 12V53Z" fill="#929d73"/><path d="M91 32v29L50 74V53Z" fill="#647754"/><path d="M61 54l21-10v16l-21 9Z" fill="#293c2d"/><path d="M49 10V0" stroke="#eae2a7" stroke-width="3"/><path d="M49 0l20 5-20 5" fill="#d7b268"/></svg><span>СКЛАД</span></div>
-</div><div class="basecontrols"><span class="hint" id="basehint">Облик каждые 30 уровней</span><button class="upgrade" id="upgrade">⬆️ Улучшить</button></div><div class="hqprogress"><div id="hqbar"></div></div><div class="hint hqmeta" id="hqmeta">Следующий облик на уровне 31</div></section>
-<section class="panel"><div class="paneltitle"><b>⚙️ Сборочная площадка</b><span class="pill">5 × 5</span></div><div class="hint">Выбери две одинаковые машины на соседних клетках</div><div class="board" id="board"></div><div class="message" id="message" aria-live="polite"></div><div class="actions"><button class="action" id="buy">＋ Техника · 20 🪙</button><button class="action secondary" id="restart">↻ Заново</button></div></section>
-</div><div id="view-garage" class="subview" hidden><section class="panel"><div class="paneltitle"><b>🚙 Гараж</b><span class="pill">План 0.6</span></div><div class="hint">В следующей версии здесь появится хранение наземной техники. Пока весь действующий инвентарь находится на сборочной площадке.</div><div id="garagepreview" class="collection" style="margin-top:12px"></div></section></div><div id="view-hangar" class="subview" hidden><section class="panel"><div class="paneltitle"><b>🚁 Авиационный ангар</b><span class="pill">План 0.6</span></div><div class="hint">Здесь будут храниться вертолёты, беспилотники и самолёты. Производство и хранение пока не включены.</div></section></div><div id="view-missions" class="subview" hidden><section class="panel"><div class="paneltitle"><b>🗺️ Операции</b><span class="pill">План 0.8</span></div><div class="hint">Разведка, экспедиции и награды появятся позднее. Техника пока не отправляется на задания.</div></section></div><div id="view-storage" class="subview" hidden><section class="panel"><div class="paneltitle"><b>📦 Склад и сохранение</b><span class="pill">Версия 0.4</span></div><div class="storage"><div class="storecard">🪙 Монеты<strong id="storecoins">120</strong></div><div class="storecard">⭐ Очки<strong id="storescore">0</strong></div></div><p class="hint">Металл, топливо и детали будут добавлены в 0.7. Сейчас здесь можно сохранить игровой прогресс.</p><div class="savebar"><button class="action" id="savegame">💾 Сохранить</button><small id="savedstatus" role="status">Автосохранение включено</small></div><p class="hint">Сохранения хранятся только в браузере. При очистке данных Safari они могут исчезнуть.</p></section></div><div id="view-next" class="subview"><section class="panel nextwrap"><div><b>Следующая техника</b><div class="hint">Появится на случайной свободной клетке</div></div><div class="nextitem" id="next"></div></section>
-<section class="panel"><div class="paneltitle"><b>🎖️ Коллекция техники</b><span class="pill" id="progress">1 / 10</span></div><div class="collection" id="levels"></div></section>
-</div><nav class="bottomnav" aria-label="Меню игры"><button class="navbtn active" data-view="base"><span class="ico">🏕️</span>База</button><button class="navbtn" data-view="garage"><span class="ico">🚙</span>Гараж</button><button class="navbtn" data-view="hangar"><span class="ico">🚁</span>Ангар</button><button class="navbtn" data-view="missions"><span class="ico">🗺️</span>Задания</button><button class="navbtn" data-view="storage"><span class="ico">📦</span>Склад</button></nav><footer>Версия 0.5 · Автосохранение на этом устройстве · Без облака</footer>
-</main><script>
+:root{color-scheme:dark;--bg:#14261d;--panel:#294536;--border:#688068;--text:#f1f4e9;--gold:#f4d384}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#426248,#152820 70%);color:var(--text);font:15px system-ui,-apple-system,sans-serif}main{max-width:720px;margin:auto;padding:14px 12px 100px}h1{text-align:center;font-size:clamp(23px,6vw,34px);margin:4px 0}.sub{text-align:center;color:#bfd3b9;font-size:12px;margin-bottom:12px}.tag{font-size:10px;letter-spacing:2px;text-align:center;color:#e3dcad;font-weight:800}.panel{background:linear-gradient(165deg,#31513b,#1c3327);border:1px solid #698368;border-radius:15px;padding:14px;margin:10px 0;box-shadow:0 4px 12px #0d1b1377}h2{font-size:17px;margin:0 0 8px}.muted{font-size:12px;color:#c0d0ba;line-height:1.5}.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.stat{background:#223e2e;border:1px solid #59785d;border-radius:12px;padding:12px}.stat small{display:block;color:#c5d2b7}.stat strong{font-size:21px}.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:12px}.card{border:1px solid #79916b;background:#344f3b;border-radius:13px;padding:11px;min-width:0}.card h3{margin:2px 0 7px;font-size:15px}.symbol{font-size:33px}.rate{color:#e5dd9d;font-size:12px}.btn{background:linear-gradient(#e4d293,#bfaa6e);color:#263123;border:0;border-radius:10px;padding:11px;font-size:13px;font-weight:800;cursor:pointer;touch-action:manipulation}.btn:disabled{opacity:.43}.card .btn{width:100%;margin-top:8px}.btn.alt{background:#44634a;color:#f4f6e7;border:1px solid #7c9878}.bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}.baseart{border-radius:12px;border:2px solid #829671;height:136px;background:repeating-linear-gradient(35deg,#89977129 0 22px,#b6c1a11f 23px 25px),linear-gradient(#8ea178,#547552);display:flex;align-items:end;justify-content:space-around;padding:14px 2px 8px;overflow:hidden}.building{text-align:center;min-width:0;flex:1;filter:drop-shadow(2px 3px 2px #182b22aa)}.building .roof{font-size:38px}.building small{display:block;color:#192c20;font-size:10px;font-weight:900;background:#cbd4a9;border-radius:5px;margin:3px auto;max-width:92px}.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,720px);padding:8px max(8px,env(safe-area-inset-right)) calc(7px + env(safe-area-inset-bottom));background:#183125f5;border:1px solid #58765d;display:grid;grid-template-columns:repeat(5,1fr);gap:3px;z-index:5}.nav button{background:transparent;border:0;color:#c3d3b7;border-radius:10px;padding:6px 2px;font:10px system-ui;cursor:pointer}.nav button span{display:block;font-size:21px}.nav button.on{background:#4a684e;color:#fff1c6}.view[hidden]{display:none!important}.notice{min-height:23px;color:#f1dc9b;font-size:12px}.save{margin-top:12px;display:flex;align-items:center;flex-wrap:wrap;gap:8px}.detail{font-size:12px;color:#d1e0c6}.chip{padding:4px 8px;border-radius:20px;background:#49664b;color:#eff1cf;font-size:11px}.locked{opacity:.78}.spinner{font-size:11px;color:#bcd5b4}footer{text-align:center;color:#a9bca8;font-size:11px;margin-top:20px}
+@media(max-width:370px){.card{padding:8px}.panel{padding:11px}.btn{font-size:11px}.building .roof{font-size:31px}}
+</style></head><body><main>
+<div class="tag">MILITARY BASE • VERSION 0.6</div><h1>🪖 ВОЕННАЯ БАЗА</h1><div class="sub">Строй заводы • Производи материалы • Развивай базу</div>
+<div class="stats"><div class="stat"><small>🪙 Монеты</small><strong id="coins">0</strong></div><div class="stat"><small>🏛️ Уровень штаба</small><strong id="hq">1 / 1000</strong></div></div>
+<div id="view-base" class="view">
+<section class="panel"><div class="bar"><h2>🏕️ Командный центр</h2><span class="chip" id="look">Облик 1 / 34</span></div>
+<div class="baseart"><div class="building"><div class="roof">🏛️</div><small>ШТАБ</small></div><div class="building"><div class="roof">🏭</div><small>ЗАВОДЫ</small></div><div class="building"><div class="roof">📦</div><small>СКЛАД</small></div></div>
+<p class="muted">Заводы производят ресурсы автоматически, даже когда игра закрыта. Улучшение штаба за ресурсы появится в версии 0.8. Текущий уровень сохранён.</p><div class="notice" id="notice" role="status"></div></section>
+<section class="panel"><div class="bar"><h2>🏭 Производственный сектор</h2><span class="chip">До 8 часов офлайн</span></div><p class="muted">Построй завод за материалы. Каждый полный прошедший минутный интервал приносит ресурсы на склад.</p><div class="cards" id="factories"></div></section>
+</div>
+<div id="view-storage" class="view" hidden><section class="panel"><h2>📦 Склад ресурсов</h2><div class="cards" id="resources"></div><p class="muted">Вместимость каждого ресурса сейчас 2 000. Расширение склада запланировано на версию 0.7.</p><div class="save"><button class="btn" id="save">💾 Сохранить</button><small class="detail" id="saveStatus">Автосохранение включено</small></div><p class="muted">Сохранение локальное, в Safari. Удаление данных браузера может стереть прогресс. Облачный аккаунт будет позже.</p></section></div>
+<div id="view-garage" class="view" hidden><section class="panel"><h2>🚙 Гараж</h2><p class="muted">Гараж, хранение наземной техники и производство техники будут добавлены в версии 0.9.</p></section></div>
+<div id="view-hangar" class="view" hidden><section class="panel"><h2>🚁 Ангар</h2><p class="muted">Авиационный ангар и коллекция воздушной техники появятся в версии 0.9.</p></section></div>
+<div id="view-missions" class="view" hidden><section class="panel"><h2>🗺️ Задания</h2><p class="muted">Экспедиции и задания появятся в версии 1.0.</p></section></div>
+<footer>Версия 0.6 · Заводы и автоматическое производство · Мини-игры отложены</footer>
+</main><nav class="nav" aria-label="Главное меню">
+<button class="on" data-view="base"><span>🏕️</span>База</button><button data-view="garage"><span>🚙</span>Гараж</button><button data-view="hangar"><span>🚁</span>Ангар</button><button data-view="missions"><span>🗺️</span>Задания</button><button data-view="storage"><span>📦</span>Склад</button>
+</nav>
+<script>
 (()=>{
-const names=["Разведджип","Бронемашина","БТР","Лёгкий танк","Основной танк","Тяжёлый танк","Вертолёт","Штурмовик","Командный штаб","Главная база"];
-const $=id=>document.getElementById(id),random=()=>Math.random()<.82?0:1;
-let board,coins=120,score=0,best=Number(localStorage.getItem("mbm_best")||0),selected=null,next=0,merged=-1,baseLevel=1;
-const SAVE_KEY="mbm_save_v5",BACKUP_KEY="mbm_backup_v5",PREVIOUS_KEY="mbm_save_v4",LEGACY_KEY="mbm_save";
-let lastSavedAt=null;
-function valid(data){
- return data&&Array.isArray(data.board)&&data.board.length===25
-  &&data.board.every(v=>v===null||(Number.isInteger(v)&&v>=0&&v<10))
-  &&Number.isFinite(data.coins)&&data.coins>=0
-  &&Number.isFinite(data.score)&&data.score>=0
-  &&Number.isInteger(data.baseLevel||1)&&((data.baseLevel||1)>=1)&&((data.baseLevel||1)<=1000);
-}
-function pack(){return {version:5,board:board.slice(),coins,score,baseLevel,best,modified:new Date().toISOString()};}
-function saveGame(manual=false){
- try{
-  const state=pack();
-  const previous=localStorage.getItem(SAVE_KEY);
-  if(previous&&valid(JSON.parse(previous)))localStorage.setItem(BACKUP_KEY,previous);
-  localStorage.setItem(SAVE_KEY,JSON.stringify(state));
-  localStorage.setItem("mbm_best",String(best));
-  lastSavedAt=state.modified;
-  updateSaveStatus(manual?"✓ Сохранено вручную":"✓ Автосохранено");
-  return true;
- }catch(e){updateSaveStatus("⚠️ Не удалось сохранить");return false;}
-}
-function updateSaveStatus(message){
- const target=$("savedstatus");if(target)target.textContent=message+(lastSavedAt?" · "+new Date(lastSavedAt).toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"}):"");
-}
-function importSave(){
- for(const key of [SAVE_KEY,BACKUP_KEY,PREVIOUS_KEY,LEGACY_KEY]){
-  try{
-   const state=JSON.parse(localStorage.getItem(key)||"null");
-   if(!valid(state))continue;
-   board=state.board.slice();coins=state.coins;score=state.score;baseLevel=state.baseLevel||1;
-   best=Math.max(best,Number.isFinite(state.best)?state.best:0,score);
-   next=random();selected=null;merged=-1;
-   if(key===LEGACY_KEY){try{localStorage.setItem("mbm_legacy_backup_v03",JSON.stringify(state));}catch(e){}}
-if(key===PREVIOUS_KEY){try{localStorage.setItem("mbm_legacy_backup_v04",JSON.stringify(state));}catch(e){}}
-   // Do not replace the recovery backup with a corrupt or incomplete state.
-   if(key!==SAVE_KEY)saveGame();
-   return key;
-  }catch(e){}
+"use strict";
+const KEY="mbm_save_v6",LEGACY=["mbm_save_v51","mbm_save_v5","mbm_save_v4","mbm_save"],LIMIT=2000,MAX_OFFLINE=480,MINUTE=60000;
+const definitions=[
+{id:"metal",icon:"🏭",title:"Металлургический завод",resource:"metal",rate:10,cost:{coins:100,metal:80}},
+{id:"fuel",icon:"🛢️",title:"Нефтеперерабатывающий завод",resource:"fuel",rate:8,cost:{coins:100,metal:120}},
+{id:"parts",icon:"⚙️",title:"Машиностроительный завод",resource:"parts",rate:5,cost:{coins:150,metal:180}},
+{id:"electronics",icon:"🔌",title:"Электронный завод",resource:"electronics",rate:3,cost:{coins:200,metal:240}}
+];
+const labels={metal:"🔩 Металл",fuel:"🛢️ Топливо",parts:"⚙️ Детали",electronics:"🔌 Электроника"};
+const $=id=>document.getElementById(id);
+const defaults=()=>({version:6,coins:600,baseLevel:1,best:0,board:Array(25).fill(null),score:0,resources:{metal:300,fuel:0,parts:0,electronics:0},factories:{metal:0,fuel:0,parts:0,electronics:0},lastProduction:Date.now()});
+const safeNum=(v,fallback=0)=>Number.isFinite(v)&&v>=0?v:fallback;
+function safeParse(key){try{return JSON.parse(localStorage.getItem(key)||"null")}catch(e){return null}}
+function normalize(raw){
+const result=defaults();
+if(!raw||typeof raw!=="object")return result;
+result.coins=safeNum(raw.coins,600);result.baseLevel=Number.isInteger(raw.baseLevel)&&raw.baseLevel>=1&&raw.baseLevel<=1000?raw.baseLevel:1;
+result.best=safeNum(raw.best);result.score=safeNum(raw.score);
+result.board=Array.isArray(raw.board)&&raw.board.length===25?raw.board.slice():result.board;
+if(raw.version===6){
+ for(const name of Object.keys(result.resources)){
+ result.resources[name]=Math.min(LIMIT,safeNum(raw.resources&&raw.resources[name]));
+ result.factories[name]=Math.min(999,Math.floor(safeNum(raw.factories&&raw.factories[name])));
  }
- return null;
+ result.lastProduction=Number.isFinite(raw.lastProduction)&&raw.lastProduction>0?Math.min(raw.lastProduction,Date.now()):Date.now();
 }
-
-function vehicle(n){
- const palette=["#c4d78d","#9ebc72","#b0b66e","#8fa466","#6d955d","#778b56","#85a5a7","#9eb4ba","#cbba84","#dfbe76"];
- const c=palette[n], edge="#324b3b", windowColor="#b7dce0";
- const wheels='<circle cx="29" cy="48" r="9" fill="#23332e" stroke="#8a967b" stroke-width="2"/><circle cx="75" cy="48" r="9" fill="#23332e" stroke="#8a967b" stroke-width="2"/><circle cx="29" cy="48" r="3" fill="#c8bfa1"/><circle cx="75" cy="48" r="3" fill="#c8bfa1"/>';
- const track='<path d="M14 40h72a12 12 0 0 1 0 24H14a12 12 0 0 1 0-24Z" fill="#304039" stroke="#c3c4a0" stroke-width="2"/>'+[22,38,54,70,83].map(x=>'<circle cx="'+x+'" cy="52" r="7" fill="#7d9270" stroke="#283c33" stroke-width="2"/>').join('');
- let body='';
- if(n<=2)body='<path d="M12 38L22 23h47l17 14 7 10H10Z" fill="'+c+'" stroke="'+edge+'" stroke-width="3"/><path d="M30 26h17v12H23Z M51 26h15l12 12H51Z" fill="'+windowColor+'" stroke="'+edge+'" stroke-width="2"/>'+wheels+'<rect x="4" y="40" width="9" height="6" rx="2" fill="#e8ca84"/>';
- else if(n<=5)body=track+'<path d="M13 37h76l-7 13H18Z" fill="'+c+'" stroke="'+edge+'" stroke-width="3"/><path d="M30 28h42l9 10H21Z" fill="'+c+'" stroke="'+edge+'" stroke-width="3"/><path d="M48 27h23v-5H48Z" fill="#536f50"/><path d="M66 23h36v4H66Z" fill="#414c3a"/>';
- else if(n<=7)body=n===6?'<path d="M16 34q0-15 22-16h34q18 3 12 21l-15 9H29Z" fill="'+c+'" stroke="'+edge+'" stroke-width="3"/><path d="M48 22h20l8 12H48Z" fill="'+windowColor+'"/><path d="M6 32h18v6H6Z" fill="'+c+'"/><path d="M35 53h45" stroke="#2f4337" stroke-width="4"/><path d="M52 16V9 M15 9h75" stroke="#273e32" stroke-width="4" stroke-linecap="round"/>':'<path d="M5 39l40-12 12-22 11 1-4 22 29 11-2 9-32-3-14 17-10-1 4-20L6 46Z" fill="'+c+'" stroke="'+edge+'" stroke-width="3"/><path d="M45 24l12-12-2 19Z" fill="'+windowColor+'"/>';
- else body='<path d="M14 39L51 15 90 39 50 59Z" fill="'+c+'" stroke="'+edge+'" stroke-width="3"/><path d="M14 39v19l36 14V59Z" fill="#a4ad78"/><path d="M90 39v19L50 72V59Z" fill="#607750"/><rect x="42" y="5" width="20" height="17" rx="3" fill="#9baf8d" stroke="'+edge+'" stroke-width="2"/><path d="M52 5V0" stroke="'+edge+'" stroke-width="3"/><path d="M52 0l17 5-17 3Z" fill="#e9c47c"/>';
- const detail=[
-'<rect x="60" y="33" width="16" height="3" fill="#fff1bb"/><circle cx="15" cy="43" r="2" fill="#f2d68b"/>',
-'<path d="M32 18h30l9 6H25Z" fill="#526a53"/><rect x="39" y="14" width="18" height="5" rx="2" fill="#d2e4c0"/>',
-'<path d="M8 33h88l-5 10H11Z" fill="#667855"/><path d="M50 23V12h21v11" fill="#647d60" stroke="#344c3b" stroke-width="2"/>',
-'<path d="M35 22L44 12h18l9 10Z" fill="#8caa78"/><path d="M71 20h25" stroke="#354a35" stroke-width="4"/>',
-'<path d="M31 23L42 13h28l9 10Z" fill="#6f8e61"/><path d="M64 17h39" stroke="#263c34" stroke-width="5"/>',
-'<path d="M25 25l15-15h32l13 15Z" fill="#627b56"/><rect x="28" y="30" width="12" height="6" fill="#344d3a"/><path d="M65 15h40" stroke="#283e35" stroke-width="6"/>',
-'<rect x="50" y="10" width="12" height="5" fill="#d9e5b5"/><path d="M77 38l20 6" stroke="#495d4c" stroke-width="4"/>',
-'<path d="M25 29l21-5 12-21 4 25 32 13-34-1-8 22-9-23-26 9Z" fill="#b5c4ba" stroke="#43534b" stroke-width="2"/>',
-'<rect x="21" y="38" width="17" height="11" fill="#c7d1a0"/><rect x="67" y="38" width="15" height="10" fill="#e6d2a3"/>',
-'<path d="M26 13h48l8 8H18Z" fill="#e3cf8e"/><path d="M50 0V14" stroke="#354b3a" stroke-width="3"/><path d="M51 0l20 5-20 4Z" fill="#e9b965"/>'
-][n];
-return '<svg viewBox="0 0 106 76" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="'+names[n]+'"><ellipse cx="54" cy="64" rx="46" ry="7" fill="#1f322955"/>'+body+detail+'</svg>';
+return result;
 }
-function say(s){$("message").textContent=s}
-function hqPrice(level){return Math.floor(40+12*level+Math.pow(level,1.4)*3)}
-function lookNumber(level){return Math.min(34,Math.floor((level-1)/30)+1)}
-function lookName(level){const n=lookNumber(level);return n===1?"Полевой штаб":n===2?"Укреплённый штаб":n===3?"Командный комплекс":"Облик №"+n+" (графика в разработке)"}
-function save(){saveGame(false)}
+let data;
+const current=safeParse(KEY);
+if(current&&current.version===6){data=normalize(current)}
+else{
+ const prev=LEGACY.map(safeParse).find(v=>v&&Array.isArray(v.board)&&v.board.length===25);
+ data=normalize(prev);
+ if(prev){try{localStorage.setItem("mbm_backup_before_v6",JSON.stringify(prev))}catch(e){}}
+}
+function format(n){return Math.floor(n).toLocaleString("ru-RU")}
+function status(message){$("notice").textContent=message;$("saveStatus").textContent=message}
+function save(manual=false){
+ try{localStorage.setItem(KEY,JSON.stringify(data));$("saveStatus").textContent=manual?"✓ Сохранено вручную":"✓ Автосохранено";return true}
+ catch(e){$("saveStatus").textContent="⚠️ Не удалось сохранить";return false}
+}
+function accrue(now=Date.now()){
+const elapsed=Math.max(0,Math.min(MAX_OFFLINE,Math.floor((now-data.lastProduction)/MINUTE)));
+if(!elapsed)return 0;
+let made=0;
+for(const def of definitions){
+ const old=data.resources[def.resource];
+ data.resources[def.resource]=Math.min(LIMIT,old+elapsed*def.rate*data.factories[def.id]);made+=data.resources[def.resource]-old;
+}
+data.lastProduction+=elapsed*MINUTE;
+return made;
+}
+function canAfford(cost){return Object.entries(cost).every(([k,v])=>k==="coins"?data.coins>=v:data.resources[k]>=v)}
+function spend(cost){for(const [k,v]of Object.entries(cost)){if(k==="coins")data.coins-=v;else data.resources[k]-=v}}
+function build(id){
+accrue();const def=definitions.find(x=>x.id===id);if(!def)return;
+const level=data.factories[id];const price=Object.fromEntries(Object.entries(def.cost).map(([k,v])=>[k,Math.round(v*(1+level*0.85))]));
+if(!canAfford(price)){status("Недостаточно ресурсов для "+def.title);render();return}
+spend(price);data.factories[id]++;status(def.title+" улучшен: уровень "+data.factories[id]);save();render();
+}
 function render(){
-$("board").replaceChildren();board.forEach((v,i)=>{const el=document.createElement("button");el.className="cell"+(v===null?" empty":"")+(selected===i?" selected":"")+(merged===i?" justmerged":"");el.setAttribute("aria-label",v===null?"Пустая клетка":names[v]);el.innerHTML=v===null?'<span class="plus">＋</span>':vehicle(v)+'<span class="lv">'+(v+1)+'</span>';el.onclick=()=>tap(i);$("board").append(el)});
-$("coins").textContent=coins;$("score").textContent=score;$("storecoins").textContent=coins;$("storescore").textContent=score;$("best").textContent=best;$("next").innerHTML=vehicle(next);$("buy").disabled=coins<20||!board.includes(null);const price=hqPrice(baseLevel),look=lookNumber(baseLevel),nextMilestone=Math.min(1000,look*30+1);
-$("hqlevel").textContent="Штаб • "+baseLevel+"/1000";
-$("base").className="base visual-"+Math.min(3,look);
-$("upgrade").textContent=baseLevel>=1000?"Максимум":"⬆️ Улучшить · "+price.toLocaleString("ru-RU")+" 🪙";
-$("upgrade").disabled=baseLevel>=1000||coins<price;
-$("basehint").textContent=lookName(baseLevel)+" · облик "+look+"/34";
-$("hqmeta").textContent=baseLevel>=1000?"Штаб достиг максимального уровня":look===34?"Финальный облик открыт":look<=3?"Следующий облик на уровне "+nextMilestone:"Следующий облик на уровне "+nextMilestone+" (графика в разработке)";
-$("hqbar").style.width=(baseLevel>=1000?100:(((baseLevel-1)%30)+1)/30*100)+"%";
-let max=Math.max(0,...board.filter(v=>v!==null));$("progress").textContent=(max+1)+" / 10";
-$("garagepreview").innerHTML=names.slice(0,6).map((name,i)=>'<div class="collect">'+vehicle(i)+'<small>'+name+'</small></div>').join("");$("levels").innerHTML=names.map((name,i)=>'<div class="collect'+(i>max?' locked':'')+'">'+vehicle(i)+'<small>УР. '+(i+1)+'</small></div>').join("");
+$("coins").textContent=format(data.coins);$("hq").textContent=format(data.baseLevel)+" / 1000";
+$("look").textContent="Облик "+Math.min(34,Math.floor((data.baseLevel-1)/30)+1)+" / 34";
+$("factories").innerHTML=definitions.map(def=>{
+const level=data.factories[def.id],price=Object.fromEntries(Object.entries(def.cost).map(([k,v])=>[k,Math.round(v*(1+level*0.85))]));
+const priceText=Object.entries(price).map(([k,v])=>format(v)+" "+(k==="coins"?"🪙":"🔩")).join(" + ");
+return '<article class="card"><div class="symbol">'+def.icon+'</div><h3>'+def.title+'</h3><div class="detail">Уровень '+level+'</div><div class="rate">+'+format(level*def.rate)+' / мин</div><div class="muted">Цена: '+priceText+'</div><button class="btn" data-build="'+def.id+'" '+(!canAfford(price)||level>=999?'disabled':'')+'>'+(level?"Улучшить":"Построить")+'</button></article>';
+}).join("");
+$("resources").innerHTML=definitions.map(def=>'<div class="card"><b>'+labels[def.resource]+'</b><div class="symbol">'+format(data.resources[def.resource])+'</div><div class="detail">из '+format(LIMIT)+'</div></div>').join("");
+document.querySelectorAll("[data-build]").forEach(btn=>btn.onclick=()=>build(btn.dataset.build));
 }
-function start(){board=Array(25).fill(null);[2,5,8,11,14,17,20,23].forEach(i=>board[i]=random());coins=120;score=0;baseLevel=1;selected=null;next=random();merged=-1;say("Нажми на технику, затем на такую же рядом.");save();render()}
-function tap(i){const val=board[i];merged=-1;if(val===null){selected=null;say("Пустая клетка. Добавь технику кнопкой ниже.");render();return}
-if(selected===null){selected=i;say("Выбери такой же объект на соседней клетке.");render();return}
-if(selected===i){selected=null;say("Выбор отменён.");render();return}
-const adjacent=Math.abs(Math.floor(selected/5)-Math.floor(i/5))+Math.abs(selected%5-i%5)===1;
-if(!adjacent||board[selected]!==val){selected=i;say("Объекты должны быть одинаковыми и стоять рядом.");render();return}
-if(val===9){selected=null;say("Максимальный уровень уже достигнут!");render();return}
-board[i]=val+1;merged=i;board[selected]=null;selected=null;const gained=25*(val+1);score+=gained;coins+=10+val*5;best=Math.max(best,score);say("🎉 "+names[val+1]+" создан! +"+gained+" очков");save();render()}
-$("buy").onclick=()=>{const empty=board.flatMap((v,i)=>v===null?[i]:[]);if(!empty.length||coins<20)return;board[empty[Math.floor(Math.random()*empty.length)]]=next;coins-=20;next=random();selected=null;merged=-1;say("📦 Новая техника доставлена!");save();render()};
-$("upgrade").onclick=()=>{const price=hqPrice(baseLevel);if(baseLevel>=1000||coins<price)return;const oldLook=lookNumber(baseLevel);coins-=price;baseLevel++;say(lookNumber(baseLevel)!==oldLook?"🏛️ Новый облик штаба! Уровень "+baseLevel:"🏕️ Штаб улучшен до уровня "+baseLevel+"!");save();render()};
-$("restart").onclick=()=>{if(confirm("Начать новую игру? Текущий раунд сбросится, но резервная копия сохранения останется."))start()};
-$("savegame").onclick=()=>saveGame(true);
-document.querySelectorAll("[data-view]").forEach(btn=>btn.addEventListener("click",()=>{
- const view=btn.dataset.view;
- document.querySelectorAll(".navbtn").forEach(b=>b.classList.toggle("active",b===btn));
- for(const key of ["base","garage","hangar","missions","storage"])$("view-"+key).hidden=key!==view;
- $("view-next").hidden=view!=="base";window.scrollTo({top:0,behavior:"smooth"});
-}));
-document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"&&board)saveGame(false)});
-window.addEventListener("pagehide",()=>{if(board)saveGame(false)});
-const source=importSave();
-if(source){say(source===LEGACY_KEY?"Прогресс 0.3 перенесён!":source===PREVIOUS_KEY?"Прогресс 0.4 перенесён!":"С возвращением! Прогресс загружен.");render();}
-else start();
+document.querySelectorAll("[data-view]").forEach(btn=>btn.onclick=()=>{
+const name=btn.dataset.view;
+document.querySelectorAll("[data-view]").forEach(b=>b.classList.toggle("on",b===btn));
+["base","garage","hangar","missions","storage"].forEach(v=>$("view-"+v).hidden=v!==name);
+render();
+});
+$("save").onclick=()=>{accrue();save(true);render()};
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"){accrue();save()}else{const gained=accrue();if(gained)status("Производство принесло "+format(gained)+" ресурсов");save();render()}});
+window.addEventListener("pagehide",()=>{accrue();save()});
+const gained=accrue();if(gained)status("Пока тебя не было, заводы произвели "+format(gained)+" ресурсов");
+save();render();
+// Periodic refresh is for UI only; offline output depends on timestamps, not background timers.
+setInterval(()=>{const gained=accrue();if(gained){save();render();}},10000);
 })();
 </script></body></html>
