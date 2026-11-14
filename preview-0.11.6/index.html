@@ -1,0 +1,1308 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#172e25">
+<title>Военная база — 0.11.6 Живая база и анимация конвоев</title>
+<style>
+:root{color-scheme:dark;--bg:#14261d;--panel:#294536;--border:#688068;--text:#f1f4e9;--gold:#f4d384}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#426248,#152820 70%);color:var(--text);font:15px system-ui,-apple-system,sans-serif}main{max-width:720px;margin:auto;padding:14px 12px 100px}h1{text-align:center;font-size:clamp(23px,6vw,34px);margin:4px 0}.sub{text-align:center;color:#bfd3b9;font-size:12px;margin-bottom:12px}.tag{font-size:10px;letter-spacing:2px;text-align:center;color:#e3dcad;font-weight:800}.panel{background:linear-gradient(165deg,#31513b,#1c3327);border:1px solid #698368;border-radius:15px;padding:14px;margin:10px 0;box-shadow:0 4px 12px #0d1b1377}h2{font-size:17px;margin:0 0 8px}.muted{font-size:12px;color:#c0d0ba;line-height:1.5}.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.stat{background:#223e2e;border:1px solid #59785d;border-radius:12px;padding:12px}.stat small{display:block;color:#c5d2b7}.stat strong{font-size:21px}.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:12px}.card{border:1px solid #79916b;background:#344f3b;border-radius:13px;padding:11px;min-width:0}.card h3{margin:2px 0 7px;font-size:15px}.symbol{font-size:33px}.rate{color:#e5dd9d;font-size:12px}.btn{background:linear-gradient(#e4d293,#bfaa6e);color:#263123;border:0;border-radius:10px;padding:11px;font-size:13px;font-weight:800;cursor:pointer;touch-action:manipulation}.btn:disabled{opacity:.43}.card .btn{width:100%;margin-top:8px}.btn.alt{background:#44634a;color:#f4f6e7;border:1px solid #7c9878}.bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}.baseart{border-radius:12px;border:2px solid #829671;height:136px;background:repeating-linear-gradient(35deg,#89977129 0 22px,#b6c1a11f 23px 25px),linear-gradient(#8ea178,#547552);display:flex;align-items:end;justify-content:space-around;padding:14px 2px 8px;overflow:hidden}.building{text-align:center;min-width:0;flex:1;filter:drop-shadow(2px 3px 2px #182b22aa)}.building .roof{font-size:38px}.building small{display:block;color:#192c20;font-size:10px;font-weight:900;background:#cbd4a9;border-radius:5px;margin:3px auto;max-width:92px}.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,720px);padding:8px max(8px,env(safe-area-inset-right)) calc(7px + env(safe-area-inset-bottom));background:#183125f5;border:1px solid #58765d;display:grid;grid-template-columns:repeat(5,1fr);gap:3px;z-index:5}.nav button{background:transparent;border:0;color:#c3d3b7;border-radius:10px;padding:6px 2px;font:10px system-ui;cursor:pointer}.nav button span{display:block;font-size:21px}.nav button.on{background:#4a684e;color:#fff1c6}.view[hidden]{display:none!important}.notice{min-height:23px;color:#f1dc9b;font-size:12px}.save{margin-top:12px;display:flex;align-items:center;flex-wrap:wrap;gap:8px}.detail{font-size:12px;color:#d1e0c6}.chip{padding:4px 8px;border-radius:20px;background:#49664b;color:#eff1cf;font-size:11px}.locked{opacity:.78}.spinner{font-size:11px;color:#bcd5b4}footer{text-align:center;color:#a9bca8;font-size:11px;margin-top:20px}
+@media(max-width:370px){.card{padding:8px}.panel{padding:11px}.btn{font-size:11px}.building .roof{font-size:31px}}
+
+.landscapeTip{padding:12px;text-align:center;border:1px solid #e3c780;border-radius:12px;background:#4f4930;color:#fff1c0;margin:7px 0;font-weight:700;font-size:13px}
+.world-wrap{background:#132d25;border:2px solid #658c70;border-radius:15px;overflow:hidden;position:relative;height:clamp(280px,65vh,640px);touch-action:pan-x pan-y}
+.world-scroll{width:100%;height:100%;overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.world{position:relative;width:900px;height:600px;transform-origin:0 0;background:radial-gradient(ellipse at 40% 42%,#91b276,#71975b 52%,#496e4b 95%);background-image:linear-gradient(90deg,#c3df9b19 1px,transparent 1px),linear-gradient(#c3df9b19 1px,transparent 1px),linear-gradient(135deg,#8aab6a,#497b57);background-size:100px 100px,100px 100px,auto}
+.world:before{content:"";position:absolute;left:-40px;top:190px;width:1000px;height:48px;background:#c2b590;transform:rotate(-11deg);box-shadow:0 8px #8d8568}
+.world:after{content:"";position:absolute;left:245px;top:-55px;width:36px;height:700px;background:#b8ab86;transform:rotate(35deg);pointer-events:none}
+.plot{position:absolute;width:116px;height:90px;z-index:1;background:#456d4d66;border:2px dashed #d5e5ac70;border-radius:13px;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#e9f2d3;cursor:pointer;text-shadow:1px 2px #263c24;font-weight:700;font-size:12px;box-shadow:inset 0 0 18px #27422c50;touch-action:manipulation}
+.plot strong{font-size:32px;line-height:1.1}.plot.occupied{background:#b6bd8880;border:2px solid #e1d7a1;box-shadow:0 6px 0 #405a3ea0,0 8px 12px #1c3b2e99}.plot.selected{outline:4px solid #ffdf79}
+.plot small{background:#21402bd9;border-radius:6px;padding:2px 5px;font-size:10px;white-space:nowrap;max-width:105px;overflow:hidden;text-overflow:ellipsis}
+.maptools{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:7px;margin:8px 0}.maptools .btn{padding:8px 13px}
+.placement{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin:9px 0}.placement select{font:inherit;background:#233c2c;color:#f4f0db;border:1px solid #809977;border-radius:9px;padding:10px;max-width:100%;flex:1}.placement button{flex-shrink:0}
+.map-status{font-size:12px;min-height:18px;color:#f2dda4}.hqbox{border:1px solid #769174;background:#274331b8;border-radius:12px;padding:10px;margin-top:10px}.hqbox .btn{margin:9px 0}.construction{font-size:12px;color:#f6dda1;margin-top:5px}.world{background-image:linear-gradient(90deg,#c3df9b19 1px,transparent 1px),linear-gradient(#c3df9b19 1px,transparent 1px),radial-gradient(ellipse at 62% 31%,#b7c78c,#78a36b 62%,#446c53);}
+@media(orientation:landscape){.landscapeTip{display:none}main{max-width:1200px;padding:7px 12px 75px}.maplayout{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(240px,.85fr);gap:9px}.maplayout>.panel{min-width:0;margin:8px 0}.world-wrap{height:calc(100dvh - 175px);min-height:220px}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.tag,h1,.sub{display:inline-block;margin-right:10px}h1{font-size:21px}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.stat{padding:6px}.stat strong{font-size:15px}.nav{width:100%;grid-template-columns:repeat(5,1fr);padding:4px}.nav button{padding:2px}.nav button span{font-size:16px}}
+
+html,body{width:100%;height:100%;margin:0;overflow:hidden;overscroll-behavior:none}
+body{font:14px system-ui,-apple-system,sans-serif;background:#101e18;color:#eff5e5}
+.game{position:fixed;inset:0;display:grid;grid-template-rows:auto minmax(0,1fr) auto;overflow:hidden}
+.hud{padding:calc(5px + env(safe-area-inset-top)) calc(10px + env(safe-area-inset-right)) 5px calc(10px + env(safe-area-inset-left));display:flex;align-items:center;gap:12px;background:#1b3225eF;border-bottom:1px solid #77926f;min-height:40px;z-index:4}
+.brand{white-space:nowrap;font-size:13px}.brand small{font-size:10px;color:#d4dba1}
+.meters{flex:1;display:flex;justify-content:flex-end;gap:7px;align-items:center;flex-wrap:wrap;font-size:11px}.meters span{white-space:nowrap;background:#314e38;border-radius:7px;padding:3px 6px}
+.stage{position:relative;min-width:0;min-height:0;padding:0;margin:0;max-width:none;overflow:hidden}
+.map-screen{position:absolute;inset:0;overflow:hidden}
+.world-wrap{position:absolute;inset:0!important;height:auto!important;min-height:0!important;border:0;border-radius:0;overflow:hidden;background:#365f46}
+.world-scroll{overflow:auto;width:100%;height:100%;touch-action:pan-x pan-y;-webkit-overflow-scrolling:touch}
+.world{width:900px;height:600px}
+.plot{z-index:3}.plot:focus-visible,.poi:focus-visible{outline:3px solid #f7d07f}
+.poi{position:absolute;z-index:4;width:125px;height:100px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:2px solid #f9e0a5;background:#516c4dbd;box-shadow:0 8px 13px #203321b0;transform:rotate(-3deg);border-radius:15px;color:white;font-weight:800;cursor:pointer;text-shadow:1px 2px #1b2a1a}
+.poi strong{font-size:43px}.poi small{background:#213a29cf;padding:3px 7px;border-radius:6px}
+.edge-actions{position:absolute;right:max(9px,env(safe-area-inset-right));top:9px;display:flex;gap:5px;z-index:5}.edge-actions .btn{padding:5px 11px;min-height:34px}
+.hint{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);font-size:11px;background:#173723dc;border:1px solid #718a6f;border-radius:15px;padding:6px 12px;pointer-events:none;text-align:center;max-width:85%;z-index:5}
+.nav{position:static;transform:none;width:100%;height:auto;min-height:44px;padding:3px calc(8px + env(safe-area-inset-right)) calc(3px + env(safe-area-inset-bottom)) calc(8px + env(safe-area-inset-left));grid-template-columns:repeat(5,1fr);z-index:6;border-radius:0}.nav button{padding:1px;font-size:10px}.nav button span{display:inline;margin-right:5px;font-size:15px}
+.toast{position:absolute;top:45px;left:50%;transform:translateX(-50%);background:#1c392cde;border-radius:9px;max-width:70%;text-align:center;pointer-events:none;z-index:9;min-height:0;padding:0 8px;color:#ffeca5}
+.overlay{position:fixed;inset:0;background:#09170dbb;display:flex;justify-content:flex-end;align-items:center;z-index:10;padding:calc(5px + env(safe-area-inset-top)) calc(8px + env(safe-area-inset-right)) calc(5px + env(safe-area-inset-bottom)) 8px}
+.overlay[hidden]{display:none}
+.sheet{background:linear-gradient(150deg,#36533d,#182d22);border:1px solid #b2ba82;border-radius:16px;width:min(370px,88vw);max-height:100%;display:flex;flex-direction:column;padding:12px;box-shadow:0 12px 30px #0008}
+.sheetbar{display:flex;align-items:center;justify-content:space-between;gap:8px}.sheetbar h2{font-size:18px;margin:0}.sheetbar button{padding:7px 12px}
+.sheetbody{overflow:auto;min-height:0;overscroll-behavior:contain;padding:6px 1px}.sheetbody p{margin:8px 0}.sheetbody .btn{width:100%;margin-top:10px}.sheetbody .btn:disabled{opacity:.5}
+.sheetbody .detail{font-size:13px}.sheetbody select{width:100%;padding:9px;background:#263e2d;color:#fff;border-radius:8px;border:1px solid #7e987d;margin:8px 0}
+.sheetbody .choice{display:grid;gap:6px}
+.aux{height:100%;overflow:auto;padding:12px}.aux h2{font-size:16px}.aux .cards{grid-template-columns:repeat(4,1fr);max-width:900px}.aux .card{padding:8px}.aux .symbol{font-size:20px}
+.rotate{display:none}
+@media(orientation:portrait){.game{display:none}.rotate{display:grid;position:fixed;inset:0;place-items:center;padding:24px;text-align:center;background:#1a3729}.rotate h2{font-size:20px;margin:8px 0}.rotate p{color:#c5d1b9}}
+@media(max-height:410px) and (orientation:landscape){.hud{min-height:32px;padding-top:2px;padding-bottom:2px}.brand{font-size:11px}.meters{gap:3px;font-size:10px}.meters span{padding:2px 4px}.nav{min-height:35px}.nav button span{font-size:13px}.sheet{padding:8px}.sheetbody{font-size:12px}.sheetbody p{margin:5px 0}}
+
+/* 0.8.2: a planned base layout; decorative ground is noninteractive. */
+.world{width:1100px;height:760px;background:
+ radial-gradient(ellipse at 19% 45%,#a5bf7c80 0 12%,transparent 30%),
+ radial-gradient(ellipse at 70% 68%,#3b6a4b55 0 18%,transparent 39%),
+ repeating-linear-gradient(25deg,#b7d29109 0px,#b7d29109 2px,transparent 2px,transparent 45px),
+ linear-gradient(137deg,#82a66c,#59895d 58%,#517d55)}
+.world:before{left:15px;top:134px;width:1040px;height:29px;transform:rotate(0deg);background:#b4a584;box-shadow:0 4px 0 #6c7e5b80;z-index:1;pointer-events:none}
+.world:after{left:687px;top:148px;width:29px;height:660px;transform:rotate(-7deg);background:#b4a584;z-index:1;pointer-events:none}
+.plot{width:114px;height:92px;border-radius:14px}
+.plot:not(.occupied){background:#3f684326;border:1px dashed #ebf2bd55;box-shadow:none;color:#edf5d3c9;text-shadow:1px 1px #30533c}
+.plot:not(.occupied) strong{font-size:23px;background:#294c35bb;border-radius:50%;width:34px;height:34px;line-height:32px}
+.plot:not(.occupied) small{font-size:10px;background:none;max-width:106px;color:#e7f1ce99;font-weight:500;letter-spacing:.2px;padding:1px}
+.plot.occupied{background:#a8b87f9c;box-shadow:0 6px 0 #345a3b99,0 8px 14px #1c3b2e80}
+.plot.occupied strong{font-size:38px}
+.poi{width:130px;height:103px;transform:none;border:2px solid #e5ddae;background:linear-gradient(140deg,#aab789cc,#4f7950dc);box-shadow:0 9px 12px #233f2b99}
+.poi:active,.plot:active{filter:brightness(1.15)}
+.zoomreadout{display:inline-flex;align-items:center;justify-content:center;min-width:44px;color:#f9ecc3;background:#1c3928d9;border:1px solid #739476;border-radius:8px;font-weight:700;font-size:11px;padding:4px 6px;height:34px;pointer-events:none}.world-scroll{touch-action:pan-x pan-y;overscroll-behavior:contain}.world{transform-origin:top left}
+.map-tree{position:absolute;z-index:2;pointer-events:none;font-size:29px;filter:drop-shadow(4px 5px 3px #1d462b77)}
+.map-mark{position:absolute;z-index:2;pointer-events:none;font-size:10px;letter-spacing:1px;color:#e4ecca;background:#20492b9a;border-radius:10px;padding:5px 10px;text-transform:uppercase}
+
+/* Original, lightweight CSS-drawn base assets. No external graphics or network fetches. */
+.world{background:
+radial-gradient(ellipse at 18% 38%,#9fba78a8 0 6%,transparent 31%),
+radial-gradient(ellipse at 83% 67%,#416e4c91 0 7%,transparent 40%),
+repeating-linear-gradient(113deg,#e2e4a009 0 2px,transparent 2px 46px),
+linear-gradient(145deg,#a0ba77 0%,#76a068 47%,#4d8058 100%)}
+.world:before{left:17px;top:143px;width:1060px;height:32px;transform:none;background:repeating-linear-gradient(90deg,#b2a88c 0 34px,#a39b80 34px 37px);border-top:5px solid #d6c7a6;border-bottom:5px solid #776e56;box-shadow:0 4px 12px #253c2775;z-index:1}
+.world:after{left:664px;top:145px;width:32px;height:620px;transform:none;background:repeating-linear-gradient(0deg,#aaa185 0 34px,#9a9279 34px 38px);border-left:4px solid #cfc19c;border-right:4px solid #746c56;z-index:1}
+.plot{border:1px dashed #e0e5b44a;background:#3b673a14;box-shadow:none}
+.plot.occupied{background:#486b4470;border:0;box-shadow:none}
+.plot:not(.occupied) strong{font-size:20px;border:1px solid #aaca9d75;background:#365d3c82}
+.plot.occupied strong{font-size:14px}
+.plot small{z-index:2;position:relative;font-weight:800;background:#1b3528d9;border:1px solid #72977766;color:#eaf5df}
+.poi{background:none;border:0;box-shadow:none;width:128px;height:114px;padding:0;justify-content:end;overflow:visible}
+.poi small{z-index:2;position:relative;padding:3px 8px;border:1px solid #b3c68b8a;background:#203c2bf0;box-shadow:0 3px 7px #142c2599;color:#fff8d6}
+.poi:focus-visible,.plot:focus-visible{outline:3px solid #fff4ae}
+.asset{position:relative;display:block;width:104px;height:66px;flex-shrink:0;filter:drop-shadow(5px 8px 2px #1c3e29a6);margin:0 auto 4px;transform:translateZ(0)}
+.asset .ground{position:absolute;left:3px;right:3px;bottom:0;height:22px;background:linear-gradient(130deg,#737a60,#495847);border:2px solid #bbc49a;border-radius:7px;transform:skew(-14deg)}
+.asset .walls{position:absolute;left:16px;right:18px;bottom:8px;height:38px;background:linear-gradient(90deg,#7c9679 0 62%,#4e6b5b 62%);border:2px solid #324c3b;transform:skewY(-5deg);border-radius:2px 4px 3px 4px}
+.asset .roof{position:absolute;left:9px;right:22px;bottom:44px;height:20px;transform:skew(-18deg);background:linear-gradient(150deg,#627665,#324e40);border:2px solid #b3bd9d;border-radius:3px 5px 2px 2px}
+.asset .door{position:absolute;bottom:10px;left:42px;width:24px;height:21px;background:repeating-linear-gradient(0deg,#344c42 0 5px,#526f5d 5px 7px);border:2px solid #d0d6ae;border-bottom:0}
+.asset .window{position:absolute;bottom:25px;left:24px;width:13px;height:10px;background:#cae6a4;border:2px solid #3c5b4c;box-shadow:39px 0 0 -1px #cae6a4}
+.asset.hq .walls{height:47px;bottom:7px;left:23px;right:24px;background:linear-gradient(90deg,#d1c59b,#9ba97d 70%,#6e8464 70%)}
+.asset.hq .roof{bottom:53px;left:17px;right:25px;background:linear-gradient(145deg,#9a9f70,#4a6249)}
+.asset.hq:before{content:"";position:absolute;z-index:2;left:47px;top:-17px;width:4px;height:28px;background:#d0d4bc;box-shadow:9px 5px 0 -1px #d0d4bc}
+.asset.hq:after{content:"";position:absolute;z-index:3;left:38px;top:-17px;width:30px;height:9px;border:2px solid #d5e4a6;border-radius:50%;transform:rotate(-17deg)}
+.asset.storage .roof{background:linear-gradient(145deg,#bd9b61,#817750);border-color:#e4c48e}
+.asset.storage .walls{background:linear-gradient(90deg,#b9ad85 0 65%,#877b5c 65%)}
+.asset.garage .roof{background:linear-gradient(145deg,#777e65,#344936)}
+.asset.garage .door{left:30px;width:47px;height:27px;bottom:8px;background:repeating-linear-gradient(0deg,#465b51 0 6px,#94a28a 6px 8px)}
+.asset.hangar .roof{left:5px;right:9px;bottom:38px;height:28px;transform:skew(-9deg);border-radius:45% 45% 6px 6px;background:linear-gradient(140deg,#9aab97,#536c5b)}
+.asset.hangar .walls{left:9px;right:12px;height:32px;background:#778a78}
+.asset.hangar .door{left:21px;width:65px;height:25px;bottom:8px;background:repeating-linear-gradient(90deg,#344c42 0 12px,#607368 12px 14px)}
+.asset.metal .roof,.asset.parts .roof{background:linear-gradient(145deg,#a2a591,#505f59)}
+.asset.metal:before,.asset.parts:before{content:"";position:absolute;z-index:3;left:78px;top:0;width:15px;height:44px;background:linear-gradient(90deg,#887a6b,#bdad89);border:2px solid #665b4c}
+.asset.fuel .walls{background:linear-gradient(90deg,#9f9e87,#67786b)}
+.asset.fuel:before{content:"";position:absolute;z-index:3;left:7px;top:15px;width:29px;height:35px;background:linear-gradient(90deg,#bbc6aa,#677f74);border:2px solid #526d60;border-radius:44% 44% 10% 10%}
+.asset.electronics .roof{background:linear-gradient(145deg,#7b9ca0,#315766)}
+.asset.electronics .walls{background:linear-gradient(90deg,#a4c1b7,#56827f)}
+.asset.construction .walls{height:12px;bottom:8px;background:repeating-linear-gradient(45deg,#d6b65f 0 10px,#424d3c 10px 15px)}
+.asset.construction .roof{display:none}
+.asset.construction:before{content:"";position:absolute;z-index:3;left:57px;top:-6px;width:5px;height:58px;background:#e6c36c}
+.asset.construction:after{content:"";position:absolute;z-index:3;left:36px;top:0;width:60px;height:5px;background:#d5b65e;transform:rotate(-9deg)}
+.landmark{position:absolute;z-index:2;pointer-events:none}
+.tree{width:23px;height:43px;filter:drop-shadow(3px 5px 2px #243f2a80)}
+.tree:before{content:"";position:absolute;left:10px;bottom:0;width:5px;height:20px;background:#755e42}
+.tree:after{content:"";position:absolute;left:0;top:0;width:25px;height:29px;border-radius:50% 45% 43% 46%;background:radial-gradient(circle at 32% 22%,#9abc74 0 18%,#478154 42%,#2b6549 100%);box-shadow:4px 6px 0 #3d7552}
+.rock{width:22px;height:14px;background:linear-gradient(140deg,#d0c7a0,#687f6d);clip-path:polygon(26% 0%,80% 8%,100% 75%,70% 100%,0 86%);opacity:.85}
+.dirt{position:absolute;z-index:0;pointer-events:none;border-radius:50%;background:#d2be8570;filter:blur(3px)}
+.map-mark{z-index:2;background:#214d309c}
+
+/* 0.9.3: original compact isometric city-builder art. All building art stays DOM based and tappable. */
+.world{background:
+ radial-gradient(ellipse at 12% 34%,#c9dba19c 0,transparent 38%),
+ radial-gradient(ellipse at 83% 84%,#3b745a65 0,transparent 38%),
+ repeating-linear-gradient(140deg,#d3e7b318 0 1px,transparent 1px 48px),
+ linear-gradient(125deg,#9ebd83 0%,#82aa78 46%,#65966d 100%)}
+.world:before,.world:after{display:none}
+.roadnet{position:absolute;inset:0;z-index:1;pointer-events:none;filter:drop-shadow(3px 4px 2px #254d3690)}
+.roadnet .pavement{stroke:#6b7c66;stroke-width:47;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.roadnet .asphalt{stroke:#afa68b;stroke-width:35;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.roadnet .edge{stroke:#d1c7ab;stroke-width:2.4;fill:none;stroke-dasharray:8 12;opacity:.78}
+.roadnet .marking{stroke:#efe9c4;stroke-width:1.5;fill:none;stroke-dasharray:14 23;opacity:.74}
+.road-actions{position:absolute;top:9px;left:max(9px,env(safe-area-inset-left));z-index:6;display:flex;align-items:center;gap:8px;max-width:55%}
+.road-actions .btn{min-height:34px;padding:5px 9px;white-space:nowrap;font-size:11px}
+.road-actions .btn[aria-pressed="true"]{background:#dec886;color:#1b3a2a;border-color:#f6e5a8}
+.roadhelp{font-size:10px;color:#ffefc4;background:#244631df;border-radius:8px;padding:6px;line-height:1.2}
+.road-spot{position:absolute;z-index:5;cursor:pointer;touch-action:manipulation;color:#fef7c8;background:#e5e0a066;border:1px dashed #fff3b5ac;border-radius:8px;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 10px #fff8d64a}
+.road-spot.horizontal{width:98px;height:27px}.road-spot.vertical{width:24px;height:98px}
+.road-spot span{background:#385b40b0;border-radius:50%;width:19px;height:19px;line-height:17px;text-align:center;font-weight:700}
+.road-spot:active{background:#e9d0a0b0}
+.plot.offline .asset{filter:grayscale(.72) brightness(.8) drop-shadow(4px 6px 3px #233d2da9)}
+.plot.offline small{background:#583d33e6;border:1px solid #dca28795;color:#fce7dc}
+.plot.offline{background:#6c624e40}
+
+@media(max-height:410px) and (orientation:landscape){.road-actions{top:5px}.road-actions .btn{min-height:29px;font-size:10px}.roadhelp{font-size:9px}}
+
+.plot{transition:background .14s,border-color .14s;z-index:3}
+.plot:not(.occupied){border:1px solid #e4e9c338;background:#d3e4ac12;box-shadow:inset 0 0 0 2px #527b5540}
+.plot:not(.occupied) strong{background:#3e744d8a;border:1px solid #d0e0b39a;color:#fff6da}
+.plot:not(.occupied) small{color:#eff9e5aa;border:0;background:#27482f72}
+.plot.occupied{background:transparent}
+.plot.occupied .asset{transform:scale(1.03)}
+.poi{height:120px;z-index:4}
+.poi:active .asset,.plot.occupied:active .asset{transform:translateY(2px) scale(.98)}
+.poi .asset{transform:scale(1.12)}
+#mapHQ .asset{transform:scale(1.29);transform-origin:50% 100%}
+#mapHQ .asset .ground{background:#8c9472;border-color:#ddd6b2}
+#mapHQ small{margin-top:5px}
+.asset{height:78px;width:111px;filter:drop-shadow(5px 9px 3px #27472ca8);overflow:visible}
+.asset .ground{left:3px;right:4px;bottom:0;height:34px;border-radius:4px;background:linear-gradient(135deg,#c1bc96,#788d73);border:1px solid #ecdfab;transform:skew(-25deg) rotate(-2deg);box-shadow:2px 4px 0 #405e48}
+.asset .walls{left:14px;right:21px;bottom:16px;height:38px;transform:skewY(10deg);border:1px solid #4d6554;border-radius:2px;background:linear-gradient(90deg,#b9bb9c 0%,#9eae93 58%,#667f71 59%,#516f60)}
+.asset .roof{left:14px;right:21px;bottom:48px;height:21px;transform:skew(-35deg) rotate(-4deg);background:linear-gradient(145deg,#aab0a0,#6c8575);border:2px solid #dae0ba;border-radius:4px;box-shadow:3px 4px 0 #415e4c}
+.asset .door{left:39px;bottom:15px;width:27px;height:23px;background:repeating-linear-gradient(0deg,#446357 0 5px,#648473 5px 7px);border:1px solid #d4dbb9}
+.asset .window{left:20px;bottom:32px;width:13px;height:11px;background:#d4eabf;border:2px solid #3b6153;box-shadow:52px 2px 0 -2px #bfdcaf}
+.asset .detail-art{position:absolute;z-index:4;pointer-events:none}
+.asset.hq .walls{height:54px;left:25px;right:28px;bottom:16px;background:linear-gradient(90deg,#ded3ad 0 51%,#bbc19b 51% 70%,#7c9981 71%);border-color:#768a6d}
+.asset.hq .roof{bottom:65px;left:21px;right:28px;height:21px;background:linear-gradient(140deg,#c7c397,#708773)}
+.asset.hq .door{left:43px;bottom:17px;width:21px;height:30px;background:#53665a}
+.asset.hq .window{left:30px;bottom:45px;width:11px;height:10px;box-shadow:35px 0 0 -1px #f3e5ae}
+.asset.hq .detail-art{left:60px;top:-26px;width:3px;height:31px;background:#d8dbbd;box-shadow:8px 6px 0 -1px #d9d9ad}
+.asset.hq .detail-art:after{content:"";position:absolute;left:-14px;top:-2px;width:29px;height:10px;border:2px solid #e6e7c7;border-radius:50%;transform:rotate(-16deg)}
+.asset.storage .roof{background:linear-gradient(130deg,#dfbd80,#918c6f);border-color:#ffdc9c}
+.asset.storage .walls{background:linear-gradient(90deg,#ddcc9f 0 54%,#8f9a82 55%)}
+.asset.storage .detail-art{bottom:5px;left:7px;width:22px;height:21px;background:linear-gradient(145deg,#cc9f61,#916842);box-shadow:77px -3px 0 -3px #c4a173;border:1px solid #e2cb91}
+.asset.storage .door{width:39px;left:38px;background:repeating-linear-gradient(0deg,#988a6f 0 4px,#d5c4a1 4px 6px)}
+.asset.garage .roof{background:linear-gradient(130deg,#9aaf9b,#566f62)}
+.asset.garage .walls{background:linear-gradient(90deg,#a8bdac 0 40%,#698774 41%)}
+.asset.garage .door{left:21px;width:70px;height:28px;bottom:15px;background:repeating-linear-gradient(90deg,#4c6558 0 18px,#b3bda6 18px 20px);border:2px solid #d3d9b8}
+.asset.garage .detail-art{left:28px;bottom:11px;width:50px;height:7px;background:#52655a;border:1px solid #a1ad9b;border-radius:4px}
+.asset.hangar .roof{left:8px;right:8px;bottom:43px;height:34px;border-radius:50% 50% 4px 4px;transform:skew(-7deg);background:linear-gradient(120deg,#c2cbc0,#758e7d 63%,#526f60)}
+.asset.hangar .walls{left:12px;right:10px;height:35px;background:linear-gradient(90deg,#9fb4a3,#60796a)}
+.asset.hangar .door{left:21px;width:72px;height:27px;background:repeating-linear-gradient(90deg,#456253 0 17px,#b6c5b0 17px 19px)}
+.asset.metal .roof{background:linear-gradient(130deg,#b5b9aa,#6a8281)}
+.asset.metal .detail-art{right:9px;top:4px;width:12px;height:49px;background:linear-gradient(90deg,#947e72,#c3ac8a);border:2px solid #715f57;box-shadow:-20px 13px 0 -2px #897b6d}
+.asset.parts .detail-art{right:8px;top:15px;width:18px;height:27px;border-radius:2px;background:#7c8b7b;border:2px solid #dae3c6;box-shadow:-24px -8px 0 -4px #d4d6b6}
+.asset.fuel .detail-art{left:3px;bottom:17px;width:33px;height:30px;background:linear-gradient(90deg,#d9dbbb,#7f9e8e);border:2px solid #526d5d;border-radius:50% 50% 12% 12%;box-shadow:48px -5px 0 -1px #b4c6ae}
+.asset.electronics .roof{background:linear-gradient(125deg,#aec5c3,#5c8c94)}
+.asset.electronics .walls{background:linear-gradient(90deg,#b9d2c6,#668f8e)}
+.asset.electronics .detail-art{right:12px;top:-6px;width:3px;height:24px;background:#d2e2d4}
+.asset.electronics .detail-art:after{content:"";position:absolute;left:-8px;top:-3px;width:19px;height:7px;border-radius:50%;border:2px solid #e6f0da}
+.asset.construction .detail-art{right:10px;top:0;width:6px;height:54px;background:#e7c76c;box-shadow:-24px 6px 0 -2px #efcf70}
+.asset.construction .detail-art:after{content:"";position:absolute;right:-3px;top:0;width:68px;height:6px;background:#ebce74;transform:rotate(-9deg)}
+.asset.construction .walls{background:repeating-linear-gradient(45deg,#e8c65a 0 9px,#59634e 9px 14px);height:12px}
+.asset.construction .roof{display:none}
+.landmark.tree{transform:scale(1.13);filter:drop-shadow(6px 9px 2px #264b318a)}
+.lamp{position:absolute;z-index:2;pointer-events:none;width:4px;height:26px;background:#647963;box-shadow:2px 2px 1px #305b39}
+.lamp:before{content:"";position:absolute;top:-3px;left:-4px;width:13px;height:5px;background:#e6e0b5;border-radius:3px;box-shadow:0 0 9px #e8e3b955}
+.fence{position:absolute;z-index:2;pointer-events:none;height:5px;border-top:2px dashed #c8c7aa;border-bottom:1px solid #71906b;opacity:.65}
+
+/* 0.9.6: drawing connected sections as continuous pavement and clean crossings */
+.roadnet{filter:drop-shadow(2px 3px 2px #2a4c3790)}
+.roadnet .pavement{stroke:#667968;stroke-width:40;stroke-linecap:butt;stroke-linejoin:round}
+.roadnet .asphalt{stroke:#b4aa90;stroke-width:34;stroke-linecap:butt;stroke-linejoin:round}
+.roadnet .marking{stroke:#f2e9c7;stroke-width:1.4;stroke-linecap:butt;stroke-dasharray:14 22}
+.road-unconnected{opacity:.65}
+.road-connected{opacity:1}
+.road-spot.vertical{height:72px}
+.road-spot:focus-visible{outline:3px solid #f8e19c}
+.plot.move-target{border:2px solid #f3d780!important;background:#d9cd7180!important;box-shadow:0 0 0 3px #ffdb7550}
+.plot.move-source{outline:3px solid #f6cf7b}
+.cancel-move{position:absolute;left:max(9px,env(safe-area-inset-left));bottom:9px;z-index:7;padding:6px 10px}
+.cancel-move[hidden]{display:none}
+#moveFactoryBtn,#moveFacilityBtn{width:100%;margin-top:8px}.poi[hidden]{display:none}
+.world{height:1050px}
+.plot.locked-land{background:#1b3c345c;border:2px dashed #c5d7af8a;box-shadow:inset 0 0 0 2px #31482d66}
+.plot.locked-land strong{font-size:25px;filter:grayscale(.3)}
+.plot.locked-land small{color:#f0e6b9;background:#3c4f3bd9}
+#expandLand{background:#476e4a;color:#f7f0c9;border:1px solid #adc795}
+
+
+/* 0.10.1.2 — disable native elastic overscroll on the game map */
+.world-scroll{overflow:hidden!important;touch-action:none!important;-webkit-overflow-scrolling:auto!important;overscroll-behavior:none!important;scrollbar-width:none!important}
+.world-scroll::-webkit-scrollbar{display:none}
+.world-canvas,.world{touch-action:none!important}
+/* 0.10.1.1 — min zoom now matches viewport width; no exposed side gutters */
+/* 0.10.1 — polished base art and bounded transform-based map zoom */
+.world-scroll{overflow:auto;touch-action:pan-x pan-y;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#c1c49866 #294638}
+.world-canvas{position:relative;min-width:100%;min-height:100%;background:radial-gradient(ellipse at 50% 52%,#8db47f,#395c43)}
+.world{position:absolute!important;left:0;top:0;width:1100px!important;height:1050px!important;transform-origin:0 0!important;zoom:1!important;
+ background:
+ radial-gradient(ellipse at 18% 20%,#e1e0a435,transparent 29%),
+ radial-gradient(ellipse at 78% 80%,#32694970,transparent 39%),
+ repeating-linear-gradient(125deg,#cce8ad16 0 2px,transparent 2px 39px),
+ repeating-linear-gradient(25deg,#223f2d0d 0 1px,transparent 1px 31px),
+ linear-gradient(130deg,#a5bf83 0%,#78a471 48%,#568b65 100%)!important;
+ box-shadow:inset 0 0 0 12px #4e705399,inset 0 0 0 16px #d7d5ab45}
+.world:before,.world:after{display:none!important}
+.plot{border:2px dashed #edebc277!important;border-radius:11px;
+ background:linear-gradient(155deg,#a6b78335,#425c4348)!important;
+ box-shadow:inset 0 0 0 2px #203a2c3d,0 5px 7px #1f372f3c!important;
+ transition:filter .16s ease,box-shadow .16s ease}
+.plot.occupied{border:2px solid #d7c992!important;
+ background:linear-gradient(145deg,#d1c99a,#8d9b79)!important;
+ box-shadow:0 6px 0 #40543f,0 11px 11px #20372980!important}
+.plot.locked-land{background:repeating-linear-gradient(135deg,#344b4290 0 13px,#576c4f90 13px 26px)!important;border:2px dashed #96a48b!important;opacity:.82}
+.plot.move-target{background:#dbc779a3!important;border-color:#fce6a8!important}
+.plot small{border:1px solid #a8ba8b6e;box-shadow:0 2px 3px #19332455}
+.poi{transform:none!important;border-radius:12px!important;border:2px solid #d7c89b!important;
+ background:linear-gradient(145deg,#b6bb8b,#68856a)!important;box-shadow:0 7px 0 #3f5a48,0 11px 12px #132a2070!important}
+.asset{filter:drop-shadow(4px 7px 3px #263a2a80)}
+.asset .roof{box-shadow:inset 0 4px 7px #ffffff2c,0 3px 0 #30443e77}
+.asset .walls{box-shadow:inset -6px 0 11px #152c2d37}
+.asset.hq .roof{background:linear-gradient(135deg,#d0d7bc,#788c84,#526e6a)!important}
+.asset.hq .walls{background:linear-gradient(95deg,#c5cfb5,#7b9b8e,#526e68)!important}
+.asset.metal .roof{background:linear-gradient(130deg,#d3cab7,#7c9190,#596f73)!important}
+.asset.fuel .roof{background:linear-gradient(130deg,#b7c7ae,#849f99,#56776c)!important}
+.asset.parts .roof{background:linear-gradient(130deg,#a5b6a5,#597968)!important}
+.asset.electronics .roof{background:linear-gradient(130deg,#c3d7c8,#74a5a7,#477e89)!important}
+.roadnet .pavement{stroke:#53695d;stroke-width:42}
+.roadnet .asphalt{stroke:#8b9389;stroke-width:33}
+.roadnet .marking{stroke:#e8deb5;stroke-width:1.8;stroke-dasharray:11 17}
+.roadnet{filter:drop-shadow(2px 5px 2px #2542328a)}
+.map-mark{letter-spacing:.08em;text-shadow:0 1px 2px #122b2199}
+.landmark.tree{filter:drop-shadow(4px 7px 3px #172d226e)}
+.road-actions,.edge-actions{background:#1a3129b8;border-radius:12px;padding:4px;backdrop-filter:blur(8px)}
+@media (prefers-reduced-motion:reduce){.plot{transition:none}}
+
+/* 0.10.2 — layered original military-building details and richer terrain */
+.asset{isolation:isolate}
+.asset .trim,.asset .emblem,.asset .equipment{position:absolute;display:block;pointer-events:none}
+.asset .trim{z-index:4;left:20px;right:25px;bottom:40px;height:3px;border-top:2px solid #e4e9c8a6;transform:skewY(-5deg);box-shadow:0 3px 0 #263f3450}
+.asset .emblem{z-index:5;left:46px;bottom:30px;width:11px;height:11px;background:#d4cc8c;border:2px solid #294c39;transform:rotate(45deg);box-shadow:0 0 0 2px #ffffff25}
+.asset .equipment{z-index:3;bottom:7px;right:3px;width:13px;height:12px;background:linear-gradient(135deg,#b6b78e,#617b66);border:2px solid #415949;box-shadow:0 3px 0 #33493ba8,-8px -1px 0 -2px #c3cead}
+.asset.hq .emblem{left:47px;bottom:39px;width:15px;height:15px;border:3px solid #e9dfaa;background:#426a60;transform:rotate(45deg)}
+.asset.hq .equipment{right:9px;bottom:8px;width:12px;height:27px;background:repeating-linear-gradient(90deg,#82968d 0 3px,#c8cdb2 3px 5px);border-color:#41584e;box-shadow:-70px 0 0 -2px #687d72}
+.asset.hq .trim{bottom:49px;left:27px;right:28px;border-color:#e8dfac;box-shadow:0 -5px 0 -1px #d1dac3}
+.asset.storage .emblem{left:41px;bottom:27px;background:#dcb775;border-color:#957143;box-shadow:0 0 0 2px #f0dab17a}
+.asset.storage .equipment{right:1px;bottom:8px;width:18px;height:17px;background:repeating-linear-gradient(0deg,#b39362 0 4px,#e3c88e 4px 6px);border-color:#745c41}
+.asset.garage .emblem{left:8px;bottom:18px;width:10px;height:10px;background:#e4df9e;border-radius:50%;transform:none}
+.asset.garage .equipment{right:2px;bottom:8px;width:23px;height:12px;background:linear-gradient(#7f967b 0 45%,#3d5a4b 46%);border-color:#3f584a;border-radius:4px 4px 2px 2px;box-shadow:-12px 7px 0 -5px #232e2a,1px 7px 0 -5px #232e2a}
+.asset.hangar .emblem{bottom:25px;left:9px;background:#d6d2a8;border-color:#648b77;transform:rotate(45deg)}
+.asset.hangar .equipment{bottom:7px;right:0;width:28px;height:9px;background:#bfd0c0;border:2px solid #5f7a6b;clip-path:polygon(0 42%,57% 0,100% 48%,64% 75%,58% 100%,40% 75%)}
+.asset.metal .emblem{left:28px;bottom:34px;width:14px;height:14px;background:radial-gradient(circle,#f4d88b 0 30%,#8e6b50 31%);border:2px solid #b89b70;border-radius:50%;transform:none}
+.asset.metal .equipment{right:3px;bottom:1px;width:26px;height:18px;background:linear-gradient(110deg,#b0a38c,#647a76);border-color:#5a6b67}
+.asset.parts .emblem{left:30px;bottom:31px;width:13px;height:13px;border:3px dashed #d4d9bf;border-radius:50%;background:#536e64;transform:none}
+.asset.parts .equipment{right:0;width:17px;height:24px;background:repeating-linear-gradient(0deg,#b2bca9 0 4px,#647e70 4px 7px)}
+.asset.fuel .emblem{left:44px;bottom:23px;border-radius:50% 50% 50% 0;background:#e2bd7b;border-color:#607d6d;transform:rotate(-45deg)}
+.asset.fuel .equipment{right:1px;bottom:12px;width:27px;height:14px;background:linear-gradient(90deg,#a2b6a1,#687c75);border-radius:9px 9px 4px 4px;border-color:#557063}
+.asset.electronics .emblem{left:44px;bottom:27px;width:15px;height:15px;background:#bfe5d7;border:2px solid #457f7e;box-shadow:0 0 8px #9fefdd77}
+.asset.electronics .equipment{right:8px;bottom:12px;width:3px;height:33px;background:#d0ebe0;box-shadow:8px -3px 0 -1px #a1d4cf}
+.asset.construction .emblem{left:29px;bottom:15px;width:24px;height:6px;background:repeating-linear-gradient(90deg,#e8cb73 0 5px,#56634d 5px 9px);transform:none;border:none}
+.asset.construction .equipment{left:8px;bottom:3px;width:26px;height:13px;background:linear-gradient(#e4c67b,#a48954);border-color:#746340}
+.grass-detail,.supply-stack{position:absolute;z-index:1;pointer-events:none}
+.grass-detail{width:37px;height:27px;border-radius:55%;background:radial-gradient(ellipse at 20% 70%,#547d52 0 8%,transparent 9%),radial-gradient(ellipse at 45% 47%,#b4cc8588 0 11%,transparent 12%),radial-gradient(ellipse at 70% 65%,#366a4c 0 9%,transparent 10%);opacity:.78}
+.supply-stack{width:24px;height:20px;border:2px solid #706447;background:repeating-linear-gradient(90deg,#b6a576 0 10px,#8b845e 10px 12px);border-radius:2px;box-shadow:5px -6px 0 -1px #b3a77d,5px -6px 0 1px #665d43,3px 4px 4px #23402e6e;transform:skewY(-8deg)}
+.plot.occupied::before{content:"";position:absolute;inset:4px;border:1px solid #e9e4bc67;border-radius:6px;pointer-events:none}
+.poi::after{content:"";position:absolute;inset:5px;border:1px solid #ebebc955;border-radius:7px;pointer-events:none}
+.roadnet .asphalt{stroke:#8a9085;stroke-width:35}
+.roadnet .pavement{stroke:#5b7365;stroke-width:44}
+.roadnet .marking{stroke:#f2e6bc;stroke-width:1.7;stroke-dasharray:13 21}
+
+/* 0.11.1: responsive portrait play without affecting landscape layout */
+@media (orientation:portrait){
+ html,body{height:100%;overflow:hidden}
+ .game{display:grid!important;grid-template-rows:auto minmax(0,1fr) auto;height:100dvh;min-height:0}
+ .rotate{display:none!important}
+ .hud{display:flex;flex-direction:column;align-items:stretch;gap:5px;min-height:0;padding:calc(7px + env(safe-area-inset-top)) 9px 7px;background:#1b3225f5}
+ .brand{display:block;font-size:14px;line-height:18px}
+ .brand small{font-size:11px}
+ .meters{display:flex;justify-content:flex-start;flex-wrap:nowrap;overflow-x:auto;gap:5px;padding-bottom:1px;-webkit-overflow-scrolling:touch;scrollbar-width:none;max-width:100%;font-size:11px}
+ .meters::-webkit-scrollbar{display:none}
+ .meters span{padding:4px 7px;flex-shrink:0;font-size:11px}
+ .stage{min-height:0;overflow:hidden}
+ .map-screen{position:absolute;inset:0}
+ .world-wrap{inset:0!important}
+ .road-actions{top:7px;left:7px;right:7px;max-width:none;width:auto;gap:5px;justify-content:flex-start;flex-wrap:wrap;padding:4px;background:#142b22b9}
+ .road-actions .btn{font-size:10px;min-height:35px;padding:6px 8px;flex:0 1 auto}
+ .roadhelp{flex:1 0 100%;font-size:10px}
+ .edge-actions{top:auto;right:8px;bottom:48px;gap:5px;padding:5px}
+ .edge-actions .btn{min-width:40px;min-height:39px;padding:6px 10px}
+ .zoomreadout{min-width:48px;height:39px}
+ .hint{bottom:9px;left:8px;right:8px;transform:none;max-width:none;width:auto;font-size:10px;line-height:1.25;padding:5px 9px;text-align:left;pointer-events:none}
+ .cancel-move{bottom:100px;left:8px}
+ .nav{height:auto;min-height:58px;grid-template-columns:repeat(5,minmax(0,1fr));padding:5px max(4px,env(safe-area-inset-right)) calc(7px + env(safe-area-inset-bottom)) max(4px,env(safe-area-inset-left));gap:2px}
+ .nav button{font-size:10px;padding:5px 1px 3px;min-width:0;line-height:1.25}
+ .nav button span{font-size:22px;margin-bottom:2px}
+ .aux{height:100%;overflow:auto;overscroll-behavior:contain;padding:13px 11px 24px}
+ .aux h2{font-size:18px}
+ .aux .cards,.cards,.vehicle-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .vehicle-card{padding:10px;min-width:0}
+ .vehicle-name{font-size:12px}
+ .vehicle-icon{font-size:30px}
+ .qa-actions .btn{flex:1 1 140px}
+ .overlay{justify-content:center;align-items:flex-end;padding:0 6px calc(5px + env(safe-area-inset-bottom))}
+ .sheet{width:100%;max-width:520px;max-height:min(79dvh,690px);padding:12px;border-radius:16px 16px 12px 12px}
+ .sheetbody{overflow:auto;overscroll-behavior:contain}
+}
+@media (orientation:portrait) and (max-width:370px){
+ .road-actions .btn{font-size:9px;padding:6px}
+ .aux .cards,.vehicle-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .meters span{font-size:10px}
+}
+@media (orientation:portrait) and (max-height:650px){
+ .hud{gap:3px;padding-top:calc(3px + env(safe-area-inset-top));padding-bottom:3px}
+ .nav{min-height:50px;padding-top:2px}
+ .nav button span{font-size:17px}
+ .edge-actions{bottom:42px}
+}
+/* 0.11.0: factory catalog, manufacturing and temporary testing tools */
+.vehicle-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:12px 0}
+.vehicle-card{padding:13px;border-radius:13px;background:linear-gradient(145deg,#3d5b49,#1d3a31);border:1px solid #849b78;box-shadow:0 5px 12px #10251d6e;display:flex;flex-direction:column;gap:5px}
+.vehicle-icon{text-align:center;font-size:38px;filter:drop-shadow(0 5px 4px #0d1c1e)}
+.vehicle-name{font-weight:800;font-size:13px;min-height:34px;color:#f7ead0}
+.vehicle-owned{font-size:12px;color:#d3dec8}
+.vehicle-meta{font-size:11px;color:#e4d29e;min-height:30px}
+.vehicle-card .btn{margin-top:auto;width:100%;min-height:34px}
+.qa-actions{display:flex;gap:8px;flex-wrap:wrap;margin:9px 0}
+.qa-actions .btn{font-size:12px;min-height:35px}
+#view-missions>.card:first-of-type{border:2px solid #d9c084;background:linear-gradient(125deg,#4b5234,#2b4837)}
+
+/* Distinct silhouettes for the four new enterprise families */
+.asset.scrap .roof{background:linear-gradient(120deg,#c0b39a,#738b7d,#435f57)}
+.asset.scrap .walls{background:repeating-linear-gradient(90deg,#b6b5a0 0 13px,#839789 13px 17px)}
+.asset.scrap .detail-art{left:7px;bottom:5px;width:24px;height:23px;background:linear-gradient(145deg,#a07d65,#635c54);border:2px solid #dcc6a1;transform:skew(-8deg)}
+.asset.scrap .equipment{right:5px;bottom:9px;width:19px;height:16px;background:#b0ac88;border:2px dashed #707e6f}
+.asset.terminal .roof{background:linear-gradient(120deg,#a9bbaa,#638e83)}
+.asset.terminal .walls{background:linear-gradient(90deg,#8ea69a,#4c7667)}
+.asset.terminal .detail-art{left:3px;bottom:11px;width:27px;height:34px;border-radius:50% 50% 10% 10%;border:3px solid #557a70;background:linear-gradient(90deg,#c7cdb9,#829b92);box-shadow:68px 0 0 -2px #c1cbba}
+.asset.terminal .equipment{right:7px;bottom:0;width:6px;height:35px;background:#cad6bd;box-shadow:7px -1px 0 -2px #e3e7cc}
+.asset.components .roof{background:linear-gradient(120deg,#c6c6b2,#748b83,#5b7367)}
+.asset.components .walls{background:repeating-linear-gradient(90deg,#b3b9a4 0 11px,#7c9488 11px 14px)}
+.asset.components .detail-art{right:5px;top:4px;width:18px;height:34px;border:3px solid #556d61;background:#a5bcb2}
+.asset.components .equipment{left:6px;bottom:7px;width:28px;height:12px;background:repeating-linear-gradient(90deg,#d2bd8d 0 7px,#77745a 7px 9px)}
+.asset.avionics .roof{background:linear-gradient(120deg,#b5d6d0,#6eaaa7,#467c82)}
+.asset.avionics .walls{background:linear-gradient(90deg,#bfd6c9,#7ca6a2,#568988)}
+.asset.avionics .detail-art{right:13px;top:-11px;width:4px;height:27px;background:#d9e8d8;box-shadow:11px 7px 0 -1px #bfe5d8}
+.asset.avionics .equipment{right:3px;bottom:17px;width:25px;height:10px;border:2px solid #d0f1e5;background:#729e9c;border-radius:50%;transform:rotate(-20deg)}
+#openTest{border:1px solid #f3da90;color:#ffe4a0;background:#4a5140}
+
+/* 0.11.2 — six persistent display pads for owned ground and air vehicles */
+.vehicle-pad{position:absolute;z-index:4;width:146px;height:67px;border:2px solid #9baf91;border-radius:11px;
+ background:linear-gradient(150deg,#586f60df,#354a43e0);color:#f4efcd;cursor:pointer;
+ display:flex;align-items:center;justify-content:center;flex-direction:column;gap:0;
+ box-shadow:0 5px 0 #304a3c,0 8px 8px #132b2077;touch-action:manipulation}
+.vehicle-pad.vehicle-vacant{border:2px dashed #b6c3a095;opacity:.7}
+.vehicle-pad.vehicle-visible{border:2px solid #e4d19b;background:linear-gradient(145deg,#788d70,#3f6356)}
+.vehicle-pad-icon{font-size:30px;line-height:33px;filter:drop-shadow(2px 4px 2px #142e2560)}
+.vehicle-pad-label{font-size:9px;font-weight:800;max-width:139px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vehicle-pad-count{position:absolute;top:2px;right:5px;background:#284b36;border-radius:8px;padding:1px 4px;font-size:10px}
+.park-btn{min-height:32px}
+.vehicle-pad:focus-visible{outline:3px solid #ffdc84}
+
+/* 0.11.3 automated trading building and per-resource settings */
+.asset.market .roof{background:linear-gradient(130deg,#d2c397,#806f51)!important;border-color:#e5d5a0}
+.asset.market .walls{background:linear-gradient(90deg,#c5b891,#8b8b71,#597e66)!important}
+.asset.market .detail-art{left:5px;bottom:10px;width:21px;height:20px;background:repeating-linear-gradient(0deg,#bea677 0 5px,#8b7957 5px 8px);border:2px solid #ebd29a;box-shadow:65px -1px 0 -2px #ad966b}
+.asset.market .emblem{background:#f0d88b!important;border-color:#6a6346!important}
+.market-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:10px 0}
+.market-line{display:flex;flex-direction:column;gap:6px;min-width:0;padding:8px;border:1px solid #7e9670;border-radius:10px;background:#294537}
+.market-line label{font-size:12px;font-weight:700;display:flex;align-items:center;gap:5px}
+.market-line span{font-size:11px;color:#dfd5a5}
+.market-line input[type=number]{width:100%;min-width:0;padding:7px;background:#152b23;border:1px solid #779475;color:#f7eed1;border-radius:7px;font-size:13px}
+.market-line input[type=checkbox]{width:17px;height:17px;accent-color:#d7bb72;flex-shrink:0}
+@media(max-width:460px){.market-grid{grid-template-columns:1fr}}
+
+/* 0.11.5 trading convoy missions and garage activity */
+.convoy-panel{margin:10px 0;background:linear-gradient(130deg,#3b563e,#233d32);border-color:#baae80}
+.convoy-panel h3{font-size:15px;margin:0 0 6px}
+.convoy-panel p{font-size:12px;line-height:1.35;margin:5px 0}
+.convoy-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:9px 0}
+.convoy-choices .btn{font-size:11px;padding:9px 4px;white-space:normal}
+.convoy-traffic{font-size:11px;color:#f0dba0;display:grid;gap:5px}
+@media(orientation:portrait){.convoy-choices{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* 0.11.6 — moving convoy sprites and active factory production effects */
+.convoy-route{position:absolute;z-index:3;left:0;top:150px;width:1100px;height:34px;background:linear-gradient(180deg,#53634c 0 18%,#39463c 18% 82%,#53634c 82%);border-top:2px solid #9d9b76;border-bottom:2px solid #9d9b76;overflow:hidden;pointer-events:none}
+.convoy-route:before{content:"";position:absolute;left:0;right:0;top:15px;border-top:2px dashed #e5d49b;opacity:.8}
+.convoy-route-label{position:absolute;left:12px;top:-1px;font-size:7px;letter-spacing:1px;color:#f1e6c1;background:#344b3c;padding:1px 4px;z-index:2}
+.moving-convoy{position:absolute;top:1px;left:-75px;animation-delay:var(--delay,0s);display:flex;align-items:center;gap:3px;font-size:25px;line-height:29px;filter:drop-shadow(1px 2px 1px #1b2b20);animation:convoy-drive 13s linear infinite}
+.moving-convoy small{font-size:8px;font-weight:900;color:#fff2c9;background:#344b3c;padding:2px 4px;border-radius:4px}
+.moving-convoy.reverse{animation-name:convoy-drive-reverse;top:2px}
+@keyframes convoy-drive{from{transform:translateX(0)}to{transform:translateX(1220px)}}
+@keyframes convoy-drive-reverse{from{transform:translateX(1220px) scaleX(-1)}to{transform:translateX(0) scaleX(-1)}}
+.asset.running:after{content:"";position:absolute;right:10px;top:-15px;width:12px;height:17px;border-radius:50%;background:radial-gradient(ellipse,#d7ddce8c 0 25%,#d7ddce45 55%,transparent 75%);animation:factory-smoke 2.8s ease-in-out infinite;pointer-events:none}
+@keyframes factory-smoke{0%{opacity:0;transform:translate(0,8px) scale(.55)}35%{opacity:.65}100%{opacity:0;transform:translate(5px,-14px) scale(1.45)}}
+@media(prefers-reduced-motion:reduce){.moving-convoy,.asset.running:after{animation:none!important}}
+@media(orientation:portrait){.convoy-route{top:150px}.moving-convoy{font-size:23px}}
+</style></head><body>
+
+<div class="game" id="game">
+ <header class="hud">
+  <b class="brand">🪖 ВОЕННАЯ БАЗА <small>0.11.6</small></b>
+  <div class="meters"><span>🏛️ <b id="hq">1 / 1000</b></span><span>🪙 <b id="coins">0</b></span><span>🔩 <b id="res-metal">0</b></span><span>🛢️ <b id="res-fuel">0</b></span><span>⚙️ <b id="res-parts">0</b></span><span>🔌 <b id="res-electronics">0</b></span></div>
+ </header>
+ <main class="stage">
+  <div id="view-base" class="view map-screen">
+   <div class="world-wrap"><div class="world-scroll" id="worldscroll"><div class="world-canvas" id="worldcanvas"><div class="world" id="world"></div></div></div></div>
+   <div class="road-actions"><button class="btn alt" id="roadMode" aria-pressed="false">🛣️ Дороги · 12 🔩</button><button class="btn alt" id="expandLand">🌿 Земля 24/36</button><button class="btn alt" id="openTest">🧪 Тест</button><span class="roadhelp" id="roadHelp" hidden>Касайся светлых участков дороги. 12 🔩 за участок.</span></div><div class="edge-actions"><button class="btn alt" id="zoomout" aria-label="Уменьшить">−</button><button class="btn alt" id="zoomin" aria-label="Увеличить">＋</button><span class="zoomreadout" id="zoomLevel" aria-live="off">100%</span><button class="btn alt" id="save" aria-label="Сохранить">💾</button></div>
+   <div class="hint" id="mapstatus">Заводы работают только с дорогой от штаба · 🛣️ строй дороги</div><button class="btn cancel-move" id="cancelMove" hidden>Отмена перемещения</button>
+  </div>
+  <div id="view-storage" class="view aux" hidden><h2>📦 Склад и торговля</h2><p>Заводы производят ресурсы, торговый центр автоматически продаёт излишки.</p><div class="card" id="marketSummary">🏪 Торговый центр</div><button class="btn alt" id="openMarket">🏪 Настроить торговлю</button><div id="convoyPanel"></div><div class="cards" id="resources"></div><button class="btn" id="goStorageMap">🗺️ Вернуться к карте и складу</button></div>
+  <div id="view-garage" class="view aux" hidden><h2>🚙 Гараж · техника</h2><p>Производство наземной техники. Для новых машин улучшай гараж и штаб.</p><div class="card" id="garageInfo"></div><div class="vehicle-grid" id="garageVehicles"></div><button class="btn alt" id="goGarageMap">🗺️ Открыть гараж</button></div>
+  <div id="view-hangar" class="view aux" hidden><h2>🚁 Ангар · авиация</h2><p>Производство вертолётов и самолётов. Для новых моделей улучшай ангар и штаб.</p><div class="card" id="hangarInfo"></div><div class="vehicle-grid" id="hangarVehicles"></div><button class="btn alt" id="goHangarMap">🗺️ Открыть ангар</button></div>
+  <div id="view-missions" class="view aux" hidden><h2>🗺️ Задания</h2><div class="card"><b>🧪 Тестирование версии 0.11.0</b><p>Здесь можно пополнять ресурсы, открывать уровень штаба и ускорять стройки. Эти бонусы сохраняются только в тестовой версии.</p><div class="qa-actions"><button class="btn" id="testResources">🎁 +500 000 каждого ресурса</button><button class="btn alt" id="testHQ">🏛️ Штаб +10 уровней</button><button class="btn alt" id="testFinish">⏩ Завершить стройки</button></div><small>Тестовый склад до 10 000 000 каждого ресурса. При первом входе автоматически +500 000 каждого ресурса и +5 000 000 монет.</small></div><p>Экспедиции и задания появятся позже.</p><div class="card"><b>🚚 Торговые конвои</b><p>Открой раздел «Склад», отправляй грузовики с ресурсами и получай монеты через 5 минут. Возвращение работает даже после закрытия игры.</p></div><div class="card"><b>🏪 Автоматическая торговля</b><p>Построй торговый центр в командном секторе. Раз в 10 минут он продаёт излишки выбранных ресурсов, оставляя неснижаемый запас. Доход начисляется офлайн до 8 часов.</p></div><div class="card"><h3>🏭 Развитие производства</h3><p>Штаб 1 — металл · штаб 2 — переработка металла · штаб 3 — топливо · штаб 4 — терминал · штаб 6 — детали · штаб 7 — комплектующие · штаб 10 — электроника · штаб 11 — авиационный цех.</p><p>Завод должен иметь непрерывную дорогу до штаба. Ранее построенные заводы сохраняются.</p></div></div>
+ </main>
+ <nav class="nav" aria-label="Главное меню"><button class="on" data-view="base"><span>🏕️</span>База</button><button data-view="garage"><span>🚙</span>Гараж</button><button data-view="hangar"><span>🚁</span>Ангар</button><button data-view="missions"><span>🗺️</span>Задания</button><button data-view="storage"><span>📦</span>Склад</button></nav>
+ <div class="toast" id="notice" role="status"></div><span id="saveStatus" hidden>Автосохранение</span>
+ <div class="overlay" id="overlay" hidden><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+  <div class="sheetbar"><h2 id="sheetTitle">Здание</h2><button id="closeSheet" class="btn alt" aria-label="Закрыть">✕</button></div><div class="sheetbody" id="sheetBody"></div>
+ </div></div>
+</div>
+<script>
+(()=>{
+"use strict";
+const KEY="mbm_save_v116_livebase",LEGACY=["mbm_save_v115_convoys","mbm_save_v114_testbonus","mbm_save_v113_trade","mbm_save_v110_test","mbm_save_v99","mbm_save_v98","mbm_save_v97","mbm_save_v96","mbm_save_v95","mbm_save_v94","mbm_save_v9","mbm_save_v81","mbm_save_v8","mbm_save_v7","mbm_save_v6","mbm_save_v51","mbm_save_v5","mbm_save_v4","mbm_save"],MAX_OFFLINE=480,MINUTE=60000;
+const definitions=[
+{id:"metal",requiredHQ:1,icon:"🏭",title:"Металлургический завод",resource:"metal",rate:10,cost:{metal:80}},
+{id:"fuel",requiredHQ:3,icon:"🛢️",title:"Нефтеперерабатывающий завод",resource:"fuel",rate:8,cost:{metal:120}},
+{id:"parts",requiredHQ:6,icon:"⚙️",title:"Машиностроительный завод",resource:"parts",rate:5,cost:{metal:180}},
+{id:"electronics",requiredHQ:10,icon:"🔌",title:"Электронный завод",resource:"electronics",rate:3,cost:{metal:240}},
+{id:"scrap",requiredHQ:2,icon:"♻️",title:"Комплекс переработки металла",resource:"metal",rate:7,cost:{metal:115}},
+{id:"terminal",requiredHQ:4,icon:"🛢️",title:"Топливный терминал",resource:"fuel",rate:6,cost:{metal:170,parts:15}},
+{id:"components",requiredHQ:7,icon:"🔧",title:"Завод комплектующих",resource:"parts",rate:4,cost:{metal:230,parts:35}},
+{id:"avionics",requiredHQ:11,icon:"📡",title:"Авиационный цех",resource:"electronics",rate:2,cost:{metal:280,parts:65}}
+];
+const vehicleDefs=[
+{id:"scout",kind:"garage",icon:"🚙",name:"Разведывательный бронеавтомобиль",hq:1,facility:1,cost:{metal:120,parts:10}},
+{id:"apc",kind:"garage",icon:"🚐",name:"Бронетранспортёр",hq:5,facility:2,cost:{metal:260,parts:55,fuel:30}},
+{id:"tank",kind:"garage",icon:"🛡️",name:"Танк",hq:10,facility:3,cost:{metal:480,parts:150,electronics:25}},
+{id:"reconHeli",kind:"hangar",icon:"🚁",name:"Разведывательный вертолёт",hq:3,facility:1,cost:{metal:210,parts:40,fuel:30}},
+{id:"attackHeli",kind:"hangar",icon:"🚁",name:"Боевой вертолёт",hq:8,facility:2,cost:{metal:450,parts:115,electronics:50}},
+{id:"transport",kind:"hangar",icon:"✈️",name:"Транспортный самолёт",hq:12,facility:3,cost:{metal:750,parts:210,fuel:120,electronics:80}}
+];
+const TRADE_PRICES={metal:5,fuel:8,parts:12,electronics:20};
+const TRADE_BATCH=100,TRADE_INTERVAL=10*MINUTE,TRADE_MAX_LEVEL=5;
+const MARKET_COSTS=[{metal:180,coins:80},{metal:350,parts:40,coins:150},{metal:650,parts:95,coins:300},{metal:1000,electronics:100,coins:500},{metal:1500,electronics:180,coins:900}];
+const labels={metal:"🔩 Металл",fuel:"🛢️ Топливо",parts:"⚙️ Детали",electronics:"🔌 Электроника"};
+const $=id=>document.getElementById(id);
+const roadSlots=[
+ ...[155,306,445,581].flatMap((y,r)=>Array.from({length:10},(_,c)=>({id:r*10+c,x:46+c*103,y,h:false}))),
+ ...[185,517,849].flatMap((x,c)=>Array.from({length:5},(_,r)=>({
+  id:40+c*5+r,x,y:[155,306,445,581,715][r],endY:[306,445,581,715,750][r],v:true
+ }))),
+ ...[185,517,849].flatMap((x,c)=>[0,1].map(r=>({
+  id:55+c*2+r,x,y:r===0?750:853,endY:r===0?853:989,v:true,extension:r+1
+ }))),
+ ...[853,989].flatMap((y,r)=>Array.from({length:10},(_,c)=>({
+  id:61+r*10+c,x:46+c*103,y,extension:r+1
+ })))
+];
+const TOTAL_PLOTS=36,BASE_PLOTS=24;
+const expansionCosts=[{metal:200,coins:50},{metal:350,coins:100}];
+const accessiblePlots=()=>BASE_PLOTS+data.territoryLevel*6;
+const plotUnlocked=slot=>Number.isInteger(slot)&&slot>=0&&slot<accessiblePlots();
+function expansionPrice(){return expansionCosts[data.territoryLevel]||null}
+function buildExpansion(){
+ advance();
+ const price=expansionPrice();
+ if(!price){status("Вся доступная территория уже открыта");return}
+ if(!canAfford(price)){status("Для расширения не хватает ресурсов");return}
+ spend(price);data.territoryLevel++;
+ mapSignature="";status("🌿 Открыто ещё 6 участков! Территория "+accessiblePlots()+"/36");
+ save();render();showCard();
+}
+function roadUnlocked(s,level=data.territoryLevel){return !s.extension||level>=s.extension}
+const defaults=()=>({version:116,coins:600,baseLevel:1,storageLevel:1,best:0,board:Array(25).fill(null),score:0,resources:{metal:300,fuel:0,parts:0,electronics:0},factories:{metal:0,fuel:0,parts:0,electronics:0,scrap:0,terminal:0,components:0,avionics:0},lastProduction:Date.now(),placements:[],construction:[],facilities:{garage:0,hangar:0},facilityJobs:[],roads:[],facilityLots:{storage:null,garage:null,hangar:null},territoryLevel:0,testMode:false,vehicles:{scout:0,apc:0,tank:0,reconHeli:0,attackHeli:0,transport:0},displayVehicles:[],marketLevel:0,marketReserve:{metal:500,fuel:500,parts:500,electronics:500},marketEnabled:{metal:true,fuel:false,parts:false,electronics:false},lastTradeAt:Date.now(),tradeEarned:0,testBonusGranted:false,convoys:[],convoyEarned:0,convoyTrips:0});
+const safeNum=(v,fallback=0)=>Number.isFinite(v)&&v>=0?v:fallback;
+function safeParse(key){try{return JSON.parse(localStorage.getItem(key)||"null")}catch(e){return null}}
+function normalize(raw){
+const result=defaults();
+if(!raw||typeof raw!=="object")return result;
+result.coins=safeNum(raw.coins,600);result.baseLevel=Number.isInteger(raw.baseLevel)&&raw.baseLevel>=1&&raw.baseLevel<=1000?raw.baseLevel:1;
+result.best=safeNum(raw.best);result.score=safeNum(raw.score);
+result.board=Array.isArray(raw.board)&&raw.board.length===25?raw.board.slice():result.board;
+if([6,7,8,81,9,94,95,96,97,98,99,110,113,114,115,116].includes(raw.version)){
+ for(const name of Object.keys(result.resources)){
+ result.resources[name]=Math.min([110,113,114,115,116].includes(raw.version)&&raw.testMode===true?10000000:2000+1000*([8,81,9,94,95,96,97,98,99,110,113,114,115,116].includes(raw.version)?Math.max(0,Math.min(999,Math.floor(safeNum(raw.storageLevel,1))-1)):0),safeNum(raw.resources&&raw.resources[name]));
+ result.factories[name]=Math.min(999,Math.floor(safeNum(raw.factories&&raw.factories[name])));
+ }
+ if([110,113,114,115,116].includes(raw.version)){
+ for(const def of definitions)result.factories[def.id]=Math.min(999,Math.floor(safeNum(raw.factories&&raw.factories[def.id])));
+ result.testMode=raw.testMode===true;
+ result.testBonusGranted=[114,115,116].includes(raw.version)&&raw.testBonusGranted===true;
+ for(const v of vehicleDefs)result.vehicles[v.id]=Math.min(9999,Math.floor(safeNum(raw.vehicles&&raw.vehicles[v.id])));
+ if([113,114,115,116].includes(raw.version)){
+  result.marketLevel=Math.max(0,Math.min(TRADE_MAX_LEVEL,Math.floor(safeNum(raw.marketLevel))));
+  for(const id of Object.keys(result.resources)){
+   result.marketReserve[id]=Math.min(100000,Math.floor(safeNum(raw.marketReserve&&raw.marketReserve[id],500)));
+   result.marketEnabled[id]=raw.marketEnabled?.[id]===true;
+  }
+  result.lastTradeAt=Number.isFinite(raw.lastTradeAt)&&raw.lastTradeAt>0?Math.min(Date.now(),raw.lastTradeAt):Date.now();
+  result.tradeEarned=Math.min(999999999,Math.floor(safeNum(raw.tradeEarned)));
+  if([115,116].includes(raw.version)){
+   result.convoyEarned=Math.min(999999999,Math.floor(safeNum(raw.convoyEarned)));
+   result.convoyTrips=Math.min(9999999,Math.floor(safeNum(raw.convoyTrips)));
+   if(Array.isArray(raw.convoys))result.convoys=raw.convoys.filter(j=>
+     j&&Object.hasOwn(TRADE_PRICES,j.resource)&&Number.isFinite(j.endsAt)&&j.endsAt>0&&
+     Number.isInteger(j.reward)&&j.reward>0&&j.reward<=999999).slice(0,3).map(j=>({resource:j.resource,endsAt:j.endsAt,reward:j.reward}));
+  }
+
+ }
+
+ if(Array.isArray(raw.displayVehicles)){
+  result.displayVehicles=[...new Set(raw.displayVehicles.filter(id=>vehicleDefs.some(v=>v.id===id)&&result.vehicles[id]>0))];
+ }
+}
+result.lastProduction=Number.isFinite(raw.lastProduction)&&raw.lastProduction>0?Math.min(raw.lastProduction,Date.now()):Date.now();
+if([7,8,81,9,94,95,96,97,98,99,110,113,114,115,116].includes(raw.version)&&Array.isArray(raw.placements)){
+const used=new Set();
+result.placements=raw.placements.filter(v=>v&&Number.isInteger(v.slot)&&v.slot>=0&&v.slot<([99,110,113,114,115,116].includes(raw.version)?24+Math.min(2,Math.floor(safeNum(raw.territoryLevel)))*6:24)&&definitions.some(d=>d.id===v.id)&&!used.has(v.slot)&&used.add(v.slot)).map(v=>({slot:v.slot,id:v.id}));
+}
+if(raw.version===6){let pos=0;for(const def of definitions)for(let i=0;i<result.factories[def.id]&&pos<24;i++)result.placements.push({slot:pos++,id:def.id});}
+if([8,81,9,94,95,96,97,98,99,110,113,114,115,116].includes(raw.version)){
+ result.storageLevel=Math.max(1,Math.min(1000,Math.floor(safeNum(raw.storageLevel,1))));
+ const occupied=new Set(result.placements.map(p=>p.slot));
+ if(Array.isArray(raw.construction)){
+ result.construction=raw.construction.filter(j=>j&&definitions.some(d=>d.id===j.id)&&Number.isFinite(j.endsAt)&&j.endsAt>0&&(j.slot===null||(Number.isInteger(j.slot)&&j.slot>=0&&j.slot<([99,110,113,114,115,116].includes(raw.version)?24+Math.min(2,Math.floor(safeNum(raw.territoryLevel)))*6:24)&&!occupied.has(j.slot)&&occupied.add(j.slot)))).slice(0,24).map(j=>({id:j.id,slot:j.slot,endsAt:j.endsAt}));
+ }
+ }
+if([9,94,95,96,97,98,99,110,113,114,115,116].includes(raw.version)){
+ for(const id of ["garage","hangar"])result.facilities[id]=Math.min(100,Math.floor(safeNum(raw.facilities&&raw.facilities[id])));
+ if(Array.isArray(raw.facilityJobs)){
+  const seen=new Set();
+  result.facilityJobs=raw.facilityJobs.filter(j=>j&&["garage","hangar"].includes(j.id)&&Number.isFinite(j.endsAt)&&j.endsAt>0&&!seen.has(j.id)&&seen.add(j.id)).map(j=>({id:j.id,endsAt:j.endsAt}));
+ }
+}
+if([94,95,96,97,98,99,110,113,114,115,116].includes(raw.version)&&Array.isArray(raw.roads)){
+ const valid=new Set(roadSlots.filter(s=>roadUnlocked(s,[99,110,113,114,115,116].includes(raw.version)?Math.min(2,Math.floor(safeNum(raw.territoryLevel))):0)).map(s=>s.id));
+ result.roads=[...new Set(raw.roads.filter(n=>Number.isInteger(n)&&valid.has(n)))];
+}
+if([99,110,113,114,115,116].includes(raw.version))result.territoryLevel=Math.min(2,Math.max(0,Math.floor(safeNum(raw.territoryLevel))));
+if([98,99,110,113,114,115,116].includes(raw.version)&&raw.facilityLots&&typeof raw.facilityLots==="object"){
+ const occupied=new Set(result.placements.map(p=>p.slot).concat(result.construction.filter(j=>j.slot!==null).map(j=>j.slot)));
+ for(const id of ["storage","garage","hangar"]){
+  const lot=raw.facilityLots[id];
+  if(id!=="storage"&&!result.facilities[id])continue;
+  if(Number.isInteger(lot)&&lot>=0&&lot<24+result.territoryLevel*6&&!occupied.has(lot)){
+   result.facilityLots[id]=lot;occupied.add(lot);
+  }
+ }
+}
+}
+return result;
+}
+let data;let selectedSlot=null,zoom=1;
+const current=safeParse(KEY);
+if(current&&current.version===116){data=normalize(current)}
+else{
+ const prev=LEGACY.map(safeParse).find(v=>v&&typeof v==="object"&&([6,7,8,81,9,94,95,96,97,98,99,110,113,114,115,116].includes(v.version)||Array.isArray(v.board)&&v.board.length===25));
+ data=normalize(prev);
+ if(prev){try{localStorage.setItem("mbm_backup_before_v116",JSON.stringify(prev))}catch(e){}}
+}
+// One-time test grant on first entry to this preview; older saves stay untouched.
+if(!data.testBonusGranted){
+ grantTestingStock();
+ data.testBonusGranted=true;
+ try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){}
+}
+function format(n){return Math.floor(n).toLocaleString("ru-RU")}
+function status(message){$("notice").textContent=message;$("saveStatus").textContent=message}
+function save(manual=false){data.version=116;
+ try{localStorage.setItem(KEY,JSON.stringify(data));$("saveStatus").textContent=manual?"✓ Сохранено вручную":"✓ Автосохранено";return true}
+ catch(e){$("saveStatus").textContent="⚠️ Не удалось сохранить";return false}
+}
+function capacity(){return data.testMode?10000000:2000+(data.storageLevel-1)*1000}
+function hqCost(level){return {metal:Math.floor(50+level*15),...(level>=10?{parts:Math.floor((level-9)*3)}:{}),...(level>=30?{fuel:Math.floor((level-29)*2)}:{})}}
+function storageCost(level){return {metal:Math.floor(100+level*80),...(level>=4?{parts:level*10}:{})}}
+function costLabel(cost){return Object.entries(cost).map(([k,v])=>format(v)+" "+({metal:"🔩",parts:"⚙️",fuel:"🛢️",electronics:"🔌",coins:"🪙"}[k]||k)).join(" + ")}
+function timeLeft(job,now=Date.now()){return Math.max(0,Math.ceil((job.endsAt-now)/1000))}
+function clock(secs){const m=Math.floor(secs/60),s=secs%60;return m+":"+String(s).padStart(2,"0")}
+const facilityDefs={garage:{name:"Гараж",icon:"🚙",purpose:"Наземная техника",baseCost:100},hangar:{name:"Ангар",icon:"🚁",purpose:"Воздушная техника",baseCost:160}};
+function facilityCost(id){const level=data.facilities[id];return {metal:facilityDefs[id].baseCost+level*90,...(level>=2?{parts:level*10}:{})}}
+function buyVehicle(id){
+ advance();
+ const v=vehicleDefs.find(v=>v.id===id);if(!v)return;
+ if(data.facilities[v.kind]<v.facility||data.baseLevel<v.hq){
+  status("🔒 Требуется "+(v.kind==="garage"?"гараж":"ангар")+" "+v.facility+" и штаб "+v.hq);return;
+ }
+ if(!canAfford(v.cost)){status("Недостаточно ресурсов для "+v.name);return}
+ spend(v.cost);data.vehicles[id]=Math.min(9999,data.vehicles[id]+1);
+ status(v.icon+" Произведено: "+v.name+" · всего "+data.vehicles[id]);
+ save();render();
+}
+function grantTestingStock(amount=500000,coins=5000000){
+ data.testMode=true;
+ data.coins=Math.min(999999999,data.coins+coins);
+ for(const id of Object.keys(data.resources))data.resources[id]=Math.min(10000000,data.resources[id]+amount);
+}
+function testResources(){
+ advance();grantTestingStock();
+ status("🧪 Получено +500 000 каждого ресурса и +5 000 000 монет");save();render();
+}
+function testHQ(){
+ advance();data.baseLevel=Math.min(1000,data.baseLevel+10);
+ status("🧪 Уровень штаба: "+data.baseLevel);save();render();
+}
+function testFinish(){
+ advance();const now=Date.now();
+ data.construction.forEach(j=>j.endsAt=now);
+ data.facilityJobs.forEach(j=>j.endsAt=now);
+ const result=advance(now);
+ status(result.done?"🧪 Строительство завершено":"Строек пока нет");
+ save();render();
+}
+function toggleVehicleDisplay(id){
+ const vehicle=vehicleDefs.find(v=>v.id===id);
+ if(!vehicle||!data.vehicles[id]){status("Сначала произведи технику");return}
+ const exists=data.displayVehicles.includes(id);
+ if(exists)data.displayVehicles=data.displayVehicles.filter(v=>v!==id);
+ else data.displayVehicles.push(id);
+ mapSignature="";save();render();
+ status(exists?"🚙 Техника убрана со стоянки":"✅ "+vehicle.name+" выставлен на базе");
+}
+function vehicleParking(){
+ return vehicleDefs.map((v,i)=>{
+  const owned=data.vehicles[v.id]||0,visible=owned>0&&data.displayVehicles.includes(v.id);
+  const x=45+i*173,y=975;
+  return '<button type="button" class="vehicle-pad '+(visible?'vehicle-visible':'vehicle-vacant')+
+   '" data-vehiclepad="'+v.id+'" aria-label="'+(visible?v.name+' на стоянке':'Стоянка для '+v.name)+
+   '" style="left:'+x+'px;top:'+y+'px"><span class="vehicle-pad-icon">'+
+   (visible?v.icon:(v.kind==="garage"?'🚗':'🛩️'))+'</span><span class="vehicle-pad-label">'+
+   (visible?v.name:(v.kind==="garage"?'Наземная стоянка':'Авиационная стоянка'))+
+   '</span>'+(visible?'<b class="vehicle-pad-count">×'+format(owned)+'</b>':'')+'</button>';
+ }).join("");
+}
+function vehicleList(kind){
+ return vehicleDefs.filter(v=>v.kind===kind).map(v=>{
+  const missingHQ=data.baseLevel<v.hq,missingFacility=data.facilities[kind]<v.facility;
+  const locked=missingHQ||missingFacility;
+  const affordable=canAfford(v.cost);
+  return '<div class="vehicle-card"><div class="vehicle-icon">'+v.icon+'</div><div class="vehicle-name">'+v.name+'</div>'+
+   '<div class="vehicle-owned">В наличии: <b>'+format(data.vehicles[v.id])+'</b></div>'+
+   '<div class="vehicle-meta">'+(locked?'🔒 Штаб '+v.hq+' · '+(kind==="garage"?'гараж ':'ангар ')+v.facility:costLabel(v.cost))+'</div>'+
+   '<button class="btn" data-buyvehicle="'+v.id+'" '+(locked||!affordable?'disabled':'')+'>🏭 Произвести</button>'+
+   '<button class="btn alt park-btn" data-showvehicle="'+v.id+'" '+(!data.vehicles[v.id]?'disabled':'')+'>'+
+   (data.displayVehicles.includes(v.id)?'↩️ Убрать с базы':'🅿️ Показать на базе')+'</button></div>';
+ }).join("");
+}
+function buildFacility(id){
+ advance();const def=facilityDefs[id];if(!def)return;
+ const level=data.facilities[id],cost=facilityCost(id);
+ if(level>=100||data.facilityJobs.some(j=>j.id===id))return;
+ if(!canAfford(cost)){status("Недостаточно материалов для "+def.name);return}
+ spend(cost);const seconds=level===0?60:Math.min(300,75+level*20);
+ data.facilityJobs.push({id,endsAt:Date.now()+seconds*1000});
+ status("🏗️ "+def.name+": строительство "+clock(seconds));save();render();
+}
+function finishJobs(now=Date.now()){
+ const completed=data.construction.filter(j=>j.endsAt<=now).sort((a,b)=>a.endsAt-b.endsAt);
+ for(const job of completed){
+  accrue(job.endsAt);
+  data.factories[job.id]=Math.min(999,data.factories[job.id]+1);
+  if(job.slot!==null)data.placements.push({slot:job.slot,id:job.id});
+ }
+ if(completed.length)data.construction=data.construction.filter(j=>j.endsAt>now);
+ const facilityDone=data.facilityJobs.filter(j=>j.endsAt<=now);
+ for(const j of facilityDone)data.facilities[j.id]=Math.min(100,data.facilities[j.id]+1);
+ if(facilityDone.length)data.facilityJobs=data.facilityJobs.filter(j=>j.endsAt>now);
+ return completed.length+facilityDone.length;
+}
+const CONVOY_LOAD=500,CONVOY_DURATION=5*MINUTE;
+function convoySlots(){return data.marketLevel>=4?3:data.marketLevel>=2?2:data.marketLevel>=1?1:0}
+function convoyRewards(id){return TRADE_PRICES[id]*10+20}
+function dispatchConvoy(resource){
+ advance();
+ if(!Object.hasOwn(TRADE_PRICES,resource))return;
+ if(!data.marketLevel){status("🏪 Сначала построй торговый центр");return}
+ if(data.convoys.length>=convoySlots()){status("🚚 Все торговые конвои уже в пути");return}
+ if(data.resources[resource]<CONVOY_LOAD){status("Недостаточно ресурсов для погрузки конвоя");return}
+ data.resources[resource]-=CONVOY_LOAD;
+ data.convoys.push({resource,endsAt:Date.now()+CONVOY_DURATION,reward:convoyRewards(resource)});
+ status("🚚 Конвой отправлен: 500 "+labels[resource]+" · вернётся через 5 минут");
+ save();render();
+}
+function completeConvoys(now=Date.now()){
+ const arrived=data.convoys.filter(j=>j.endsAt<=now);
+ if(!arrived.length)return 0;
+ const amount=arrived.reduce((sum,j)=>sum+j.reward,0);
+ data.coins=Math.min(999999999,data.coins+amount);
+ data.convoyEarned+=amount;data.convoyTrips+=arrived.length;
+ data.convoys=data.convoys.filter(j=>j.endsAt>now);
+ status("🚚 Вернулось конвоев: "+arrived.length+" · получено +"+format(amount)+" 🪙");
+ return arrived.length;
+}
+function convoyPanel(){
+ return '<div class="card convoy-panel"><h3>🚚 Торговые конвои</h3>'+
+ '<p>Загрузка: 500 единиц · рейс: 5 минут · одновременно: '+data.convoys.length+'/'+convoySlots()+'</p>'+
+ '<p>Рейсов завершено: '+format(data.convoyTrips)+' · заработано: '+format(data.convoyEarned)+' 🪙</p>'+
+ (data.marketLevel?'': '<p>Построй торговый центр, чтобы открыть конвои.</p>')+
+ '<div class="convoy-choices">'+Object.keys(TRADE_PRICES).map(id=>
+ '<button class="btn alt" data-convoy="'+id+'" '+(!data.marketLevel||data.convoys.length>=convoySlots()||data.resources[id]<CONVOY_LOAD?'disabled':'')+'>'+
+ labels[id]+' · +'+convoyRewards(id)+' 🪙</button>').join('')+'</div>'+
+ '<div class="convoy-traffic">'+data.convoys.map(j=>'<div>🚛 '+labels[j.resource]+' · возврат через '+clock(timeLeft(j))+'</div>').join('')+'</div></div>';
+}
+function executeTrade(){
+ if(!data.marketLevel)return 0;
+ let coins=0;
+ for(const id of Object.keys(TRADE_PRICES)){
+  if(!data.marketEnabled[id])continue;
+  const above=Math.max(0,data.resources[id]-data.marketReserve[id]);
+  const batches=Math.min(data.marketLevel*10,Math.floor(above/TRADE_BATCH));
+  if(!batches)continue;
+  data.resources[id]-=batches*TRADE_BATCH;
+  coins+=batches*TRADE_PRICES[id];
+ }
+ if(coins){
+  data.coins=Math.min(999999999,data.coins+coins);
+  data.tradeEarned+=coins;
+ }
+ return coins;
+}
+function accrue(now=Date.now()){
+ const elapsed=Math.max(0,Math.min(MAX_OFFLINE,Math.floor((now-data.lastProduction)/MINUTE)));
+ if(!elapsed)return 0;
+ let made=0;
+ const network=connectedRoads();
+ const rates=Object.fromEntries(Object.keys(data.resources).map(id=>[id,definitions.filter(d=>d.resource===id).reduce((sum,def)=>sum+def.rate*factoryActiveLevels(def.id,network),0)]));
+ // Calculate production and each ten-minute sale in chronological order.
+ // This prevents selling stock that had not yet been manufactured.
+ let tick=data.lastProduction;
+ for(let minute=0;minute<elapsed;minute++){
+  tick+=MINUTE;
+  for(const id of Object.keys(rates)){
+   const old=data.resources[id];
+   data.resources[id]=Math.min(capacity(),old+rates[id]);
+   made+=data.resources[id]-old;
+  }
+  if(data.marketLevel&&tick-data.lastTradeAt>=TRADE_INTERVAL){
+   executeTrade();
+   data.lastTradeAt=tick;
+  }
+ }
+ data.lastProduction=(now-data.lastProduction)>MAX_OFFLINE*MINUTE?now:tick;
+ if(data.marketLevel&&now-tick>=MINUTE)data.lastTradeAt=now;
+ return made;
+}
+function upgradeMarket(){
+ advance();
+ if(data.marketLevel>=TRADE_MAX_LEVEL)return;
+ const cost=MARKET_COSTS[data.marketLevel];
+ if(!canAfford(cost)){status("Для торгового центра не хватает ресурсов");return}
+ spend(cost);
+ data.marketLevel++;
+ if(data.marketLevel===1)data.lastTradeAt=Date.now();
+ status("🏪 Торговый центр: уровень "+data.marketLevel+". Автопродажа каждые 10 минут");
+ save();render();showCard();
+}
+function configureMarket(id,enabled,reserve){
+ if(!Object.hasOwn(TRADE_PRICES,id))return;
+ advance();
+ if(typeof enabled==="boolean")data.marketEnabled[id]=enabled;
+ if(Number.isFinite(reserve))data.marketReserve[id]=Math.max(0,Math.min(100000,Math.floor(reserve)));
+ save();render();showCard();
+}
+function canAfford(cost){return Object.entries(cost).every(([k,v])=>k==="coins"?data.coins>=v:data.resources[k]>=v)}
+function spend(cost){for(const [k,v]of Object.entries(cost)){if(k==="coins")data.coins-=v;else data.resources[k]-=v}}
+function build(id,slot=null){
+advance();const def=definitions.find(x=>x.id===id);if(!def)return;
+if(data.factories[id]===0&&data.baseLevel<def.requiredHQ){status("🔒 "+def.title+" откроется на уровне штаба "+def.requiredHQ);return;}
+const level=data.factories[id];
+if(level>=999)return;
+if(data.construction.some(j=>j.id===id)){status("Завод этого типа уже строится или улучшается");return}
+if(slot!==null&&(!plotUnlocked(slot)||data.placements.some(p=>p.slot===slot)||data.construction.some(p=>p.slot===slot)||facilityAt(slot))){status("Участок занят");return}
+if(slot===null&&level===0){const free=Array.from({length:accessiblePlots()},(_,i)=>i).find(i=>!data.placements.some(p=>p.slot===i)&&!data.construction.some(p=>p.slot===i)&&!facilityAt(i));if(free===undefined){status("Нет свободных участков");return}slot=free}
+const price=Object.fromEntries(Object.entries(def.cost).map(([k,v])=>[k,Math.round(v*(1+level*.85))]));
+if(!canAfford(price)){status("Недостаточно материалов для "+def.title);render();return}
+spend(price);
+const duration=slot!==null?45:Math.min(180,60+level*15);
+data.construction.push({id,slot,endsAt:Date.now()+duration*1000});
+selectedSlot=null;status("🏗️ "+def.title+": строительство "+clock(duration));save();render();
+}
+function advance(now=Date.now()){const done=finishJobs(now);const made=accrue(now);const arrived=completeConvoys(now);if(done||arrived)save();return {done:done+arrived,made}}
+function upgradeHQ(){
+advance();if(data.baseLevel>=1000)return;const price=hqCost(data.baseLevel);
+if(!canAfford(price)){status("Для штаба недостаточно ресурсов");return}
+spend(price);const previous=Math.floor((data.baseLevel-1)/30);data.baseLevel++;
+status(previous!==Math.floor((data.baseLevel-1)/30)?"🏛️ Открыт новый этап облика штаба!":"🏛️ Штаб улучшен до уровня "+data.baseLevel);
+save();render();
+}
+function upgradeStorage(){
+advance();if(data.storageLevel>=1000)return;const price=storageCost(data.storageLevel);
+if(!canAfford(price)){status("Для склада недостаточно ресурсов");return}
+spend(price);data.storageLevel++;status("📦 Вместимость склада увеличена до "+format(capacity()));save();render();
+}
+
+let activeCard=null,mapSignature="",roadMode=false,movingFactory=null,movingFacility=null;
+const ROAD_PRICE=12;
+// Road lanes occupy the gaps between building plots, never a plot itself.
+
+function roadSegmentArt(slot){
+ if(slot.v)return 'M '+slot.x+' '+slot.y+' L '+slot.x+' '+slot.endY;
+ return 'M '+slot.x+' '+slot.y+' L '+Math.min(slot.x+103,1075)+' '+slot.y;
+}
+// Each paid road segment is a walkable edge. Only edges reachable from the
+// headquarters access point may power a neighboring factory.
+function roadBounds(s){
+ return s.v?{x1:s.x,x2:s.x,y1:s.y,y2:s.endY}:{x1:s.x,x2:Math.min(s.x+103,1075),y1:s.y,y2:s.y};
+}
+function rectGap(a,b){
+ const dx=Math.max(0,a.x1-b.x2,b.x1-a.x2);
+ const dy=Math.max(0,a.y1-b.y2,b.y1-a.y2);
+ return Math.hypot(dx,dy);
+}
+function connectedRoads(){
+ const built=data.roads.map(id=>roadSlots.find(s=>s.id===id)).filter(s=>s&&roadUnlocked(s));
+ const connected=new Set(),queue=[];
+ const entry={x1:244,x2:244,y1:155,y2:155};
+ for(const s of built){if(rectGap(roadBounds(s),entry)<=1){connected.add(s.id);queue.push(s)}}
+ while(queue.length){
+  const item=queue.pop(),bounds=roadBounds(item);
+  for(const other of built){
+   if(!connected.has(other.id)&&rectGap(bounds,roadBounds(other))<=1){
+    connected.add(other.id);queue.push(other);
+   }
+  }
+ }
+ return connected;
+}
+function isFactoryConnected(slot,network=connectedRoads()){
+ const column=slot%6,row=Math.floor(slot/6);
+ const x=42+column*166,y=190+row*136;
+ // Approach roads within 40px of a plot's boundary serve its entrance.
+ const building={x1:x,x2:x+114,y1:y,y2:y+92};
+ return roadSlots.some(s=>network.has(s.id)&&rectGap(roadBounds(s),building)<=40);
+}
+function factoryActiveLevels(id,network=connectedRoads()){
+ const plots=data.placements.filter(p=>p.id===id);
+ const connected=plots.filter(p=>isFactoryConnected(p.slot,network)).length;
+ const inactive=plots.length-connected;
+ return plots.length?Math.max(0,data.factories[id]-inactive):0;
+}
+function factoryConnectedCount(){
+ const network=connectedRoads();
+ return data.placements.filter(p=>isFactoryConnected(p.slot,network)).length;
+}
+function roadSvg(){
+ if(!data.roads.length)return "";
+ const network=connectedRoads();
+ const built=data.roads.map(id=>roadSlots.find(s=>s.id===id)).filter(s=>s&&roadUnlocked(s));
+ // All curbs, then all pavement, then lane markings: seamless shared joints.
+ const paths=(className,items)=>items.map(s=>
+  '<path class="'+className+'" d="'+roadSegmentArt(s)+'"/>').join("");
+ const active=built.filter(s=>network.has(s.id));
+ const inactive=built.filter(s=>!network.has(s.id));
+ const layer=items=>paths("pavement",items)+paths("asphalt",items)+paths("marking",items);
+ return '<svg class="roadnet" width="1100" height="1050" viewBox="0 0 1100 1050" aria-hidden="true">'+
+ '<g class="road-unconnected">'+layer(inactive)+'</g>'+
+ '<g class="road-connected">'+layer(active)+'</g></svg>';
+}
+function buildRoad(id){
+ if(!roadMode)return;
+ const place=roadSlots.find(s=>s.id===id);
+ if(!place||!roadUnlocked(place)||data.roads.includes(id))return;
+ advance();
+ if(data.resources.metal<ROAD_PRICE){status("Для дороги нужно "+ROAD_PRICE+" металла 🔩");return}
+ data.resources.metal-=ROAD_PRICE;data.roads.push(id);
+ // Reset the accounting boundary: an unconnected factory never earns past output.
+ data.lastProduction=Date.now();
+ status("🛣️ Дорога построена: "+factoryConnectedCount()+" подключённых заводов. −"+ROAD_PRICE+" 🔩");
+ save();render();
+}
+
+// Relocation never changes factory levels or production counters.
+function facilityAt(slot){
+ for(const id of ["storage","garage","hangar"])if(data.facilityLots[id]===slot)return id;
+ return null;
+}
+function facilityName(id){return id==="storage"?"Склад":facilityDefs[id].name}
+function beginMovingFacility(id){
+ if(!["storage","garage","hangar"].includes(id))return;
+ if(id!=="storage"&&!data.facilities[id]){status("Сначала построй "+facilityName(id));return}
+ if(data.facilityJobs.some(j=>j.id===id)){status("Дождись завершения строительства");return}
+ movingFactory=null;movingFacility={id};roadMode=false;closeCard();mapSignature="";
+ $("mapstatus").textContent="🏗️ Выбери свободный участок для "+facilityName(id);
+ status("Переставляем "+facilityName(id)+": коснись свободного участка");
+ render();
+}
+function moveFacility(toSlot){
+ if(!movingFacility)return;
+ const id=movingFacility.id;
+ if(!plotUnlocked(toSlot))return;
+ if(data.facilityLots[id]===toSlot){cancelMovingFactory();return}
+ if(data.placements.some(p=>p.slot===toSlot)||data.construction.some(j=>j.slot===toSlot)||facilityAt(toSlot)){
+  status("Участок занят. Выбери свободное место");return;
+ }
+ advance();data.facilityLots[id]=toSlot;
+ movingFacility=null;mapSignature="";
+ $("mapstatus").textContent="Нажмите на здание, ＋ или «Дороги»";
+ status("🏗️ "+facilityName(id)+" перемещён на участок "+(toSlot+1));
+ save();render();
+}
+function returnFacility(id){
+ if(!["storage","garage","hangar"].includes(id))return;
+ advance();data.facilityLots[id]=null;movingFacility=null;mapSignature="";
+ status("🏗️ "+facilityName(id)+" возвращён в командный сектор");
+ save();render();
+}
+function beginMovingFactory(slot,id){
+ if(data.construction.some(j=>j.id===id)){
+  status("Дождись завершения строительства завода");return;
+ }
+ const placed=data.placements.find(p=>p.slot===slot&&p.id===id);
+ if(!placed)return;
+ movingFacility=null;movingFactory={from:slot,id};
+ roadMode=false;closeCard();mapSignature="";
+ $("mapstatus").textContent="🏗️ Перемещение: выбери свободный участок на карте или нажми «Отмена»";
+ status("Выбери свободный участок для "+definitions.find(d=>d.id===id).title);
+ render();
+}
+function cancelMovingFactory(){
+ movingFactory=null;movingFacility=null;mapSignature="";
+ $("mapstatus").textContent="Нажмите на здание, ＋ или «Дороги»";
+ render();
+}
+function moveFactory(toSlot){
+ if(!movingFactory)return;
+ const {from,id}=movingFactory;
+ if(!plotUnlocked(toSlot))return;
+ if(toSlot===from){cancelMovingFactory();return}
+ if(data.placements.some(p=>p.slot===toSlot)||data.construction.some(j=>j.slot===toSlot)||facilityAt(toSlot)){
+  status("Участок занят. Выбери свободный участок");return;
+ }
+ const current=data.placements.find(p=>p.slot===from&&p.id===id);
+ if(!current){cancelMovingFactory();return}
+ advance();
+ const oldActive=isFactoryConnected(from);
+ current.slot=toSlot;
+ // No retrospective production at the new road location.
+ data.lastProduction=Date.now();
+ const newActive=isFactoryConnected(toSlot);
+ movingFactory=null;mapSignature="";
+ $("mapstatus").textContent="Нажмите на здание, ＋ или «Дороги»";
+ status("🏗️ Завод перемещён · "+(newActive?"✅ дорога подключена":"🚫 нужна дорога от штаба"));
+ save();render();
+}
+function factoryCost(id){const d=definitions.find(x=>x.id===id);const level=data.factories[id];return Object.fromEntries(Object.entries(d.cost).map(([k,v])=>[k,Math.round(v*(1+level*.85))]))}
+function openCard(type,slot=null,id=null){activeCard={type,slot,id};showCard()}
+function closeCard(){$("overlay").hidden=true;activeCard=null}
+function showCard(){
+ if(!activeCard)return;
+ const {type,slot,id}=activeCard;
+ let title="",html="",act=null;
+ const button=(label,disabled=false)=>'<button class="btn" id="cardAction" '+(disabled?"disabled":"")+'>'+label+'</button>';
+ if(type==="market"){
+  title="🏪 Торговый центр";
+  const cost=MARKET_COSTS[data.marketLevel],max=data.marketLevel>=TRADE_MAX_LEVEL;
+  html='<p>Уровень: <b>'+data.marketLevel+' / '+TRADE_MAX_LEVEL+'</b> · Автопродажа раз в 10 минут</p>'+
+   '<p>Общий доход от торговли: <b>'+format(data.tradeEarned)+' 🪙</b></p>'+
+   '<p class="muted">Продаётся только продукция сверх неснижаемого запаса. Лимит за цикл: '+(data.marketLevel*1000)+' единиц каждого ресурса.</p>'+
+   (data.marketLevel?'<div class="market-grid">'+Object.keys(TRADE_PRICES).map(resource=>
+    '<div class="market-line"><label><input type="checkbox" data-market-toggle="'+resource+'" '+(data.marketEnabled[resource]?'checked':'')+'> '+labels[resource]+'</label>'+
+    '<span>'+TRADE_BATCH+' ед. → '+TRADE_PRICES[resource]+' 🪙</span>'+
+    '<label>Сохранять на складе <input type="number" data-market-reserve="'+resource+'" min="0" max="100000" step="100" value="'+data.marketReserve[resource]+'"></label></div>'
+   ).join('')+'</div>':'<p>Построй центр, чтобы открыть автоматическую торговлю.</p>')+
+   (max?'<p>Достигнут максимальный уровень.</p>':button(data.marketLevel?'⬆️ Улучшить · '+costLabel(cost):'🏗️ Построить · '+costLabel(cost),!canAfford(cost)));
+  act=upgradeMarket;
+ }else if(type==="territory"){
+ title="🌿 Расширение базы";
+ const price=expansionPrice();
+ html='<p>Доступно: <b>'+accessiblePlots()+' из '+TOTAL_PLOTS+' участков</b></p>'+
+ (price?'<p>Открывает 6 новых участков для зданий и дорог.</p><p>Стоимость: <b>'+costLabel(price)+'</b></p>':'<p>Вся территория уже открыта.</p>')+
+ button(price?"🌿 Купить территорию":"Максимальное расширение",!price||!canAfford(price));
+ act=buildExpansion;
+ } else if(type==="facility"){
+ const def=facilityDefs[id],level=data.facilities[id],job=data.facilityJobs.find(j=>j.id===id),cost=facilityCost(id);
+ title=def.icon+" "+def.name;
+ html='<p>Уровень: <b>'+level+' / 100</b></p><p>Назначение: '+def.purpose+'</p>'+(job?'<p>🏗️ Осталось: <b>'+clock(timeLeft(job))+'</b></p>':'<p>Стоимость: '+costLabel(cost)+'</p>')+'<p class="muted">'+(level===0?'Здание ещё не построено.':'Здание работает. Открой раздел техники, чтобы производить машины.')+'</p>'+button(job?"Строится…":level?"⬆️ Улучшить":"🏗️ Построить",!!job||level>=100||!canAfford(cost));
+ act=()=>buildFacility(id);
+ } else if(type==="hq"){
+ title="🏛️ Командный штаб";
+ const price=hqCost(data.baseLevel),max=data.baseLevel>=1000;
+ html='<p>Уровень: <b>'+data.baseLevel+' / 1000</b> · Облик '+Math.min(34,Math.floor((data.baseLevel-1)/30)+1)+'/34</p><p>Следующее улучшение: '+(max?"достигнут максимум":costLabel(price))+'</p><p class="muted">Новый этап внешнего вида каждые 30 уровней</p>'+button(max?"Максимальный уровень":"⬆️ Улучшить штаб",max||!canAfford(price));
+ act=()=>upgradeHQ();
+ } else if(type==="storage"){
+ title="📦 Склад";
+ const price=storageCost(data.storageLevel),max=data.storageLevel>=1000;
+ html='<p>Уровень: <b>'+data.storageLevel+'</b></p><p>Вместимость: <b>'+format(capacity())+' на каждый ресурс</b></p><p>Стоимость улучшения: '+(max?"максимальный уровень":costLabel(price))+'</p>'+button("📦 Расширить склад",max||!canAfford(price));
+ act=()=>upgradeStorage();
+ } else if(type==="factory"){
+ const def=definitions.find(x=>x.id===id),level=data.factories[id],job=data.construction.find(j=>j.id===id),price=factoryCost(id);
+ title=def.icon+" "+def.title;
+ const connected=isFactoryConnected(slot),activeLevel=factoryActiveLevels(id);
+ html='<p>Уровень: <b>'+level+'</b> · Открывается на штабе '+def.requiredHQ+'</p><p>🚧 Дорога: <b>'+(connected?'✅ подключён':'❌ нет связи со штабом')+'</b></p><p>Производство: <b>+'+format(activeLevel*def.rate)+' '+labels[def.resource]+' / мин</b></p>'+(job?'<p>🏗️ Строительство: '+clock(timeLeft(job))+'</p>':'<p>Стоимость улучшения: '+costLabel(price)+'</p>')+button(job?"Строится…":"⬆️ Улучшить",!!job||level>=999||!canAfford(price));
+ act=()=>build(id);
+ } else if(type==="construction"){
+ const job=data.construction.find(j=>j.slot===slot);
+ if(!job){closeCard();return}
+ const def=definitions.find(x=>x.id===job.id);
+ title="🏗️ "+def.title;
+ html='<p>Идёт строительство</p><p>Осталось: <b>'+clock(timeLeft(job))+'</b></p><p class="muted">После завершения здание появится на карте.</p>';
+ } else if(type==="empty"){
+ title="🏗️ Строительство · участок "+(slot+1);
+ const choices=definitions.map(d=>{
+ const blocked=data.factories[d.id]===0&&data.baseLevel<d.requiredHQ;
+ return '<option value="'+d.id+'" '+(blocked?'disabled':'')+'>'+d.icon+' '+d.title+
+ (blocked?' · 🔒 Штаб '+d.requiredHQ:' · '+costLabel(factoryCost(d.id)))+'</option>';
+ }).join("");
+ html='<p>Выберите завод для этого участка:</p><select id="cardChoice">'+choices+'</select><p class="muted" id="choiceCost"></p>'+button("🏗️ Начать строительство");
+ act=()=>build($("cardChoice").value,slot);
+ }
+ $("sheetTitle").textContent=title;$("sheetBody").innerHTML=html;$("overlay").hidden=false;
+ const action=$("cardAction");
+ if(action)action.onclick=()=>{act();if(type!=="empty"&&type!=="factory"){showCard()}else if(type==="factory"){showCard()}else{closeCard()}};
+ if(type==="storage"||type==="facility"){
+   const fid=type==="storage"?"storage":id;
+   if(fid==="storage"||data.facilities[fid]>0){
+    if(!data.facilityJobs.some(j=>j.id===fid)){
+     const move=document.createElement("button");
+     move.className="btn alt";move.id="moveFacilityBtn";
+     move.textContent="↔️ Переместить "+facilityName(fid).toLowerCase();
+     move.onclick=()=>beginMovingFacility(fid);
+     $("sheetBody").appendChild(move);
+     if(data.facilityLots[fid]!==null){
+      const back=document.createElement("button");
+      back.className="btn alt";back.textContent="↩️ Вернуть в командный сектор";
+      back.onclick=()=>{returnFacility(fid);closeCard()};
+      $("sheetBody").appendChild(back);
+     }
+    }
+   }
+ }
+ if(type==="factory"){
+   const relocate=document.createElement("button");
+   relocate.className="btn alt";
+   relocate.id="moveFactoryBtn";
+   relocate.textContent="↔️ Переместить завод";
+   relocate.onclick=()=>beginMovingFactory(slot,id);
+   $("sheetBody").appendChild(relocate);
+ }
+ if(type==="market"&&data.marketLevel){
+  document.querySelectorAll("[data-market-toggle]").forEach(el=>el.onchange=()=>{
+   configureMarket(el.dataset.marketToggle,el.checked,null);
+  });
+  document.querySelectorAll("[data-market-reserve]").forEach(el=>el.onchange=()=>{
+   configureMarket(el.dataset.marketReserve,null,Number(el.value));
+  });
+ }
+ if(type==="empty"){
+ const choice=$("cardChoice");
+ const refresh=()=>{const id=choice.value,job=data.construction.some(j=>j.id===id),cost=factoryCost(id);$("choiceCost").textContent="Цена: "+costLabel(cost)+(job?" · уже строится":"");$("cardAction").disabled=job||!canAfford(cost)||(data.factories[id]===0&&data.baseLevel<definitions.find(d=>d.id===id).requiredHQ)};
+ choice.onchange=refresh;refresh();
+ }
+}
+function buildingArt(type,running=false){
+ return '<span class="asset '+type+(running?' running':'')+'" aria-hidden="true"><i class="ground"></i><i class="walls"></i><i class="roof"></i><i class="door"></i><i class="window"></i><i class="detail-art"></i><i class="trim"></i><i class="emblem"></i><i class="equipment"></i></span>';
+}
+function convoyTrafficArt(){
+ if(!data.convoys.length)return "";
+ return '<div class="convoy-route" aria-label="Торговые конвои в пути"><span class="convoy-route-label">ЛОГИСТИЧЕСКИЙ МАРШРУТ</span>'+
+ data.convoys.map((job,i)=>'<span class="moving-convoy '+(i%2?"reverse":"")+'" style="--delay:-'+(i*2)+'s" title="Конвой: '+labels[job.resource]+'">🚚<small>'+labels[job.resource]+'</small></span>').join("")+'</div>';
+}
+function terrainArt(){
+ const trees=[[29,97],[394,82],[737,73],[1049,207],[97,716],[1085,720],[17,447],[889,721],[467,743],[1051,445],[66,920],[264,987],[620,986],[1022,963],[1090,863],[12,794]];
+ const rocks=[[122,129],[322,717],[819,145],[1066,608],[572,180],[89,960],[390,945],[760,967]];
+ const roads=roadSvg();
+ const landscaping=[[128,385],[284,555],[624,270],[922,605],[218,822],[755,928],[982,303],[40,617]];
+ const crates=[[91,295],[980,165],[225,738],[981,783]];
+ return roads+'<span class="map-mark" style="left:25px;top:15px">Командный сектор</span><span class="dirt" style="left:90px;top:327px;width:230px;height:130px"></span><span class="dirt" style="left:778px;top:398px;width:245px;height:96px"></span><span class="fence" style="left:25px;top:15px;width:990px"></span><span class="fence" style="left:34px;top:1018px;width:1026px"></span><span class="lamp" style="left:87px;top:131px"></span><span class="lamp" style="left:445px;top:131px"></span><span class="lamp" style="left:964px;top:131px"></span><span class="lamp" style="left:425px;top:823px"></span><span class="lamp" style="left:985px;top:846px"></span>'+
+ landscaping.map(([x,y])=>'<span class="grass-detail" style="left:'+x+'px;top:'+y+'px"></span>').join("")+
+ crates.map(([x,y])=>'<span class="supply-stack" style="left:'+x+'px;top:'+y+'px"></span>').join("")+
+ trees.map(([x,y])=>'<span class="landmark tree" style="left:'+x+'px;top:'+y+'px"></span>').join("")+
+ rocks.map(([x,y])=>'<span class="landmark rock" style="left:'+x+'px;top:'+y+'px"></span>').join("");
+}
+function renderMap(){
+ const signature=JSON.stringify([data.placements,data.construction.map(j=>[j.id,j.slot]),data.baseLevel,data.storageLevel,data.facilities,data.facilityJobs.map(j=>j.id),data.roads,roadMode,movingFactory,movingFacility,data.facilityLots,data.territoryLevel,data.vehicles,data.displayVehicles,data.marketLevel,data.convoys.map(j=>[j.resource,j.endsAt])]);
+ if(mapSignature===signature)return;
+ mapSignature=signature;
+ const slots=[];
+ for(let i=0;i<TOTAL_PLOTS;i++){
+ const placed=data.placements.find(v=>v.slot===i),job=data.construction.find(v=>v.slot===i),def=placed&&definitions.find(d=>d.id===placed.id),facility=facilityAt(i),locked=!plotUnlocked(i);
+ const x=42+(i%6)*166,y=190+Math.floor(i/6)*136;
+ const connected=def?isFactoryConnected(i):false;
+ const label=locked?"Закрытая территория":facility?facilityName(facility):def?def.title+(connected?" · работает":" · нет дороги"):job?"Строится":"Свободный участок";
+ slots.push('<button type="button" class="plot '+(locked?" locked-land":placed||job||facility?"occupied":"")+(def&&!connected?" offline":"")+(movingFactory&&movingFactory.from===i||movingFacility&&data.facilityLots[movingFacility.id]===i?" move-source":"")+((movingFactory||movingFacility)&&!locked&&!placed&&!job&&!facility?" move-target":"")+'" aria-label="'+label+'" data-slot="'+i+'" style="left:'+x+'px;top:'+y+'px">'+(locked?'<strong>🔒</strong>':facility?buildingArt(facility):def?buildingArt(def.id,connected):job?buildingArt("construction"):'<strong>＋</strong>')+'<small>'+(locked?"Открыть":facility?facilityName(facility):def?(connected?'✅ ':'🚫 ')+def.title.replace(" завод",""):job?"Строится":"Участок")+'</small></button>');
+ }
+ const roadControls=roadMode&&!movingFactory&&!movingFacility?roadSlots.filter(s=>roadUnlocked(s)&&!data.roads.includes(s.id)).map(s=>
+ '<button type="button" class="road-spot '+(s.v?'vertical':'horizontal')+'" data-road="'+s.id+
+ '" style="left:'+(s.v?s.x-12:s.x)+'px;top:'+(s.v?(s.y+s.endY)/2-36:s.y-13)+
+ 'px" aria-label="Построить участок дороги за 12 металла"><span>＋</span></button>').join(""):"";
+ const facilityArt=["garage","hangar"].map((id,i)=>{
+  const d=facilityDefs[id],level=data.facilities[id],job=data.facilityJobs.find(j=>j.id===id);
+  return '<button class="poi" id="map-'+id+'" '+(data.facilityLots[id]!==null?'hidden ':'')+'style="left:'+(i===0?770:938)+'px;top:25px" aria-label="Открыть '+d.name+'">'+buildingArt(job?"construction":id)+'<small>'+d.name+' · '+(job?'стройка':level||'построить')+'</small></button>';
+ }).join("");
+ $("world").innerHTML=terrainArt()+roadControls+slots.join("")+convoyTrafficArt()+vehicleParking()+
+ '<button class="poi" id="mapMarket" style="left:365px;top:25px" aria-label="Открыть торговый центр">'+buildingArt("market")+'<small>Торговля · '+(data.marketLevel||'построить')+'</small></button>'+
+ '<button class="poi" id="mapHQ" style="left:183px;top:25px" aria-label="Открыть штаб">'+buildingArt("hq")+'<small>Штаб · '+data.baseLevel+'</small></button>'+
+ '<button class="poi" id="mapStorage" '+(data.facilityLots.storage!==null?'hidden ':'')+'style="left:530px;top:25px" aria-label="Открыть склад">'+buildingArt("storage")+'<small>Склад · '+data.storageLevel+'</small></button>'+facilityArt;
+ document.querySelectorAll("[data-road]").forEach(btn=>btn.onclick=()=>buildRoad(Number(btn.dataset.road)));
+ document.querySelectorAll("[data-vehiclepad]").forEach(btn=>btn.onclick=()=>{
+  const id=btn.dataset.vehiclepad,v=vehicleDefs.find(v=>v.id===id);
+  showView(v.kind);
+ });
+ document.querySelectorAll("[data-slot]").forEach(btn=>btn.onclick=()=>{
+  const slot=Number(btn.dataset.slot),placed=data.placements.find(v=>v.slot===slot),job=data.construction.find(v=>v.slot===slot);
+  if(!plotUnlocked(slot)){openCard("territory");return}
+  if(movingFactory){moveFactory(slot);return}
+  if(movingFacility){moveFacility(slot);return}
+  const facility=facilityAt(slot);if(facility){openCard(facility==="storage"?"storage":"facility",slot,facility);return}
+  if(placed)openCard("factory",slot,placed.id);else if(job)openCard("construction",slot);else openCard("empty",slot);
+ });
+ $("mapMarket").onclick=()=>openCard("market");
+ $("mapHQ").onclick=()=>openCard("hq");$("mapStorage").onclick=()=>openCard("storage");
+ for(const id of ["garage","hangar"])$("map-"+id).onclick=()=>openCard("facility",null,id);
+}
+function render(){
+ renderMap();
+ $("coins").textContent=format(data.coins);$("hq").textContent=format(data.baseLevel)+" / 1000";
+ for(const name of Object.keys(data.resources))$("res-"+name).textContent=format(data.resources[name]);
+ $("marketSummary").textContent="🏪 Торговый центр · уровень "+data.marketLevel+" · заработано "+format(data.tradeEarned)+" 🪙 · "+(data.marketLevel?"продажа каждые 10 минут":"ещё не построен");
+ $("roadMode").textContent=roadMode?"✓ Готово · дорог "+data.roads.length:"🛣️ Дороги · "+ROAD_PRICE+" 🔩";
+ $("expandLand").textContent=data.territoryLevel===2?"🌿 Земля 36/36":"🌿 Земля "+accessiblePlots()+"/36";
+ $("cancelMove").hidden=!(movingFactory||movingFacility);
+ $("roadMode").setAttribute("aria-pressed",String(roadMode));
+ $("roadHelp").hidden=!roadMode;
+ $("convoyPanel").innerHTML=convoyPanel();
+ $("resources").innerHTML=Object.keys(data.resources).map(id=>{
+  const defs=definitions.filter(def=>def.resource===id);
+  const rate=defs.reduce((sum,def)=>sum+def.rate*factoryActiveLevels(def.id),0);
+  return '<div class="card"><b>'+labels[id]+'</b><div class="symbol">'+format(data.resources[id])+'</div>'+
+  '<div class="detail">🏭 Производство: +'+format(rate)+'/мин · Вместимость '+format(capacity())+'</div></div>';
+ }).join("");
+ for(const id of ["garage","hangar"]){
+  const job=data.facilityJobs.find(j=>j.id===id);
+  $(id+"Info").textContent=facilityDefs[id].icon+" "+facilityDefs[id].name+" · уровень "+data.facilities[id]+(job?" · строится "+clock(timeLeft(job)):"")+" · единиц техники "+vehicleDefs.filter(v=>v.kind===id).reduce((n,v)=>n+data.vehicles[v.id],0);
+  $(id+"Vehicles").innerHTML=vehicleList(id);
+ }
+ document.querySelectorAll("[data-convoy]").forEach(btn=>btn.onclick=()=>dispatchConvoy(btn.dataset.convoy));
+ document.querySelectorAll("[data-buyvehicle]").forEach(btn=>btn.onclick=()=>buyVehicle(btn.dataset.buyvehicle));
+ document.querySelectorAll("[data-showvehicle]").forEach(btn=>btn.onclick=()=>toggleVehicleDisplay(btn.dataset.showvehicle));
+ if(activeCard&&$("overlay").hidden===false&&(activeCard.type==="construction"||activeCard.type==="facility"&&data.facilityJobs.some(j=>j.id===activeCard.id)))showCard();
+}
+function showView(name){
+ document.querySelectorAll("[data-view]").forEach(b=>b.classList.toggle("on",b.dataset.view===name));
+ ["base","garage","hangar","missions","storage"].forEach(v=>{$("view-"+v).hidden=v!==name});
+ closeCard();render();
+}
+$("expandLand").onclick=()=>openCard("territory");
+$("openMarket").onclick=()=>openCard("market");
+$("openTest").onclick=()=>showView("missions");
+$("testResources").onclick=testResources;
+$("testHQ").onclick=testHQ;
+$("testFinish").onclick=testFinish;
+document.querySelectorAll("[data-view]").forEach(btn=>btn.onclick=()=>{if(movingFactory||movingFacility)cancelMovingFactory();showView(btn.dataset.view)});
+$("cancelMove").onclick=cancelMovingFactory;
+$("roadMode").onclick=()=>{if(movingFactory||movingFacility)cancelMovingFactory();roadMode=!roadMode;mapSignature="";render()};
+$("goStorageMap").onclick=()=>{showView("base");openCard("storage")};for(const id of ["garage","hangar"])$("go"+(id==="garage"?"Garage":"Hangar")+"Map").onclick=()=>{showView("base");openCard("facility",null,id)};
+$("closeSheet").onclick=closeCard;
+$("overlay").onclick=e=>{if(e.target===$("overlay"))closeCard()};
+const mapScroll=$("worldscroll"),mapWorld=$("world"),mapCanvas=$("worldcanvas");
+const WORLD_WIDTH=1100,WORLD_HEIGHT=1050,BASE_MIN_ZOOM=.25,MAX_ZOOM=2.5;
+// The lowest zoom must always cover the full viewport width, including landscape phones.
+function minMapZoom(){
+ const fitWidth=(mapScroll.clientWidth||1)/WORLD_WIDTH;
+ return Math.min(MAX_ZOOM,Math.max(BASE_MIN_ZOOM,Math.ceil(fitWidth*10000)/10000));
+}
+let mapPadX=0,mapPadY=0;
+function mapBounds(){
+ return {x:Math.max(0,mapCanvas.offsetWidth-mapScroll.clientWidth),y:Math.max(0,mapCanvas.offsetHeight-mapScroll.clientHeight)};
+}
+function clampMap(){
+ const b=mapBounds();
+ mapScroll.scrollLeft=Math.max(0,Math.min(b.x,mapScroll.scrollLeft));
+ mapScroll.scrollTop=Math.max(0,Math.min(b.y,mapScroll.scrollTop));
+}
+function layoutMap(){
+ const w=mapScroll.clientWidth||1,h=mapScroll.clientHeight||1;
+ const scaledW=WORLD_WIDTH*zoom,scaledH=WORLD_HEIGHT*zoom;
+ const stageW=Math.max(w,scaledW),stageH=Math.max(h,scaledH);
+ mapPadX=(stageW-scaledW)/2;mapPadY=(stageH-scaledH)/2;
+ mapCanvas.style.width=stageW+"px";mapCanvas.style.height=stageH+"px";
+ mapWorld.style.left=mapPadX+"px";mapWorld.style.top=mapPadY+"px";
+ mapWorld.style.transform="scale("+zoom+")";
+ clampMap();
+}
+function setZoom(value,focusX=mapScroll.clientWidth/2,focusY=mapScroll.clientHeight/2){
+ const next=Math.max(minMapZoom(),Math.min(MAX_ZOOM,Math.round(value*10000)/10000));
+ if(next===zoom)return;
+ // Keep the map point beneath the pinch midpoint in the same on-screen position.
+ const worldX=(mapScroll.scrollLeft+focusX-mapPadX)/zoom;
+ const worldY=(mapScroll.scrollTop+focusY-mapPadY)/zoom;
+ zoom=next;layoutMap();
+ mapScroll.scrollLeft=worldX*zoom+mapPadX-focusX;
+ mapScroll.scrollTop=worldY*zoom+mapPadY-focusY;
+ clampMap();
+ $("zoomLevel").textContent=Math.round(zoom*100)+"%";
+}
+function centerMap(){
+ // Portrait starts at a full-width overview; landscape keeps the existing zoom.
+ if(mapScroll.clientHeight>mapScroll.clientWidth)zoom=minMapZoom();
+ else zoom=Math.max(zoom,minMapZoom());
+ layoutMap();
+ const b=mapBounds();
+ mapScroll.scrollLeft=b.x/2;mapScroll.scrollTop=0;
+ $("zoomLevel").textContent=Math.round(zoom*100)+"%";
+}
+function fitMapAfterResize(){
+ const centerX=(mapScroll.scrollLeft+mapScroll.clientWidth/2-mapPadX)/zoom;
+ const centerY=(mapScroll.scrollTop+mapScroll.clientHeight/2-mapPadY)/zoom;
+ zoom=Math.max(zoom,minMapZoom());
+ layoutMap();
+ mapScroll.scrollLeft=centerX*zoom+mapPadX-mapScroll.clientWidth/2;
+ mapScroll.scrollTop=centerY*zoom+mapPadY-mapScroll.clientHeight/2;
+ clampMap();
+ $("zoomLevel").textContent=Math.round(zoom*100)+"%";
+}
+$("zoomin").onclick=()=>setZoom(zoom+.2);
+$("zoomout").onclick=()=>setZoom(zoom-.2);
+// Use manual, bounded touch pan instead of iOS WebKit's elastic overscroll.
+// Tap on a plot still works: preventDefault only after actual movement.
+let pinch=null,drag=null;
+const spacing=(a,b)=>Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY);
+mapScroll.addEventListener("touchstart",e=>{
+ if(e.touches.length===2){
+  const a=e.touches[0],b=e.touches[1];
+  drag=null;
+  pinch={distance:Math.max(1,spacing(a,b)),zoom};
+ }else if(e.touches.length===1){
+  pinch=null;
+  const a=e.touches[0];
+  drag={x:a.clientX,y:a.clientY,left:mapScroll.scrollLeft,top:mapScroll.scrollTop,moved:false};
+ }
+},{passive:true});
+mapScroll.addEventListener("touchmove",e=>{
+ if(e.touches.length===2){
+  if(e.cancelable)e.preventDefault();
+  const a=e.touches[0],b=e.touches[1],rect=mapScroll.getBoundingClientRect();
+  if(!pinch)pinch={distance:Math.max(1,spacing(a,b)),zoom};
+  const focusX=(a.clientX+b.clientX)/2-rect.left;
+  const focusY=(a.clientY+b.clientY)/2-rect.top;
+  setZoom(pinch.zoom*spacing(a,b)/pinch.distance,focusX,focusY);
+  return;
+ }
+ if(e.touches.length===1&&drag){
+  const a=e.touches[0],dx=a.clientX-drag.x,dy=a.clientY-drag.y;
+  if(!drag.moved&&Math.hypot(dx,dy)<7)return;
+  drag.moved=true;
+  if(e.cancelable)e.preventDefault();
+  const bounds=mapBounds();
+  mapScroll.scrollLeft=Math.max(0,Math.min(bounds.x,drag.left-dx));
+  mapScroll.scrollTop=Math.max(0,Math.min(bounds.y,drag.top-dy));
+ }
+},{passive:false});
+mapScroll.addEventListener("touchend",e=>{
+ if(e.touches.length<2)pinch=null;
+ if(e.touches.length===0)drag=null;
+},{passive:true});
+mapScroll.addEventListener("touchcancel",()=>{pinch=null;drag=null},{passive:true});
+mapScroll.addEventListener("scroll",clampMap,{passive:true});
+if(typeof ResizeObserver!=="undefined"){
+ new ResizeObserver(fitMapAfterResize).observe(mapScroll);
+}else window.addEventListener("resize",fitMapAfterResize);
+mapScroll.addEventListener("wheel",e=>{
+ if(!e.ctrlKey&&!e.metaKey)return;
+ e.preventDefault();
+ const rect=mapScroll.getBoundingClientRect();
+ setZoom(zoom*(e.deltaY<0?1.1:.9),e.clientX-rect.left,e.clientY-rect.top);
+},{passive:false});
+$("save").onclick=()=>{advance();save(true);render()};
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"){advance();save()}else{const gained=advance().made;if(gained)status("Производство принесло "+format(gained)+" ресурсов");save();render()}});
+window.addEventListener("pagehide",()=>{advance();save()});
+const gained=advance().made;if(gained)status("Пока тебя не было, заводы произвели "+format(gained)+" ресурсов");
+save();render();centerMap();
+// Periodic refresh is for UI only; offline output depends on timestamps, not background timers.
+setInterval(()=>{const result=advance();if(result.made||result.done)save();render();},1000);
+})();
+</script></body></html>
