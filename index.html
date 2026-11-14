@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#142820"><title>Военная база: Merge 0.5</title>
+<meta name="theme-color" content="#142820"><title>Военная база: Merge 0.5.1</title>
 <style>
 :root{--ink:#eef5df;--muted:#b6cbb0;--lime:#d6e994;--border:#516d4c;--sand:#ddba75}
 *{box-sizing:border-box}html{background:#102218}body{margin:0;color:var(--ink);background:radial-gradient(ellipse at 48% 0%,#426044 0%,#1e3829 38%,#0f2118 85%);font:15px system-ui,-apple-system,sans-serif}button{font:inherit;touch-action:manipulation}
@@ -21,23 +21,23 @@ header{text-align:center;margin:0 0 10px}header .eyebrow{font-weight:800;letter-
 .bottomnav{position:sticky;bottom:0;z-index:20;background:#152b20f2;border:1px solid #617851;box-shadow:0 -3px 14px #0818109c;display:grid;grid-template-columns:repeat(5,1fr);gap:3px;border-radius:13px;padding:5px;margin:12px 0 4px;backdrop-filter:blur(7px)}.navbtn{border:0;color:#bbd1b5;background:transparent;padding:7px 0;font-size:10px;min-width:0;border-radius:9px;cursor:pointer}.navbtn .ico{display:block;font-size:21px}.navbtn.active{color:#fff7c5;background:#476349}.navbtn:focus-visible,.action:focus-visible{outline:2px solid #ffdd80}.subview{min-height:220px}.subview[hidden]{display:none}.storage{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:10px 0}.storecard{padding:11px;border:1px solid #617856;background:#2a4434;border-radius:12px}.storecard strong{display:block;font-size:20px}.state{font-weight:bold;color:#d9d89c}.muted{opacity:.83}.savebar{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:9px}.savebar button{padding:8px 11px;font-size:12px}.savebar small{color:#b9d2b1;flex:1;min-width:140px}@media(max-width:430px){.navbtn{font-size:9px}.panel{padding:9px}.base{height:100px}.building svg{height:57px}}
 </style></head>
 <body><main>
-<header><div class="eyebrow">TACTICAL MERGE • 0.5</div><h1>🪖 ВОЕННАЯ БАЗА</h1><div class="sub">Объединяй технику — развивай свою базу</div></header>
+<header><div class="eyebrow">TACTICAL MERGE • 0.5.1</div><h1>🪖 ВОЕННАЯ БАЗА</h1><div class="sub">Объединяй технику — развивай свою базу</div></header>
 <div class="stats"><div class="stat"><small>🪙 МОНЕТЫ</small><strong id="coins">120</strong></div><div class="stat"><small>⭐ ОЧКИ</small><strong id="score">0</strong></div><div class="stat"><small>🏆 РЕКОРД</small><strong id="best">0</strong></div></div>
 <div id="view-base" class="subview"><section class="panel"><div class="paneltitle"><b>🏕️ Твоя военная база</b><span class="pill" id="hqlevel">Штаб • 1/1000</span></div><div class="base" id="base">
 <div class="building"><svg viewBox="0 0 100 75"><path d="M11 30L51 10 90 29 50 49Z" fill="#65775b" stroke="#253e2a" stroke-width="3"/><path d="M11 30v27l39 16V49Z" fill="#84916b"/><path d="M90 29v29L50 73V49Z" fill="#506a52"/><path d="M60 52l21-9v18l-21 8Z" fill="#243f33"/><path d="M20 42l19 8v13l-19-8Z" fill="#c5d2a4"/></svg><span>ШТАБ</span></div>
 <div class="building"><svg viewBox="0 0 100 75"><path d="M9 32L51 9 93 32 51 50Z" fill="#7a8260" stroke="#344631" stroke-width="3"/><path d="M9 32v30l42 12V50Z" fill="#c0ba8e"/><path d="M93 32v30L51 74V50Z" fill="#7b8763"/><path d="M62 51l24-10v20L62 69Z" fill="#283e33"/></svg><span>ГАРАЖ</span></div>
 <div class="building"><svg viewBox="0 0 100 75"><path d="M10 33L48 12 91 32 50 53Z" fill="#70815f" stroke="#354934" stroke-width="3"/><path d="M10 33v29l40 12V53Z" fill="#929d73"/><path d="M91 32v29L50 74V53Z" fill="#647754"/><path d="M61 54l21-10v16l-21 9Z" fill="#293c2d"/><path d="M49 10V0" stroke="#eae2a7" stroke-width="3"/><path d="M49 0l20 5-20 5" fill="#d7b268"/></svg><span>СКЛАД</span></div>
 </div><div class="basecontrols"><span class="hint" id="basehint">Облик каждые 30 уровней</span><button class="upgrade" id="upgrade">⬆️ Улучшить</button></div><div class="hqprogress"><div id="hqbar"></div></div><div class="hint hqmeta" id="hqmeta">Следующий облик на уровне 31</div></section>
-<section class="panel"><div class="paneltitle"><b>⚙️ Сборочная площадка</b><span class="pill">5 × 5</span></div><div class="hint">Выбери две одинаковые машины на соседних клетках</div><div class="board" id="board"></div><div class="message" id="message" aria-live="polite"></div><div class="actions"><button class="action" id="buy">＋ Техника · 20 🪙</button><button class="action secondary" id="restart">↻ Заново</button></div></section>
+<section class="panel"><div class="paneltitle"><b>⚙️ Сборочная площадка</b><span class="pill">5 × 5</span></div><div class="hint">Объединяй технику, побей свой рекорд и заработай монеты на штаб</div><div class="hint" id="rewardhint">За новый рубеж рекорда +150 🪙 каждые 100 очков</div><div class="board" id="board"></div><div class="message" id="message" aria-live="polite"></div><div class="actions"><button class="action" id="buy">＋ Получить технику</button><button class="action secondary" id="restart">↻ Новый раунд</button></div></section>
 </div><div id="view-garage" class="subview" hidden><section class="panel"><div class="paneltitle"><b>🚙 Гараж</b><span class="pill">План 0.6</span></div><div class="hint">В следующей версии здесь появится хранение наземной техники. Пока весь действующий инвентарь находится на сборочной площадке.</div><div id="garagepreview" class="collection" style="margin-top:12px"></div></section></div><div id="view-hangar" class="subview" hidden><section class="panel"><div class="paneltitle"><b>🚁 Авиационный ангар</b><span class="pill">План 0.6</span></div><div class="hint">Здесь будут храниться вертолёты, беспилотники и самолёты. Производство и хранение пока не включены.</div></section></div><div id="view-missions" class="subview" hidden><section class="panel"><div class="paneltitle"><b>🗺️ Операции</b><span class="pill">План 0.8</span></div><div class="hint">Разведка, экспедиции и награды появятся позднее. Техника пока не отправляется на задания.</div></section></div><div id="view-storage" class="subview" hidden><section class="panel"><div class="paneltitle"><b>📦 Склад и сохранение</b><span class="pill">Версия 0.4</span></div><div class="storage"><div class="storecard">🪙 Монеты<strong id="storecoins">120</strong></div><div class="storecard">⭐ Очки<strong id="storescore">0</strong></div></div><p class="hint">Металл, топливо и детали будут добавлены в 0.7. Сейчас здесь можно сохранить игровой прогресс.</p><div class="savebar"><button class="action" id="savegame">💾 Сохранить</button><small id="savedstatus" role="status">Автосохранение включено</small></div><p class="hint">Сохранения хранятся только в браузере. При очистке данных Safari они могут исчезнуть.</p></section></div><div id="view-next" class="subview"><section class="panel nextwrap"><div><b>Следующая техника</b><div class="hint">Появится на случайной свободной клетке</div></div><div class="nextitem" id="next"></div></section>
 <section class="panel"><div class="paneltitle"><b>🎖️ Коллекция техники</b><span class="pill" id="progress">1 / 10</span></div><div class="collection" id="levels"></div></section>
-</div><nav class="bottomnav" aria-label="Меню игры"><button class="navbtn active" data-view="base"><span class="ico">🏕️</span>База</button><button class="navbtn" data-view="garage"><span class="ico">🚙</span>Гараж</button><button class="navbtn" data-view="hangar"><span class="ico">🚁</span>Ангар</button><button class="navbtn" data-view="missions"><span class="ico">🗺️</span>Задания</button><button class="navbtn" data-view="storage"><span class="ico">📦</span>Склад</button></nav><footer>Версия 0.5 · Автосохранение на этом устройстве · Без облака</footer>
+</div><nav class="bottomnav" aria-label="Меню игры"><button class="navbtn active" data-view="base"><span class="ico">🏕️</span>База</button><button class="navbtn" data-view="garage"><span class="ico">🚙</span>Гараж</button><button class="navbtn" data-view="hangar"><span class="ico">🚁</span>Ангар</button><button class="navbtn" data-view="missions"><span class="ico">🗺️</span>Задания</button><button class="navbtn" data-view="storage"><span class="ico">📦</span>Склад</button></nav><footer>Версия 0.5.1 · Автосохранение на этом устройстве · Без облака</footer>
 </main><script>
 (()=>{
 const names=["Разведджип","Бронемашина","БТР","Лёгкий танк","Основной танк","Тяжёлый танк","Вертолёт","Штурмовик","Командный штаб","Главная база"];
 const $=id=>document.getElementById(id),random=()=>Math.random()<.82?0:1;
-let board,coins=120,score=0,best=Number(localStorage.getItem("mbm_best")||0),selected=null,next=0,merged=-1,baseLevel=1;
-const SAVE_KEY="mbm_save_v5",BACKUP_KEY="mbm_backup_v5",PREVIOUS_KEY="mbm_save_v4",LEGACY_KEY="mbm_save";
+let board,coins=120,score=0,best=Number(localStorage.getItem("mbm_best")||0),selected=null,next=0,merged=-1,baseLevel=1,paidMilestone=0;
+const SAVE_KEY="mbm_save_v51",BACKUP_KEY="mbm_backup_v51",PREVIOUS_KEY="mbm_save_v5",OLD_V4_KEY="mbm_save_v4",LEGACY_KEY="mbm_save";
 let lastSavedAt=null;
 function valid(data){
  return data&&Array.isArray(data.board)&&data.board.length===25
@@ -46,7 +46,7 @@ function valid(data){
   &&Number.isFinite(data.score)&&data.score>=0
   &&Number.isInteger(data.baseLevel||1)&&((data.baseLevel||1)>=1)&&((data.baseLevel||1)<=1000);
 }
-function pack(){return {version:5,board:board.slice(),coins,score,baseLevel,best,modified:new Date().toISOString()};}
+function pack(){return {version:51,board:board.slice(),coins,score,baseLevel,best,paidMilestone,modified:new Date().toISOString()};}
 function saveGame(manual=false){
  try{
   const state=pack();
@@ -63,15 +63,17 @@ function updateSaveStatus(message){
  const target=$("savedstatus");if(target)target.textContent=message+(lastSavedAt?" · "+new Date(lastSavedAt).toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"}):"");
 }
 function importSave(){
- for(const key of [SAVE_KEY,BACKUP_KEY,PREVIOUS_KEY,LEGACY_KEY]){
+ for(const key of [SAVE_KEY,BACKUP_KEY,PREVIOUS_KEY,OLD_V4_KEY,LEGACY_KEY]){
   try{
    const state=JSON.parse(localStorage.getItem(key)||"null");
    if(!valid(state))continue;
    board=state.board.slice();coins=state.coins;score=state.score;baseLevel=state.baseLevel||1;
    best=Math.max(best,Number.isFinite(state.best)?state.best:0,score);
+   paidMilestone=key===SAVE_KEY||key===BACKUP_KEY ? Math.max(0,Number.isInteger(state.paidMilestone)?state.paidMilestone:Math.floor(best/100)) : Math.floor(best/100);
    next=random();selected=null;merged=-1;
    if(key===LEGACY_KEY){try{localStorage.setItem("mbm_legacy_backup_v03",JSON.stringify(state));}catch(e){}}
-if(key===PREVIOUS_KEY){try{localStorage.setItem("mbm_legacy_backup_v04",JSON.stringify(state));}catch(e){}}
+if(key===OLD_V4_KEY){try{localStorage.setItem("mbm_legacy_backup_v04",JSON.stringify(state));}catch(e){}}
+   if(key===PREVIOUS_KEY){try{localStorage.setItem("mbm_legacy_backup_v05",JSON.stringify(state));}catch(e){}}
    // Do not replace the recovery backup with a corrupt or incomplete state.
    if(key!==SAVE_KEY)saveGame();
    return key;
@@ -108,10 +110,17 @@ function say(s){$("message").textContent=s}
 function hqPrice(level){return Math.floor(40+12*level+Math.pow(level,1.4)*3)}
 function lookNumber(level){return Math.min(34,Math.floor((level-1)/30)+1)}
 function lookName(level){const n=lookNumber(level);return n===1?"Полевой штаб":n===2?"Укреплённый штаб":n===3?"Командный комплекс":"Облик №"+n+" (графика в разработке)"}
+function recordReward(){
+ const earnedMilestones=Math.floor(best/100);
+ if(earnedMilestones<=paidMilestone)return 0;
+ const gained=(earnedMilestones-paidMilestone)*150;
+ coins+=gained;paidMilestone=earnedMilestones;
+ return gained;
+}
 function save(){saveGame(false)}
 function render(){
 $("board").replaceChildren();board.forEach((v,i)=>{const el=document.createElement("button");el.className="cell"+(v===null?" empty":"")+(selected===i?" selected":"")+(merged===i?" justmerged":"");el.setAttribute("aria-label",v===null?"Пустая клетка":names[v]);el.innerHTML=v===null?'<span class="plus">＋</span>':vehicle(v)+'<span class="lv">'+(v+1)+'</span>';el.onclick=()=>tap(i);$("board").append(el)});
-$("coins").textContent=coins;$("score").textContent=score;$("storecoins").textContent=coins;$("storescore").textContent=score;$("best").textContent=best;$("next").innerHTML=vehicle(next);$("buy").disabled=coins<20||!board.includes(null);const price=hqPrice(baseLevel),look=lookNumber(baseLevel),nextMilestone=Math.min(1000,look*30+1);
+$("coins").textContent=coins;$("score").textContent=score;$("storecoins").textContent=coins;$("storescore").textContent=score;$("best").textContent=best;$("next").innerHTML=vehicle(next);$("buy").disabled=!board.includes(null);$("rewardhint").textContent="Следующая награда +150 🪙 при рекорде "+((paidMilestone+1)*100)+" очков";const price=hqPrice(baseLevel),look=lookNumber(baseLevel),nextMilestone=Math.min(1000,look*30+1);
 $("hqlevel").textContent="Штаб • "+baseLevel+"/1000";
 $("base").className="base visual-"+Math.min(3,look);
 $("upgrade").textContent=baseLevel>=1000?"Максимум":"⬆️ Улучшить · "+price.toLocaleString("ru-RU")+" 🪙";
@@ -122,17 +131,17 @@ $("hqbar").style.width=(baseLevel>=1000?100:(((baseLevel-1)%30)+1)/30*100)+"%";
 let max=Math.max(0,...board.filter(v=>v!==null));$("progress").textContent=(max+1)+" / 10";
 $("garagepreview").innerHTML=names.slice(0,6).map((name,i)=>'<div class="collect">'+vehicle(i)+'<small>'+name+'</small></div>').join("");$("levels").innerHTML=names.map((name,i)=>'<div class="collect'+(i>max?' locked':'')+'">'+vehicle(i)+'<small>УР. '+(i+1)+'</small></div>').join("");
 }
-function start(){board=Array(25).fill(null);[2,5,8,11,14,17,20,23].forEach(i=>board[i]=random());coins=120;score=0;baseLevel=1;selected=null;next=random();merged=-1;say("Нажми на технику, затем на такую же рядом.");save();render()}
+function start(){board=Array(25).fill(null);[2,5,8,11,14,17,20,23].forEach(i=>board[i]=random());if(!Number.isFinite(coins))coins=120;score=0;selected=null;next=random();merged=-1;say("Новый раунд! Монеты и штаб сохранены. Побей рекорд!");save();render()}
 function tap(i){const val=board[i];merged=-1;if(val===null){selected=null;say("Пустая клетка. Добавь технику кнопкой ниже.");render();return}
 if(selected===null){selected=i;say("Выбери такой же объект на соседней клетке.");render();return}
 if(selected===i){selected=null;say("Выбор отменён.");render();return}
 const adjacent=Math.abs(Math.floor(selected/5)-Math.floor(i/5))+Math.abs(selected%5-i%5)===1;
 if(!adjacent||board[selected]!==val){selected=i;say("Объекты должны быть одинаковыми и стоять рядом.");render();return}
 if(val===9){selected=null;say("Максимальный уровень уже достигнут!");render();return}
-board[i]=val+1;merged=i;board[selected]=null;selected=null;const gained=25*(val+1);score+=gained;coins+=10+val*5;best=Math.max(best,score);say("🎉 "+names[val+1]+" создан! +"+gained+" очков");save();render()}
-$("buy").onclick=()=>{const empty=board.flatMap((v,i)=>v===null?[i]:[]);if(!empty.length||coins<20)return;board[empty[Math.floor(Math.random()*empty.length)]]=next;coins-=20;next=random();selected=null;merged=-1;say("📦 Новая техника доставлена!");save();render()};
+board[i]=val+1;merged=i;board[selected]=null;selected=null;const gained=25*(val+1);score+=gained;best=Math.max(best,score);const bonus=recordReward();say("🎉 "+names[val+1]+" создан! +"+gained+" очков"+(bonus?" · Награда за рекорд: +"+bonus+" 🪙":""));save();render()}
+$("buy").onclick=()=>{const empty=board.flatMap((v,i)=>v===null?[i]:[]);if(!empty.length)return;board[empty[Math.floor(Math.random()*empty.length)]]=next;next=random();selected=null;merged=-1;say("📦 Новая техника доставлена!");save();render()};
 $("upgrade").onclick=()=>{const price=hqPrice(baseLevel);if(baseLevel>=1000||coins<price)return;const oldLook=lookNumber(baseLevel);coins-=price;baseLevel++;say(lookNumber(baseLevel)!==oldLook?"🏛️ Новый облик штаба! Уровень "+baseLevel:"🏕️ Штаб улучшен до уровня "+baseLevel+"!");save();render()};
-$("restart").onclick=()=>{if(confirm("Начать новую игру? Текущий раунд сбросится, но резервная копия сохранения останется."))start()};
+$("restart").onclick=()=>{if(confirm("Начать новый раунд? Очки текущего раунда сбросятся, а рекорд, монеты и штаб сохранятся."))start()};
 $("savegame").onclick=()=>saveGame(true);
 document.querySelectorAll("[data-view]").forEach(btn=>btn.addEventListener("click",()=>{
  const view=btn.dataset.view;
@@ -143,7 +152,7 @@ document.querySelectorAll("[data-view]").forEach(btn=>btn.addEventListener("clic
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"&&board)saveGame(false)});
 window.addEventListener("pagehide",()=>{if(board)saveGame(false)});
 const source=importSave();
-if(source){say(source===LEGACY_KEY?"Прогресс 0.3 перенесён!":source===PREVIOUS_KEY?"Прогресс 0.4 перенесён!":"С возвращением! Прогресс загружен.");render();}
+if(source){say(source===LEGACY_KEY?"Прогресс 0.3 перенесён!":source===OLD_V4_KEY?"Прогресс 0.4 перенесён!":source===PREVIOUS_KEY?"Прогресс 0.5 перенесён!":"С возвращением! Прогресс загружен.");render();}
 else start();
 })();
 </script></body></html>
