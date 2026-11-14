@@ -301,6 +301,18 @@ linear-gradient(145deg,#a0ba77 0%,#76a068 47%,#4d8058 100%)}
 .roadnet .asphalt{stroke:#8a9085;stroke-width:35}
 .roadnet .pavement{stroke:#5b7365;stroke-width:44}
 .roadnet .marking{stroke:#f2e6bc;stroke-width:1.7;stroke-dasharray:13 21}
+
+/* 0.11.0: factory catalog, manufacturing and temporary testing tools */
+.vehicle-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:12px 0}
+.vehicle-card{padding:13px;border-radius:13px;background:linear-gradient(145deg,#3d5b49,#1d3a31);border:1px solid #849b78;box-shadow:0 5px 12px #10251d6e;display:flex;flex-direction:column;gap:5px}
+.vehicle-icon{text-align:center;font-size:38px;filter:drop-shadow(0 5px 4px #0d1c1e)}
+.vehicle-name{font-weight:800;font-size:13px;min-height:34px;color:#f7ead0}
+.vehicle-owned{font-size:12px;color:#d3dec8}
+.vehicle-meta{font-size:11px;color:#e4d29e;min-height:30px}
+.vehicle-card .btn{margin-top:auto;width:100%;min-height:34px}
+.qa-actions{display:flex;gap:8px;flex-wrap:wrap;margin:9px 0}
+.qa-actions .btn{font-size:12px;min-height:35px}
+#view-missions>.card:first-of-type{border:2px solid #d9c084;background:linear-gradient(125deg,#4b5234,#2b4837)}
 </style></head><body>
 <div id="rotate" class="rotate"><div>📱↻<h2>Поверните телефон горизонтально</h2><p>Вся военная база помещается на одном экране.</p></div></div>
 <div class="game" id="game">
@@ -315,9 +327,9 @@ linear-gradient(145deg,#a0ba77 0%,#76a068 47%,#4d8058 100%)}
    <div class="hint" id="mapstatus">Заводы работают только с дорогой от штаба · 🛣️ строй дороги</div><button class="btn cancel-move" id="cancelMove" hidden>Отмена перемещения</button>
   </div>
   <div id="view-storage" class="view aux" hidden><h2>📦 Склад</h2><p>Нажмите на склад на карте, чтобы улучшить его.</p><div class="cards" id="resources"></div><button class="btn" id="goStorageMap">🗺️ Вернуться к карте и складу</button></div>
-  <div id="view-garage" class="view aux" hidden><h2>🚙 Гараж</h2><p>Постройте или улучшите гараж на карте.</p><div class="card" id="garageInfo"></div><button class="btn" id="goGarageMap">🗺️ Открыть гараж</button></div>
-  <div id="view-hangar" class="view aux" hidden><h2>🚁 Ангар</h2><p>Постройте или улучшите ангар на карте.</p><div class="card" id="hangarInfo"></div><button class="btn" id="goHangarMap">🗺️ Открыть ангар</button></div>
-  <div id="view-missions" class="view aux" hidden><h2>🗺️ Задания</h2><p>Экспедиции и задания появятся позже.</p><div class="card"><h3>🏭 Развитие производства</h3><p>Штаб 1 — металл · штаб 3 — топливо · штаб 6 — детали · штаб 10 — электроника.</p><p>Завод должен иметь непрерывную дорогу до штаба. Ранее построенные заводы сохраняются.</p></div></div>
+  <div id="view-garage" class="view aux" hidden><h2>🚙 Гараж · техника</h2><p>Производство наземной техники. Для новых машин улучшай гараж и штаб.</p><div class="card" id="garageInfo"></div><div class="vehicle-grid" id="garageVehicles"></div><button class="btn alt" id="goGarageMap">🗺️ Открыть гараж</button></div>
+  <div id="view-hangar" class="view aux" hidden><h2>🚁 Ангар · авиация</h2><p>Производство вертолётов и самолётов. Для новых моделей улучшай ангар и штаб.</p><div class="card" id="hangarInfo"></div><div class="vehicle-grid" id="hangarVehicles"></div><button class="btn alt" id="goHangarMap">🗺️ Открыть ангар</button></div>
+  <div id="view-missions" class="view aux" hidden><h2>🗺️ Задания</h2><div class="card"><b>🧪 Тестирование версии 0.11.0</b><p>Здесь можно пополнять ресурсы, открывать уровень штаба и ускорять стройки. Эти бонусы сохраняются только в тестовой версии.</p><div class="qa-actions"><button class="btn" id="testResources">🎁 +50 000 каждого ресурса</button><button class="btn alt" id="testHQ">🏛️ Штаб +10 уровней</button><button class="btn alt" id="testFinish">⏩ Завершить стройки</button></div><small>Тестовые ресурсы: склад до 100 000 единиц на каждый вид.</small></div><p>Экспедиции и задания появятся позже.</p><div class="card"><h3>🏭 Развитие производства</h3><p>Штаб 1 — металл · штаб 3 — топливо · штаб 6 — детали · штаб 10 — электроника.</p><p>Завод должен иметь непрерывную дорогу до штаба. Ранее построенные заводы сохраняются.</p></div></div>
  </main>
  <nav class="nav" aria-label="Главное меню"><button class="on" data-view="base"><span>🏕️</span>База</button><button data-view="garage"><span>🚙</span>Гараж</button><button data-view="hangar"><span>🚁</span>Ангар</button><button data-view="missions"><span>🗺️</span>Задания</button><button data-view="storage"><span>📦</span>Склад</button></nav>
  <div class="toast" id="notice" role="status"></div><span id="saveStatus" hidden>Автосохранение</span>
@@ -455,6 +467,45 @@ function timeLeft(job,now=Date.now()){return Math.max(0,Math.ceil((job.endsAt-no
 function clock(secs){const m=Math.floor(secs/60),s=secs%60;return m+":"+String(s).padStart(2,"0")}
 const facilityDefs={garage:{name:"Гараж",icon:"🚙",purpose:"Наземная техника",baseCost:100},hangar:{name:"Ангар",icon:"🚁",purpose:"Воздушная техника",baseCost:160}};
 function facilityCost(id){const level=data.facilities[id];return {metal:facilityDefs[id].baseCost+level*90,...(level>=2?{parts:level*10}:{})}}
+function buyVehicle(id){
+ advance();
+ const v=vehicleDefs.find(v=>v.id===id);if(!v)return;
+ if(data.facilities[v.kind]<v.facility||data.baseLevel<v.hq){
+  status("🔒 Требуется "+(v.kind==="garage"?"гараж":"ангар")+" "+v.facility+" и штаб "+v.hq);return;
+ }
+ if(!canAfford(v.cost)){status("Недостаточно ресурсов для "+v.name);return}
+ spend(v.cost);data.vehicles[id]=Math.min(9999,data.vehicles[id]+1);
+ status(v.icon+" Произведено: "+v.name+" · всего "+data.vehicles[id]);
+ save();render();
+}
+function testResources(){
+ advance();data.testMode=true;data.coins=Math.min(9999999,data.coins+200000);
+ for(const id of Object.keys(data.resources))data.resources[id]=Math.min(100000,data.resources[id]+50000);
+ status("🧪 Начислено +50 000 каждого ресурса и +200 000 монет");save();render();
+}
+function testHQ(){
+ advance();data.baseLevel=Math.min(1000,data.baseLevel+10);
+ status("🧪 Уровень штаба: "+data.baseLevel);save();render();
+}
+function testFinish(){
+ advance();const now=Date.now();
+ data.construction.forEach(j=>j.endsAt=now);
+ data.facilityJobs.forEach(j=>j.endsAt=now);
+ const result=advance(now);
+ status(result.done?"🧪 Строительство завершено":"Строек пока нет");
+ save();render();
+}
+function vehicleList(kind){
+ return vehicleDefs.filter(v=>v.kind===kind).map(v=>{
+  const missingHQ=data.baseLevel<v.hq,missingFacility=data.facilities[kind]<v.facility;
+  const locked=missingHQ||missingFacility;
+  const affordable=canAfford(v.cost);
+  return '<div class="vehicle-card"><div class="vehicle-icon">'+v.icon+'</div><div class="vehicle-name">'+v.name+'</div>'+
+   '<div class="vehicle-owned">В наличии: <b>'+format(data.vehicles[v.id])+'</b></div>'+
+   '<div class="vehicle-meta">'+(locked?'🔒 Штаб '+v.hq+' · '+(kind==="garage"?'гараж ':'ангар ')+v.facility:costLabel(v.cost))+'</div>'+
+   '<button class="btn" data-buyvehicle="'+v.id+'" '+(locked||!affordable?'disabled':'')+'>🏭 Произвести</button></div>';
+ }).join("");
+}
 function buildFacility(id){
  advance();const def=facilityDefs[id];if(!def)return;
  const level=data.facilities[id],cost=facilityCost(id);
@@ -482,9 +533,11 @@ const elapsed=Math.max(0,Math.min(MAX_OFFLINE,Math.floor((now-data.lastProductio
 if(!elapsed)return 0;
 let made=0;
 const network=connectedRoads();
-for(const def of definitions){
- const old=data.resources[def.resource];
- data.resources[def.resource]=Math.min(capacity(),old+elapsed*def.rate*factoryActiveLevels(def.id,network));made+=data.resources[def.resource]-old;
+for(const id of Object.keys(data.resources)){
+ const old=data.resources[id];
+ const totalRate=definitions.filter(d=>d.resource===id).reduce((sum,def)=>sum+def.rate*factoryActiveLevels(def.id,network),0);
+ data.resources[id]=Math.min(capacity(),old+elapsed*totalRate);
+ made+=data.resources[id]-old;
 }
 data.lastProduction=(now-data.lastProduction)>MAX_OFFLINE*MINUTE ? now : data.lastProduction+elapsed*MINUTE;
 return made;
@@ -816,14 +869,18 @@ function render(){
  $("cancelMove").hidden=!(movingFactory||movingFacility);
  $("roadMode").setAttribute("aria-pressed",String(roadMode));
  $("roadHelp").hidden=!roadMode;
- $("resources").innerHTML=definitions.map(def=>{
- const enabled=data.factories[def.id]>0||data.baseLevel>=def.requiredHQ;
- const active=factoryActiveLevels(def.id);
- return '<div class="card"><b>'+labels[def.resource]+'</b><div class="symbol">'+format(data.resources[def.resource])+'</div>'+
- '<div class="detail">'+(enabled?'🏭 Производство: +'+format(active*def.rate)+'/мин':'🔒 Штаб '+def.requiredHQ)+
- ' · Склад '+format(capacity())+'</div></div>';
+ $("resources").innerHTML=Object.keys(data.resources).map(id=>{
+  const defs=definitions.filter(def=>def.resource===id);
+  const rate=defs.reduce((sum,def)=>sum+def.rate*factoryActiveLevels(def.id),0);
+  return '<div class="card"><b>'+labels[id]+'</b><div class="symbol">'+format(data.resources[id])+'</div>'+
+  '<div class="detail">🏭 Производство: +'+format(rate)+'/мин · Вместимость '+format(capacity())+'</div></div>';
  }).join("");
- for(const id of ["garage","hangar"]){const job=data.facilityJobs.find(j=>j.id===id);$(id+"Info").textContent=facilityDefs[id].icon+" "+facilityDefs[id].name+" · уровень "+data.facilities[id]+(job?" · строится "+clock(timeLeft(job)):"");}
+ for(const id of ["garage","hangar"]){
+  const job=data.facilityJobs.find(j=>j.id===id);
+  $(id+"Info").textContent=facilityDefs[id].icon+" "+facilityDefs[id].name+" · уровень "+data.facilities[id]+(job?" · строится "+clock(timeLeft(job)):"")+" · единиц техники "+vehicleDefs.filter(v=>v.kind===id).reduce((n,v)=>n+data.vehicles[v.id],0);
+  $(id+"Vehicles").innerHTML=vehicleList(id);
+ }
+ document.querySelectorAll("[data-buyvehicle]").forEach(btn=>btn.onclick=()=>buyVehicle(btn.dataset.buyvehicle));
  if(activeCard&&$("overlay").hidden===false&&(activeCard.type==="construction"||activeCard.type==="facility"&&data.facilityJobs.some(j=>j.id===activeCard.id)))showCard();
 }
 function showView(name){
@@ -832,6 +889,9 @@ function showView(name){
  closeCard();render();
 }
 $("expandLand").onclick=()=>openCard("territory");
+$("testResources").onclick=testResources;
+$("testHQ").onclick=testHQ;
+$("testFinish").onclick=testFinish;
 document.querySelectorAll("[data-view]").forEach(btn=>btn.onclick=()=>{if(movingFactory||movingFacility)cancelMovingFactory();showView(btn.dataset.view)});
 $("cancelMove").onclick=cancelMovingFactory;
 $("roadMode").onclick=()=>{if(movingFactory||movingFacility)cancelMovingFactory();roadMode=!roadMode;mapSignature="";render()};
