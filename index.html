@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#172e25">
-<title>Военная база — 0.10.0 Развитие экономики</title>
+<title>Военная база — 0.10.1 Графика и закреплённая карта</title>
 <style>
 :root{color-scheme:dark;--bg:#14261d;--panel:#294536;--border:#688068;--text:#f1f4e9;--gold:#f4d384}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#426248,#152820 70%);color:var(--text);font:15px system-ui,-apple-system,sans-serif}main{max-width:720px;margin:auto;padding:14px 12px 100px}h1{text-align:center;font-size:clamp(23px,6vw,34px);margin:4px 0}.sub{text-align:center;color:#bfd3b9;font-size:12px;margin-bottom:12px}.tag{font-size:10px;letter-spacing:2px;text-align:center;color:#e3dcad;font-weight:800}.panel{background:linear-gradient(165deg,#31513b,#1c3327);border:1px solid #698368;border-radius:15px;padding:14px;margin:10px 0;box-shadow:0 4px 12px #0d1b1377}h2{font-size:17px;margin:0 0 8px}.muted{font-size:12px;color:#c0d0ba;line-height:1.5}.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.stat{background:#223e2e;border:1px solid #59785d;border-radius:12px;padding:12px}.stat small{display:block;color:#c5d2b7}.stat strong{font-size:21px}.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:12px}.card{border:1px solid #79916b;background:#344f3b;border-radius:13px;padding:11px;min-width:0}.card h3{margin:2px 0 7px;font-size:15px}.symbol{font-size:33px}.rate{color:#e5dd9d;font-size:12px}.btn{background:linear-gradient(#e4d293,#bfaa6e);color:#263123;border:0;border-radius:10px;padding:11px;font-size:13px;font-weight:800;cursor:pointer;touch-action:manipulation}.btn:disabled{opacity:.43}.card .btn{width:100%;margin-top:8px}.btn.alt{background:#44634a;color:#f4f6e7;border:1px solid #7c9878}.bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}.baseart{border-radius:12px;border:2px solid #829671;height:136px;background:repeating-linear-gradient(35deg,#89977129 0 22px,#b6c1a11f 23px 25px),linear-gradient(#8ea178,#547552);display:flex;align-items:end;justify-content:space-around;padding:14px 2px 8px;overflow:hidden}.building{text-align:center;min-width:0;flex:1;filter:drop-shadow(2px 3px 2px #182b22aa)}.building .roof{font-size:38px}.building small{display:block;color:#192c20;font-size:10px;font-weight:900;background:#cbd4a9;border-radius:5px;margin:3px auto;max-width:92px}.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,720px);padding:8px max(8px,env(safe-area-inset-right)) calc(7px + env(safe-area-inset-bottom));background:#183125f5;border:1px solid #58765d;display:grid;grid-template-columns:repeat(5,1fr);gap:3px;z-index:5}.nav button{background:transparent;border:0;color:#c3d3b7;border-radius:10px;padding:6px 2px;font:10px system-ui;cursor:pointer}.nav button span{display:block;font-size:21px}.nav button.on{background:#4a684e;color:#fff1c6}.view[hidden]{display:none!important}.notice{min-height:23px;color:#f1dc9b;font-size:12px}.save{margin-top:12px;display:flex;align-items:center;flex-wrap:wrap;gap:8px}.detail{font-size:12px;color:#d1e0c6}.chip{padding:4px 8px;border-radius:20px;background:#49664b;color:#eff1cf;font-size:11px}.locked{opacity:.78}.spinner{font-size:11px;color:#bcd5b4}footer{text-align:center;color:#a9bca8;font-size:11px;margin-top:20px}
@@ -220,16 +220,58 @@ linear-gradient(145deg,#a0ba77 0%,#76a068 47%,#4d8058 100%)}
 .plot.locked-land small{color:#f0e6b9;background:#3c4f3bd9}
 #expandLand{background:#476e4a;color:#f7f0c9;border:1px solid #adc795}
 
+
+/* 0.10.1 — polished base art and bounded transform-based map zoom */
+.world-scroll{overflow:auto;touch-action:pan-x pan-y;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#c1c49866 #294638}
+.world-canvas{position:relative;min-width:100%;min-height:100%;background:radial-gradient(ellipse at 50% 52%,#8db47f,#395c43)}
+.world{position:absolute!important;left:0;top:0;width:1100px!important;height:1050px!important;transform-origin:0 0!important;zoom:1!important;
+ background:
+ radial-gradient(ellipse at 18% 20%,#e1e0a435,transparent 29%),
+ radial-gradient(ellipse at 78% 80%,#32694970,transparent 39%),
+ repeating-linear-gradient(125deg,#cce8ad16 0 2px,transparent 2px 39px),
+ repeating-linear-gradient(25deg,#223f2d0d 0 1px,transparent 1px 31px),
+ linear-gradient(130deg,#a5bf83 0%,#78a471 48%,#568b65 100%)!important;
+ box-shadow:inset 0 0 0 12px #4e705399,inset 0 0 0 16px #d7d5ab45}
+.world:before,.world:after{display:none!important}
+.plot{border:2px dashed #edebc277!important;border-radius:11px;
+ background:linear-gradient(155deg,#a6b78335,#425c4348)!important;
+ box-shadow:inset 0 0 0 2px #203a2c3d,0 5px 7px #1f372f3c!important;
+ transition:filter .16s ease,box-shadow .16s ease}
+.plot.occupied{border:2px solid #d7c992!important;
+ background:linear-gradient(145deg,#d1c99a,#8d9b79)!important;
+ box-shadow:0 6px 0 #40543f,0 11px 11px #20372980!important}
+.plot.locked-land{background:repeating-linear-gradient(135deg,#344b4290 0 13px,#576c4f90 13px 26px)!important;border:2px dashed #96a48b!important;opacity:.82}
+.plot.move-target{background:#dbc779a3!important;border-color:#fce6a8!important}
+.plot small{border:1px solid #a8ba8b6e;box-shadow:0 2px 3px #19332455}
+.poi{transform:none!important;border-radius:12px!important;border:2px solid #d7c89b!important;
+ background:linear-gradient(145deg,#b6bb8b,#68856a)!important;box-shadow:0 7px 0 #3f5a48,0 11px 12px #132a2070!important}
+.asset{filter:drop-shadow(4px 7px 3px #263a2a80)}
+.asset .roof{box-shadow:inset 0 4px 7px #ffffff2c,0 3px 0 #30443e77}
+.asset .walls{box-shadow:inset -6px 0 11px #152c2d37}
+.asset.hq .roof{background:linear-gradient(135deg,#d0d7bc,#788c84,#526e6a)!important}
+.asset.hq .walls{background:linear-gradient(95deg,#c5cfb5,#7b9b8e,#526e68)!important}
+.asset.metal .roof{background:linear-gradient(130deg,#d3cab7,#7c9190,#596f73)!important}
+.asset.fuel .roof{background:linear-gradient(130deg,#b7c7ae,#849f99,#56776c)!important}
+.asset.parts .roof{background:linear-gradient(130deg,#a5b6a5,#597968)!important}
+.asset.electronics .roof{background:linear-gradient(130deg,#c3d7c8,#74a5a7,#477e89)!important}
+.roadnet .pavement{stroke:#53695d;stroke-width:42}
+.roadnet .asphalt{stroke:#8b9389;stroke-width:33}
+.roadnet .marking{stroke:#e8deb5;stroke-width:1.8;stroke-dasharray:11 17}
+.roadnet{filter:drop-shadow(2px 5px 2px #2542328a)}
+.map-mark{letter-spacing:.08em;text-shadow:0 1px 2px #122b2199}
+.landmark.tree{filter:drop-shadow(4px 7px 3px #172d226e)}
+.road-actions,.edge-actions{background:#1a3129b8;border-radius:12px;padding:4px;backdrop-filter:blur(8px)}
+@media (prefers-reduced-motion:reduce){.plot{transition:none}}
 </style></head><body>
 <div id="rotate" class="rotate"><div>📱↻<h2>Поверните телефон горизонтально</h2><p>Вся военная база помещается на одном экране.</p></div></div>
 <div class="game" id="game">
  <header class="hud">
-  <b class="brand">🪖 ВОЕННАЯ БАЗА <small>0.10.0</small></b>
+  <b class="brand">🪖 ВОЕННАЯ БАЗА <small>0.10.1</small></b>
   <div class="meters"><span>🏛️ <b id="hq">1 / 1000</b></span><span>🪙 <b id="coins">0</b></span><span>🔩 <b id="res-metal">0</b></span><span>🛢️ <b id="res-fuel">0</b></span><span>⚙️ <b id="res-parts">0</b></span><span>🔌 <b id="res-electronics">0</b></span></div>
  </header>
  <main class="stage">
   <div id="view-base" class="view map-screen">
-   <div class="world-wrap"><div class="world-scroll" id="worldscroll"><div class="world" id="world"></div></div></div>
+   <div class="world-wrap"><div class="world-scroll" id="worldscroll"><div class="world-canvas" id="worldcanvas"><div class="world" id="world"></div></div></div></div>
    <div class="road-actions"><button class="btn alt" id="roadMode" aria-pressed="false">🛣️ Дороги · 12 🔩</button><button class="btn alt" id="expandLand">🌿 Земля 24/36</button><span class="roadhelp" id="roadHelp" hidden>Касайся светлых участков дороги. 12 🔩 за участок.</span></div><div class="edge-actions"><button class="btn alt" id="zoomout" aria-label="Уменьшить">−</button><button class="btn alt" id="zoomin" aria-label="Увеличить">＋</button><span class="zoomreadout" id="zoomLevel" aria-live="off">100%</span><button class="btn alt" id="save" aria-label="Сохранить">💾</button></div>
    <div class="hint" id="mapstatus">Заводы работают только с дорогой от штаба · 🛣️ строй дороги</div><button class="btn cancel-move" id="cancelMove" hidden>Отмена перемещения</button>
   </div>
@@ -736,17 +778,43 @@ $("roadMode").onclick=()=>{if(movingFactory||movingFacility)cancelMovingFactory(
 $("goStorageMap").onclick=()=>{showView("base");openCard("storage")};for(const id of ["garage","hangar"])$("go"+(id==="garage"?"Garage":"Hangar")+"Map").onclick=()=>{showView("base");openCard("facility",null,id)};
 $("closeSheet").onclick=closeCard;
 $("overlay").onclick=e=>{if(e.target===$("overlay"))closeCard()};
-const mapScroll=$("worldscroll"),mapWorld=$("world");
-const MIN_ZOOM=.55,MAX_ZOOM=2.5;
+const mapScroll=$("worldscroll"),mapWorld=$("world"),mapCanvas=$("worldcanvas");
+const WORLD_WIDTH=1100,WORLD_HEIGHT=1050,MIN_ZOOM=.45,MAX_ZOOM=2.5;
+let mapPadX=0,mapPadY=0;
+function mapBounds(){
+ return {x:Math.max(0,mapCanvas.offsetWidth-mapScroll.clientWidth),y:Math.max(0,mapCanvas.offsetHeight-mapScroll.clientHeight)};
+}
+function clampMap(){
+ const b=mapBounds();
+ mapScroll.scrollLeft=Math.max(0,Math.min(b.x,mapScroll.scrollLeft));
+ mapScroll.scrollTop=Math.max(0,Math.min(b.y,mapScroll.scrollTop));
+}
+function layoutMap(){
+ const w=mapScroll.clientWidth||1,h=mapScroll.clientHeight||1;
+ const scaledW=WORLD_WIDTH*zoom,scaledH=WORLD_HEIGHT*zoom;
+ const stageW=Math.max(w,scaledW),stageH=Math.max(h,scaledH);
+ mapPadX=(stageW-scaledW)/2;mapPadY=(stageH-scaledH)/2;
+ mapCanvas.style.width=stageW+"px";mapCanvas.style.height=stageH+"px";
+ mapWorld.style.left=mapPadX+"px";mapWorld.style.top=mapPadY+"px";
+ mapWorld.style.transform="scale("+zoom+")";
+ clampMap();
+}
 function setZoom(value,focusX=mapScroll.clientWidth/2,focusY=mapScroll.clientHeight/2){
  const next=Math.max(MIN_ZOOM,Math.min(MAX_ZOOM,Math.round(value*100)/100));
  if(next===zoom)return;
- const worldX=(mapScroll.scrollLeft+focusX)/zoom;
- const worldY=(mapScroll.scrollTop+focusY)/zoom;
- zoom=next;mapWorld.style.zoom=zoom;
- mapScroll.scrollLeft=worldX*zoom-focusX;
- mapScroll.scrollTop=worldY*zoom-focusY;
+ // Keep the map point beneath the pinch midpoint in the same on-screen position.
+ const worldX=(mapScroll.scrollLeft+focusX-mapPadX)/zoom;
+ const worldY=(mapScroll.scrollTop+focusY-mapPadY)/zoom;
+ zoom=next;layoutMap();
+ mapScroll.scrollLeft=worldX*zoom+mapPadX-focusX;
+ mapScroll.scrollTop=worldY*zoom+mapPadY-focusY;
+ clampMap();
  $("zoomLevel").textContent=Math.round(zoom*100)+"%";
+}
+function centerMap(){
+ layoutMap();
+ const b=mapBounds();
+ mapScroll.scrollLeft=b.x/2;mapScroll.scrollTop=0;
 }
 $("zoomin").onclick=()=>setZoom(zoom+.2);
 $("zoomout").onclick=()=>setZoom(zoom-.2);
@@ -770,6 +838,17 @@ mapScroll.addEventListener("touchmove",e=>{
 const resetPinch=e=>{if(e.touches.length<2)pinch=null};
 mapScroll.addEventListener("touchend",resetPinch,{passive:true});
 mapScroll.addEventListener("touchcancel",()=>{pinch=null},{passive:true});
+mapScroll.addEventListener("scroll",()=>{if(!pinch)clampMap()},{passive:true});
+if(typeof ResizeObserver!=="undefined"){
+ new ResizeObserver(()=>{
+  const centerX=(mapScroll.scrollLeft+mapScroll.clientWidth/2-mapPadX)/zoom;
+  const centerY=(mapScroll.scrollTop+mapScroll.clientHeight/2-mapPadY)/zoom;
+  layoutMap();
+  mapScroll.scrollLeft=centerX*zoom+mapPadX-mapScroll.clientWidth/2;
+  mapScroll.scrollTop=centerY*zoom+mapPadY-mapScroll.clientHeight/2;
+  clampMap();
+ }).observe(mapScroll);
+}else window.addEventListener("resize",layoutMap);
 mapScroll.addEventListener("wheel",e=>{
  if(!e.ctrlKey&&!e.metaKey)return;
  e.preventDefault();
@@ -780,7 +859,7 @@ $("save").onclick=()=>{advance();save(true);render()};
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"){advance();save()}else{const gained=advance().made;if(gained)status("Производство принесло "+format(gained)+" ресурсов");save();render()}});
 window.addEventListener("pagehide",()=>{advance();save()});
 const gained=advance().made;if(gained)status("Пока тебя не было, заводы произвели "+format(gained)+" ресурсов");
-save();render();
+save();render();centerMap();
 // Periodic refresh is for UI only; offline output depends on timestamps, not background timers.
 setInterval(()=>{const result=advance();if(result.made||result.done)save();render();},1000);
 })();
