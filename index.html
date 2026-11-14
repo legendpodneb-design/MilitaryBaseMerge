@@ -307,7 +307,7 @@ if([8,81,9,94,95,96,97,98,99].includes(raw.version)){
  result.storageLevel=Math.max(1,Math.min(1000,Math.floor(safeNum(raw.storageLevel,1))));
  const occupied=new Set(result.placements.map(p=>p.slot));
  if(Array.isArray(raw.construction)){
- result.construction=raw.construction.filter(j=>j&&definitions.some(d=>d.id===j.id)&&Number.isFinite(j.endsAt)&&j.endsAt>0&&(j.slot===null||(Number.isInteger(j.slot)&&j.slot>=0&&j.slot<(raw.version===99?24+Math.min(2,Math.floor(safeNum(raw.territoryLevel)))*6:24)&&!occupied.has(j.slot)&&!occupied.add(j.slot)))).slice(0,24).map(j=>({id:j.id,slot:j.slot,endsAt:j.endsAt}));
+ result.construction=raw.construction.filter(j=>j&&definitions.some(d=>d.id===j.id)&&Number.isFinite(j.endsAt)&&j.endsAt>0&&(j.slot===null||(Number.isInteger(j.slot)&&j.slot>=0&&j.slot<(raw.version===99?24+Math.min(2,Math.floor(safeNum(raw.territoryLevel)))*6:24)&&!occupied.has(j.slot)&&occupied.add(j.slot)))).slice(0,24).map(j=>({id:j.id,slot:j.slot,endsAt:j.endsAt}));
  }
  }
 if([9,94,95,96,97,98,99].includes(raw.version)){
