@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#172e25">
-<title>Военная база — 0.11.1 Вертикальная и горизонтальная игра</title>
+<title>Военная база — 0.11.2 Стоянки военной техники</title>
 <style>
 :root{color-scheme:dark;--bg:#14261d;--panel:#294536;--border:#688068;--text:#f1f4e9;--gold:#f4d384}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#426248,#152820 70%);color:var(--text);font:15px system-ui,-apple-system,sans-serif}main{max-width:720px;margin:auto;padding:14px 12px 100px}h1{text-align:center;font-size:clamp(23px,6vw,34px);margin:4px 0}.sub{text-align:center;color:#bfd3b9;font-size:12px;margin-bottom:12px}.tag{font-size:10px;letter-spacing:2px;text-align:center;color:#e3dcad;font-weight:800}.panel{background:linear-gradient(165deg,#31513b,#1c3327);border:1px solid #698368;border-radius:15px;padding:14px;margin:10px 0;box-shadow:0 4px 12px #0d1b1377}h2{font-size:17px;margin:0 0 8px}.muted{font-size:12px;color:#c0d0ba;line-height:1.5}.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.stat{background:#223e2e;border:1px solid #59785d;border-radius:12px;padding:12px}.stat small{display:block;color:#c5d2b7}.stat strong{font-size:21px}.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:12px}.card{border:1px solid #79916b;background:#344f3b;border-radius:13px;padding:11px;min-width:0}.card h3{margin:2px 0 7px;font-size:15px}.symbol{font-size:33px}.rate{color:#e5dd9d;font-size:12px}.btn{background:linear-gradient(#e4d293,#bfaa6e);color:#263123;border:0;border-radius:10px;padding:11px;font-size:13px;font-weight:800;cursor:pointer;touch-action:manipulation}.btn:disabled{opacity:.43}.card .btn{width:100%;margin-top:8px}.btn.alt{background:#44634a;color:#f4f6e7;border:1px solid #7c9878}.bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}.baseart{border-radius:12px;border:2px solid #829671;height:136px;background:repeating-linear-gradient(35deg,#89977129 0 22px,#b6c1a11f 23px 25px),linear-gradient(#8ea178,#547552);display:flex;align-items:end;justify-content:space-around;padding:14px 2px 8px;overflow:hidden}.building{text-align:center;min-width:0;flex:1;filter:drop-shadow(2px 3px 2px #182b22aa)}.building .roof{font-size:38px}.building small{display:block;color:#192c20;font-size:10px;font-weight:900;background:#cbd4a9;border-radius:5px;margin:3px auto;max-width:92px}.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,720px);padding:8px max(8px,env(safe-area-inset-right)) calc(7px + env(safe-area-inset-bottom));background:#183125f5;border:1px solid #58765d;display:grid;grid-template-columns:repeat(5,1fr);gap:3px;z-index:5}.nav button{background:transparent;border:0;color:#c3d3b7;border-radius:10px;padding:6px 2px;font:10px system-ui;cursor:pointer}.nav button span{display:block;font-size:21px}.nav button.on{background:#4a684e;color:#fff1c6}.view[hidden]{display:none!important}.notice{min-height:23px;color:#f1dc9b;font-size:12px}.save{margin-top:12px;display:flex;align-items:center;flex-wrap:wrap;gap:8px}.detail{font-size:12px;color:#d1e0c6}.chip{padding:4px 8px;border-radius:20px;background:#49664b;color:#eff1cf;font-size:11px}.locked{opacity:.78}.spinner{font-size:11px;color:#bcd5b4}footer{text-align:center;color:#a9bca8;font-size:11px;margin-top:20px}
@@ -379,11 +379,24 @@ linear-gradient(145deg,#a0ba77 0%,#76a068 47%,#4d8058 100%)}
 .asset.avionics .detail-art{right:13px;top:-11px;width:4px;height:27px;background:#d9e8d8;box-shadow:11px 7px 0 -1px #bfe5d8}
 .asset.avionics .equipment{right:3px;bottom:17px;width:25px;height:10px;border:2px solid #d0f1e5;background:#729e9c;border-radius:50%;transform:rotate(-20deg)}
 #openTest{border:1px solid #f3da90;color:#ffe4a0;background:#4a5140}
+
+/* 0.11.2 — six persistent display pads for owned ground and air vehicles */
+.vehicle-pad{position:absolute;z-index:4;width:146px;height:67px;border:2px solid #9baf91;border-radius:11px;
+ background:linear-gradient(150deg,#586f60df,#354a43e0);color:#f4efcd;cursor:pointer;
+ display:flex;align-items:center;justify-content:center;flex-direction:column;gap:0;
+ box-shadow:0 5px 0 #304a3c,0 8px 8px #132b2077;touch-action:manipulation}
+.vehicle-pad.vehicle-vacant{border:2px dashed #b6c3a095;opacity:.7}
+.vehicle-pad.vehicle-visible{border:2px solid #e4d19b;background:linear-gradient(145deg,#788d70,#3f6356)}
+.vehicle-pad-icon{font-size:30px;line-height:33px;filter:drop-shadow(2px 4px 2px #142e2560)}
+.vehicle-pad-label{font-size:9px;font-weight:800;max-width:139px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vehicle-pad-count{position:absolute;top:2px;right:5px;background:#284b36;border-radius:8px;padding:1px 4px;font-size:10px}
+.park-btn{min-height:32px}
+.vehicle-pad:focus-visible{outline:3px solid #ffdc84}
 </style></head><body>
 
 <div class="game" id="game">
  <header class="hud">
-  <b class="brand">🪖 ВОЕННАЯ БАЗА <small>0.11.1</small></b>
+  <b class="brand">🪖 ВОЕННАЯ БАЗА <small>0.11.2</small></b>
   <div class="meters"><span>🏛️ <b id="hq">1 / 1000</b></span><span>🪙 <b id="coins">0</b></span><span>🔩 <b id="res-metal">0</b></span><span>🛢️ <b id="res-fuel">0</b></span><span>⚙️ <b id="res-parts">0</b></span><span>🔌 <b id="res-electronics">0</b></span></div>
  </header>
  <main class="stage">
@@ -454,7 +467,7 @@ function buildExpansion(){
  save();render();showCard();
 }
 function roadUnlocked(s,level=data.territoryLevel){return !s.extension||level>=s.extension}
-const defaults=()=>({version:110,coins:600,baseLevel:1,storageLevel:1,best:0,board:Array(25).fill(null),score:0,resources:{metal:300,fuel:0,parts:0,electronics:0},factories:{metal:0,fuel:0,parts:0,electronics:0,scrap:0,terminal:0,components:0,avionics:0},lastProduction:Date.now(),placements:[],construction:[],facilities:{garage:0,hangar:0},facilityJobs:[],roads:[],facilityLots:{storage:null,garage:null,hangar:null},territoryLevel:0,testMode:false,vehicles:{scout:0,apc:0,tank:0,reconHeli:0,attackHeli:0,transport:0}});
+const defaults=()=>({version:110,coins:600,baseLevel:1,storageLevel:1,best:0,board:Array(25).fill(null),score:0,resources:{metal:300,fuel:0,parts:0,electronics:0},factories:{metal:0,fuel:0,parts:0,electronics:0,scrap:0,terminal:0,components:0,avionics:0},lastProduction:Date.now(),placements:[],construction:[],facilities:{garage:0,hangar:0},facilityJobs:[],roads:[],facilityLots:{storage:null,garage:null,hangar:null},territoryLevel:0,testMode:false,vehicles:{scout:0,apc:0,tank:0,reconHeli:0,attackHeli:0,transport:0},displayVehicles:[]});
 const safeNum=(v,fallback=0)=>Number.isFinite(v)&&v>=0?v:fallback;
 function safeParse(key){try{return JSON.parse(localStorage.getItem(key)||"null")}catch(e){return null}}
 function normalize(raw){
@@ -472,6 +485,9 @@ if([6,7,8,81,9,94,95,96,97,98,99,110].includes(raw.version)){
  for(const def of definitions)result.factories[def.id]=Math.min(999,Math.floor(safeNum(raw.factories&&raw.factories[def.id])));
  result.testMode=raw.testMode===true;
  for(const v of vehicleDefs)result.vehicles[v.id]=Math.min(9999,Math.floor(safeNum(raw.vehicles&&raw.vehicles[v.id])));
+ if(Array.isArray(raw.displayVehicles)){
+  result.displayVehicles=[...new Set(raw.displayVehicles.filter(id=>vehicleDefs.some(v=>v.id===id)&&result.vehicles[id]>0))];
+ }
 }
 result.lastProduction=Number.isFinite(raw.lastProduction)&&raw.lastProduction>0?Math.min(raw.lastProduction,Date.now()):Date.now();
 if([7,8,81,9,94,95,96,97,98,99,110].includes(raw.version)&&Array.isArray(raw.placements)){
@@ -561,6 +577,27 @@ function testFinish(){
  status(result.done?"🧪 Строительство завершено":"Строек пока нет");
  save();render();
 }
+function toggleVehicleDisplay(id){
+ const vehicle=vehicleDefs.find(v=>v.id===id);
+ if(!vehicle||!data.vehicles[id]){status("Сначала произведи технику");return}
+ const exists=data.displayVehicles.includes(id);
+ if(exists)data.displayVehicles=data.displayVehicles.filter(v=>v!==id);
+ else data.displayVehicles.push(id);
+ mapSignature="";save();render();
+ status(exists?"🚙 Техника убрана со стоянки":"✅ "+vehicle.name+" выставлен на базе");
+}
+function vehicleParking(){
+ return vehicleDefs.map((v,i)=>{
+  const owned=data.vehicles[v.id]||0,visible=owned>0&&data.displayVehicles.includes(v.id);
+  const x=45+i*173,y=975;
+  return '<button type="button" class="vehicle-pad '+(visible?'vehicle-visible':'vehicle-vacant')+
+   '" data-vehiclepad="'+v.id+'" aria-label="'+(visible?v.name+' на стоянке':'Стоянка для '+v.name)+
+   '" style="left:'+x+'px;top:'+y+'px"><span class="vehicle-pad-icon">'+
+   (visible?v.icon:(v.kind==="garage"?'🚗':'🛩️'))+'</span><span class="vehicle-pad-label">'+
+   (visible?v.name:(v.kind==="garage"?'Наземная стоянка':'Авиационная стоянка'))+
+   '</span>'+(visible?'<b class="vehicle-pad-count">×'+format(owned)+'</b>':'')+'</button>';
+ }).join("");
+}
 function vehicleList(kind){
  return vehicleDefs.filter(v=>v.kind===kind).map(v=>{
   const missingHQ=data.baseLevel<v.hq,missingFacility=data.facilities[kind]<v.facility;
@@ -569,7 +606,9 @@ function vehicleList(kind){
   return '<div class="vehicle-card"><div class="vehicle-icon">'+v.icon+'</div><div class="vehicle-name">'+v.name+'</div>'+
    '<div class="vehicle-owned">В наличии: <b>'+format(data.vehicles[v.id])+'</b></div>'+
    '<div class="vehicle-meta">'+(locked?'🔒 Штаб '+v.hq+' · '+(kind==="garage"?'гараж ':'ангар ')+v.facility:costLabel(v.cost))+'</div>'+
-   '<button class="btn" data-buyvehicle="'+v.id+'" '+(locked||!affordable?'disabled':'')+'>🏭 Произвести</button></div>';
+   '<button class="btn" data-buyvehicle="'+v.id+'" '+(locked||!affordable?'disabled':'')+'>🏭 Произвести</button>'+
+   '<button class="btn alt park-btn" data-showvehicle="'+v.id+'" '+(!data.vehicles[v.id]?'disabled':'')+'>'+
+   (data.displayVehicles.includes(v.id)?'↩️ Убрать с базы':'🅿️ Показать на базе')+'</button></div>';
  }).join("");
 }
 function buildFacility(id){
@@ -892,7 +931,7 @@ function terrainArt(){
  rocks.map(([x,y])=>'<span class="landmark rock" style="left:'+x+'px;top:'+y+'px"></span>').join("");
 }
 function renderMap(){
- const signature=JSON.stringify([data.placements,data.construction.map(j=>[j.id,j.slot]),data.baseLevel,data.storageLevel,data.facilities,data.facilityJobs.map(j=>j.id),data.roads,roadMode,movingFactory,movingFacility,data.facilityLots,data.territoryLevel]);
+ const signature=JSON.stringify([data.placements,data.construction.map(j=>[j.id,j.slot]),data.baseLevel,data.storageLevel,data.facilities,data.facilityJobs.map(j=>j.id),data.roads,roadMode,movingFactory,movingFacility,data.facilityLots,data.territoryLevel,data.vehicles,data.displayVehicles]);
  if(mapSignature===signature)return;
  mapSignature=signature;
  const slots=[];
@@ -911,10 +950,14 @@ function renderMap(){
   const d=facilityDefs[id],level=data.facilities[id],job=data.facilityJobs.find(j=>j.id===id);
   return '<button class="poi" id="map-'+id+'" '+(data.facilityLots[id]!==null?'hidden ':'')+'style="left:'+(i===0?770:938)+'px;top:25px" aria-label="Открыть '+d.name+'">'+buildingArt(job?"construction":id)+'<small>'+d.name+' · '+(job?'стройка':level||'построить')+'</small></button>';
  }).join("");
- $("world").innerHTML=terrainArt()+roadControls+slots.join("")+
+ $("world").innerHTML=terrainArt()+roadControls+slots.join("")+vehicleParking()+
  '<button class="poi" id="mapHQ" style="left:183px;top:25px" aria-label="Открыть штаб">'+buildingArt("hq")+'<small>Штаб · '+data.baseLevel+'</small></button>'+
  '<button class="poi" id="mapStorage" '+(data.facilityLots.storage!==null?'hidden ':'')+'style="left:530px;top:25px" aria-label="Открыть склад">'+buildingArt("storage")+'<small>Склад · '+data.storageLevel+'</small></button>'+facilityArt;
  document.querySelectorAll("[data-road]").forEach(btn=>btn.onclick=()=>buildRoad(Number(btn.dataset.road)));
+ document.querySelectorAll("[data-vehiclepad]").forEach(btn=>btn.onclick=()=>{
+  const id=btn.dataset.vehiclepad,v=vehicleDefs.find(v=>v.id===id);
+  showView(v.kind);
+ });
  document.querySelectorAll("[data-slot]").forEach(btn=>btn.onclick=()=>{
   const slot=Number(btn.dataset.slot),placed=data.placements.find(v=>v.slot===slot),job=data.construction.find(v=>v.slot===slot);
   if(!plotUnlocked(slot)){openCard("territory");return}
@@ -947,6 +990,7 @@ function render(){
   $(id+"Vehicles").innerHTML=vehicleList(id);
  }
  document.querySelectorAll("[data-buyvehicle]").forEach(btn=>btn.onclick=()=>buyVehicle(btn.dataset.buyvehicle));
+ document.querySelectorAll("[data-showvehicle]").forEach(btn=>btn.onclick=()=>toggleVehicleDisplay(btn.dataset.showvehicle));
  if(activeCard&&$("overlay").hidden===false&&(activeCard.type==="construction"||activeCard.type==="facility"&&data.facilityJobs.some(j=>j.id===activeCard.id)))showCard();
 }
 function showView(name){
