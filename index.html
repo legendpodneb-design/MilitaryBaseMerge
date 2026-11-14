@@ -27,10 +27,10 @@
 "use strict";
 const KEY="mbm_save_v6",LEGACY=["mbm_save_v51","mbm_save_v5","mbm_save_v4","mbm_save"],LIMIT=2000,MAX_OFFLINE=480,MINUTE=60000;
 const definitions=[
-{id:"metal",icon:"🏭",title:"Металлургический завод",resource:"metal",rate:10,cost:{coins:100,metal:80}},
-{id:"fuel",icon:"🛢️",title:"Нефтеперерабатывающий завод",resource:"fuel",rate:8,cost:{coins:100,metal:120}},
-{id:"parts",icon:"⚙️",title:"Машиностроительный завод",resource:"parts",rate:5,cost:{coins:150,metal:180}},
-{id:"electronics",icon:"🔌",title:"Электронный завод",resource:"electronics",rate:3,cost:{coins:200,metal:240}}
+{id:"metal",icon:"🏭",title:"Металлургический завод",resource:"metal",rate:10,cost:{metal:80}},
+{id:"fuel",icon:"🛢️",title:"Нефтеперерабатывающий завод",resource:"fuel",rate:8,cost:{metal:120}},
+{id:"parts",icon:"⚙️",title:"Машиностроительный завод",resource:"parts",rate:5,cost:{metal:180}},
+{id:"electronics",icon:"🔌",title:"Электронный завод",resource:"electronics",rate:3,cost:{metal:240}}
 ];
 const labels={metal:"🔩 Металл",fuel:"🛢️ Топливо",parts:"⚙️ Детали",electronics:"🔌 Электроника"};
 const $=id=>document.getElementById(id);
@@ -74,7 +74,7 @@ for(const def of definitions){
  const old=data.resources[def.resource];
  data.resources[def.resource]=Math.min(LIMIT,old+elapsed*def.rate*data.factories[def.id]);made+=data.resources[def.resource]-old;
 }
-data.lastProduction+=elapsed*MINUTE;
+data.lastProduction=(now-data.lastProduction)>MAX_OFFLINE*MINUTE ? now : data.lastProduction+elapsed*MINUTE;
 return made;
 }
 function canAfford(cost){return Object.entries(cost).every(([k,v])=>k==="coins"?data.coins>=v:data.resources[k]>=v)}
