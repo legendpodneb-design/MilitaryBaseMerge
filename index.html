@@ -213,7 +213,7 @@ linear-gradient(145deg,#a0ba77 0%,#76a068 47%,#4d8058 100%)}
 .plot.move-source{outline:3px solid #f6cf7b}
 .cancel-move{position:absolute;left:max(9px,env(safe-area-inset-left));bottom:9px;z-index:7;padding:6px 10px}
 .cancel-move[hidden]{display:none}
-#moveFactoryBtn{width:100%;margin-top:8px}
+#moveFactoryBtn,#moveFacilityBtn{width:100%;margin-top:8px}.poi[hidden]{display:none}
 </style></head><body>
 <div id="rotate" class="rotate"><div>📱↻<h2>Поверните телефон горизонтально</h2><p>Вся военная база помещается на одном экране.</p></div></div>
 <div class="game" id="game">
@@ -587,6 +587,24 @@ function showCard(){
  $("sheetTitle").textContent=title;$("sheetBody").innerHTML=html;$("overlay").hidden=false;
  const action=$("cardAction");
  if(action)action.onclick=()=>{act();if(type!=="empty"&&type!=="factory"){showCard()}else if(type==="factory"){showCard()}else{closeCard()}};
+ if(type==="storage"||type==="facility"){
+   const fid=type==="storage"?"storage":id;
+   if(fid==="storage"||data.facilities[fid]>0){
+    if(!data.facilityJobs.some(j=>j.id===fid)){
+     const move=document.createElement("button");
+     move.className="btn alt";move.id="moveFacilityBtn";
+     move.textContent="↔️ Переместить "+facilityName(fid).toLowerCase();
+     move.onclick=()=>beginMovingFacility(fid);
+     $("sheetBody").appendChild(move);
+     if(data.facilityLots[fid]!==null){
+      const back=document.createElement("button");
+      back.className="btn alt";back.textContent="↩️ Вернуть в командный сектор";
+      back.onclick=()=>{returnFacility(fid);closeCard()};
+      $("sheetBody").appendChild(back);
+     }
+    }
+   }
+ }
  if(type==="factory"){
    const relocate=document.createElement("button");
    relocate.className="btn alt";
@@ -613,32 +631,34 @@ function terrainArt(){
  rocks.map(([x,y])=>'<span class="landmark rock" style="left:'+x+'px;top:'+y+'px"></span>').join("");
 }
 function renderMap(){
- const signature=JSON.stringify([data.placements,data.construction.map(j=>[j.id,j.slot]),data.baseLevel,data.storageLevel,data.facilities,data.facilityJobs.map(j=>j.id),data.roads,roadMode,movingFactory]);
+ const signature=JSON.stringify([data.placements,data.construction.map(j=>[j.id,j.slot]),data.baseLevel,data.storageLevel,data.facilities,data.facilityJobs.map(j=>j.id),data.roads,roadMode,movingFactory,movingFacility,data.facilityLots]);
  if(mapSignature===signature)return;
  mapSignature=signature;
  const slots=[];
  for(let i=0;i<24;i++){
- const placed=data.placements.find(v=>v.slot===i),job=data.construction.find(v=>v.slot===i),def=placed&&definitions.find(d=>d.id===placed.id);
+ const placed=data.placements.find(v=>v.slot===i),job=data.construction.find(v=>v.slot===i),def=placed&&definitions.find(d=>d.id===placed.id),facility=facilityAt(i);
  const x=42+(i%6)*166,y=190+Math.floor(i/6)*136;
  const connected=def?isFactoryConnected(i):false;
- const label=def?def.title+(connected?" · работает":" · нет дороги"):job?"Строится":"Свободный участок";
- slots.push('<button type="button" class="plot '+(placed||job?"occupied":"")+(def&&!connected?" offline":"")+(movingFactory&&movingFactory.from===i?" move-source":"")+(movingFactory&&!placed&&!job?" move-target":"")+'" aria-label="'+label+'" data-slot="'+i+'" style="left:'+x+'px;top:'+y+'px">'+(def?buildingArt(def.id):job?buildingArt("construction"):'<strong>＋</strong>')+'<small>'+(def?(connected?'✅ ':'🚫 ')+def.title.replace(" завод",""):job?"Строится":"Участок")+'</small></button>');
+ const label=facility?facilityName(facility):def?def.title+(connected?" · работает":" · нет дороги"):job?"Строится":"Свободный участок";
+ slots.push('<button type="button" class="plot '+(placed||job||facility?"occupied":"")+(def&&!connected?" offline":"")+(movingFactory&&movingFactory.from===i||movingFacility&&data.facilityLots[movingFacility.id]===i?" move-source":"")+(movingFactory||movingFacility)&&!placed&&!job&&!facility?" move-target":"")+'" aria-label="'+label+'" data-slot="'+i+'" style="left:'+x+'px;top:'+y+'px">'+(facility?buildingArt(facility):def?buildingArt(def.id):job?buildingArt("construction"):'<strong>＋</strong>')+'<small>'+(facility?facilityName(facility):def?(connected?'✅ ':'🚫 ')+def.title.replace(" завод",""):job?"Строится":"Участок")+'</small></button>');
  }
- const roadControls=roadMode&&!movingFactory?roadSlots.filter(s=>!data.roads.includes(s.id)).map(s=>
+ const roadControls=roadMode&&!movingFactory&&!movingFacility?roadSlots.filter(s=>!data.roads.includes(s.id)).map(s=>
  '<button type="button" class="road-spot '+(s.v?'vertical':'horizontal')+'" data-road="'+s.id+
  '" style="left:'+(s.v?s.x-12:s.x)+'px;top:'+(s.v?(s.y+s.endY)/2-36:s.y-13)+
  'px" aria-label="Построить участок дороги за 12 металла"><span>＋</span></button>').join(""):"";
  const facilityArt=["garage","hangar"].map((id,i)=>{
   const d=facilityDefs[id],level=data.facilities[id],job=data.facilityJobs.find(j=>j.id===id);
-  return '<button class="poi" id="map-'+id+'" style="left:'+(i===0?770:938)+'px;top:25px" aria-label="Открыть '+d.name+'">'+buildingArt(job?"construction":id)+'<small>'+d.name+' · '+(job?'стройка':level||'построить')+'</small></button>';
+  return '<button class="poi" id="map-'+id+'" '+(data.facilityLots[id]!==null?'hidden ':'')+'style="left:'+(i===0?770:938)+'px;top:25px" aria-label="Открыть '+d.name+'">'+buildingArt(job?"construction":id)+'<small>'+d.name+' · '+(job?'стройка':level||'построить')+'</small></button>';
  }).join("");
  $("world").innerHTML=terrainArt()+roadControls+slots.join("")+
  '<button class="poi" id="mapHQ" style="left:183px;top:25px" aria-label="Открыть штаб">'+buildingArt("hq")+'<small>Штаб · '+data.baseLevel+'</small></button>'+
- '<button class="poi" id="mapStorage" style="left:530px;top:25px" aria-label="Открыть склад">'+buildingArt("storage")+'<small>Склад · '+data.storageLevel+'</small></button>'+facilityArt;
+ '<button class="poi" id="mapStorage" '+(data.facilityLots.storage!==null?'hidden ':'')+'style="left:530px;top:25px" aria-label="Открыть склад">'+buildingArt("storage")+'<small>Склад · '+data.storageLevel+'</small></button>'+facilityArt;
  document.querySelectorAll("[data-road]").forEach(btn=>btn.onclick=()=>buildRoad(Number(btn.dataset.road)));
  document.querySelectorAll("[data-slot]").forEach(btn=>btn.onclick=()=>{
   const slot=Number(btn.dataset.slot),placed=data.placements.find(v=>v.slot===slot),job=data.construction.find(v=>v.slot===slot);
   if(movingFactory){moveFactory(slot);return}
+  if(movingFacility){moveFacility(slot);return}
+  const facility=facilityAt(slot);if(facility){openCard(facility==="storage"?"storage":"facility",slot,facility);return}
   if(placed)openCard("factory",slot,placed.id);else if(job)openCard("construction",slot);else openCard("empty",slot);
  });
  $("mapHQ").onclick=()=>openCard("hq");$("mapStorage").onclick=()=>openCard("storage");
@@ -649,7 +669,7 @@ function render(){
  $("coins").textContent=format(data.coins);$("hq").textContent=format(data.baseLevel)+" / 1000";
  for(const name of Object.keys(data.resources))$("res-"+name).textContent=format(data.resources[name]);
  $("roadMode").textContent=roadMode?"✓ Готово · дорог "+data.roads.length:"🛣️ Дороги · "+ROAD_PRICE+" 🔩";
- $("cancelMove").hidden=!movingFactory;
+ $("cancelMove").hidden=!(movingFactory||movingFacility);
  $("roadMode").setAttribute("aria-pressed",String(roadMode));
  $("roadHelp").hidden=!roadMode;
  $("resources").innerHTML=definitions.map(def=>'<div class="card"><b>'+labels[def.resource]+'</b><div class="symbol">'+format(data.resources[def.resource])+'</div><div class="detail">из '+format(capacity())+'</div></div>').join("");
@@ -661,9 +681,9 @@ function showView(name){
  ["base","garage","hangar","missions","storage"].forEach(v=>{$("view-"+v).hidden=v!==name});
  closeCard();render();
 }
-document.querySelectorAll("[data-view]").forEach(btn=>btn.onclick=()=>{if(movingFactory)cancelMovingFactory();showView(btn.dataset.view)});
+document.querySelectorAll("[data-view]").forEach(btn=>btn.onclick=()=>{if(movingFactory||movingFacility)cancelMovingFactory();showView(btn.dataset.view)});
 $("cancelMove").onclick=cancelMovingFactory;
-$("roadMode").onclick=()=>{if(movingFactory)cancelMovingFactory();roadMode=!roadMode;mapSignature="";render()};
+$("roadMode").onclick=()=>{if(movingFactory||movingFacility)cancelMovingFactory();roadMode=!roadMode;mapSignature="";render()};
 $("goStorageMap").onclick=()=>{showView("base");openCard("storage")};for(const id of ["garage","hangar"])$("go"+(id==="garage"?"Garage":"Hangar")+"Map").onclick=()=>{showView("base");openCard("facility",null,id)};
 $("closeSheet").onclick=closeCard;
 $("overlay").onclick=e=>{if(e.target===$("overlay"))closeCard()};
