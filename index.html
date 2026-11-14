@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#17251e"><title>Военная база: Merge</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#263c2d,#101a15 65%);color:#f1f4e9;font:16px system-ui,sans-serif}
+main{max-width:700px;margin:auto;padding:20px 14px}h1{text-align:center;font-size:clamp(23px,6vw,36px)}.sub{text-align:center;color:#b5c3ae;font-size:13px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat,.panel{background:#1d2d23;border:1px solid #405744;border-radius:14px;padding:13px;margin:10px 0}
+.stat{text-align:center}.stat small{display:block;color:#b5c3ae;font-size:11px}.stat strong{font-size:21px}
+.board{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;margin-top:12px}.cell{aspect-ratio:1;border-radius:10px;border:1px solid #50664d;background:#344936;color:white;position:relative;display:grid;place-items:center;font-size:clamp(22px,7vw,42px);cursor:pointer;touch-action:manipulation;padding:0}.cell.empty{background:#18271d;border-style:dashed}.cell.selected{outline:3px solid #e8c76a}.cell .lv{position:absolute;bottom:2px;right:3px;background:#122119d9;color:#fff;font-size:10px;padding:2px 4px;border-radius:5px}
+.actions{display:flex;gap:8px;margin-top:10px}.actions button{flex:1}button.action{background:#8fb774;color:#132019;border:0;border-radius:10px;padding:12px;font-size:14px;font-weight:bold}button.secondary{background:#344a39;color:#fff;border:1px solid #526b54}button:disabled{opacity:.45}.message{color:#e8c76a;font-size:14px;min-height:40px;margin-top:10px}.hint{color:#b5c3ae;font-size:13px}.levels{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:10px}.level{background:#293e30;text-align:center;border-radius:8px;padding:7px 2px}.level b{font-size:24px;display:block}.level small{font-size:10px;color:#c0cabc}.next{font-size:32px}footer{text-align:center;color:#a9b4a1;font-size:11px}
+</style></head><body><main>
+<h1>🪖 ВОЕННАЯ БАЗА: MERGE</h1><div class="sub">Объединяй технику • Развивай базу</div>
+<div class="stats"><div class="stat"><small>МОНЕТЫ</small><strong id="coins"></strong></div><div class="stat"><small>ОЧКИ</small><strong id="score"></strong></div><div class="stat"><small>РЕКОРД</small><strong id="best"></strong></div></div>
+<section class="panel"><b>Тактическая площадка 5 × 5</b><div class="hint">Выбирай два одинаковых соседних объекта</div><div id="board" class="board"></div><div id="message" class="message"></div><div class="actions"><button class="action" id="buy">➕ Техника · 20 🪙</button><button class="action secondary" id="restart">↻ Заново</button></div></section>
+<section class="panel">Следующий объект: <span class="next" id="next"></span></section>
+<section class="panel"><b>Коллекция техники</b><div id="levels" class="levels"></div></section><footer>Прототип 0.1 · Прогресс сохраняется в браузере</footer>
+</main><script>
+(()=>{
+const units=[["Разведджип","🚙"],["Бронемашина","🚐"],["БТР","🚛"],["Лёгкий танк","🛡️"],["Основной танк","🚜"],["Тяжёлый танк","🎖️"],["Вертолёт","🚁"],["Истребитель","🛩️"],["Командный центр","🏢"],["Главная база","🏰"]];
+const $=id=>document.getElementById(id), random=()=>Math.random()<.82?0:1;
+let board,coins=120,score=0,best=Number(localStorage.getItem("mbm_best")||0),selected=null,next=0;
+const adjacent=(a,b)=>Math.abs(Math.floor(a/5)-Math.floor(b/5))+Math.abs(a%5-b%5)===1;
+function say(s){$("message").textContent=s}
+function save(){localStorage.setItem("mbm_best",best);localStorage.setItem("mbm_save",JSON.stringify({board,coins,score}))}
+function render(){
+$("board").replaceChildren();
+board.forEach((value,i)=>{const el=document.createElement("button");el.className="cell"+(value===null?" empty":"")+(selected===i?" selected":"");el.setAttribute("aria-label",value===null?"Пустая клетка":units[value][0]);el.innerHTML=value===null?"＋":units[value][1]+'<span class="lv">УР. '+(value+1)+'</span>';el.onclick=()=>tap(i);$("board").append(el)});
+$("coins").textContent=coins;$("score").textContent=score;$("best").textContent=best;$("next").textContent=units[next][1];$("buy").disabled=coins<20||!board.includes(null);
+$("levels").innerHTML=units.map((u,i)=>'<div class="level"><b>'+u[1]+'</b><small>'+(i+1)+'. '+u[0]+'</small></div>').join("");
+}
+function start(){board=Array(25).fill(null);[2,5,8,11,14,17,20,23].forEach(i=>board[i]=random());coins=120;score=0;selected=null;next=random();say("Нажми на объект, затем на такой же рядом.");save();render()}
+function tap(i){
+const val=board[i];if(val===null){selected=null;say("Пустая клетка. Добавь технику кнопкой ниже.");render();return}
+if(selected===null){selected=i;say("Теперь выбери такой же соседний объект.");render();return}
+if(selected===i){selected=null;say("Выбор отменён.");render();return}
+if(!adjacent(selected,i)||board[selected]!==val){selected=i;say("Нужны одинаковые объекты на соседних клетках.");render();return}
+if(val===9){selected=null;say("Максимальный уровень уже достигнут.");render();return}
+board[selected]=val+1;board[i]=null;selected=null;let gained=25*(val+1);score+=gained;coins+=10+val*5;best=Math.max(best,score);say(units[val+1][0]+" создан! +"+gained+" очков");save();render();
+}
+$("buy").onclick=()=>{const cells=board.flatMap((v,i)=>v===null?[i]:[]);if(!cells.length||coins<20)return;const pos=cells[Math.floor(Math.random()*cells.length)];board[pos]=next;coins-=20;next=random();selected=null;say("Новая техника доставлена!");save();render()};
+$("restart").onclick=()=>{if(confirm("Начать новую игру?"))start()};
+try{const state=JSON.parse(localStorage.getItem("mbm_save")||"null");if(state&&Array.isArray(state.board)&&state.board.length===25){board=state.board;coins=state.coins;score=state.score;next=random();say("С возвращением! Продолжай развивать базу.");render()}else start()}catch(e){start()}
+})();
+</script></body></html>
