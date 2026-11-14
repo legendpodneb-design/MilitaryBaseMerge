@@ -214,6 +214,12 @@ linear-gradient(145deg,#a0ba77 0%,#76a068 47%,#4d8058 100%)}
 .cancel-move{position:absolute;left:max(9px,env(safe-area-inset-left));bottom:9px;z-index:7;padding:6px 10px}
 .cancel-move[hidden]{display:none}
 #moveFactoryBtn,#moveFacilityBtn{width:100%;margin-top:8px}.poi[hidden]{display:none}
+.world{height:1050px}
+.plot.locked-land{background:#1b3c345c;border:2px dashed #c5d7af8a;box-shadow:inset 0 0 0 2px #31482d66}
+.plot.locked-land strong{font-size:25px;filter:grayscale(.3)}
+.plot.locked-land small{color:#f0e6b9;background:#3c4f3bd9}
+#expandLand{background:#476e4a;color:#f7f0c9;border:1px solid #adc795}
+
 </style></head><body>
 <div id="rotate" class="rotate"><div>📱↻<h2>Поверните телефон горизонтально</h2><p>Вся военная база помещается на одном экране.</p></div></div>
 <div class="game" id="game">
@@ -224,7 +230,7 @@ linear-gradient(145deg,#a0ba77 0%,#76a068 47%,#4d8058 100%)}
  <main class="stage">
   <div id="view-base" class="view map-screen">
    <div class="world-wrap"><div class="world-scroll" id="worldscroll"><div class="world" id="world"></div></div></div>
-   <div class="road-actions"><button class="btn alt" id="roadMode" aria-pressed="false">🛣️ Дороги · 12 🔩</button><span class="roadhelp" id="roadHelp" hidden>Касайся светлых участков дороги. 12 🔩 за участок.</span></div><div class="edge-actions"><button class="btn alt" id="zoomout" aria-label="Уменьшить">−</button><button class="btn alt" id="zoomin" aria-label="Увеличить">＋</button><span class="zoomreadout" id="zoomLevel" aria-live="off">100%</span><button class="btn alt" id="save" aria-label="Сохранить">💾</button></div>
+   <div class="road-actions"><button class="btn alt" id="roadMode" aria-pressed="false">🛣️ Дороги · 12 🔩</button><button class="btn alt" id="expandLand">🌿 Земля 24/36</button><span class="roadhelp" id="roadHelp" hidden>Касайся светлых участков дороги. 12 🔩 за участок.</span></div><div class="edge-actions"><button class="btn alt" id="zoomout" aria-label="Уменьшить">−</button><button class="btn alt" id="zoomin" aria-label="Увеличить">＋</button><span class="zoomreadout" id="zoomLevel" aria-live="off">100%</span><button class="btn alt" id="save" aria-label="Сохранить">💾</button></div>
    <div class="hint" id="mapstatus">Заводы работают только с дорогой от штаба · 🛣️ строй дороги</div><button class="btn cancel-move" id="cancelMove" hidden>Отмена перемещения</button>
   </div>
   <div id="view-storage" class="view aux" hidden><h2>📦 Склад</h2><p>Нажмите на склад на карте, чтобы улучшить его.</p><div class="cards" id="resources"></div><button class="btn" id="goStorageMap">🗺️ Вернуться к карте и складу</button></div>
@@ -276,6 +282,7 @@ function buildExpansion(){
  mapSignature="";status("🌿 Открыто ещё 6 участков! Территория "+accessiblePlots()+"/36");
  save();render();showCard();
 }
+function roadUnlocked(s,level=data.territoryLevel){return !s.extension||level>=s.extension}
 const defaults=()=>({version:99,coins:600,baseLevel:1,storageLevel:1,best:0,board:Array(25).fill(null),score:0,resources:{metal:300,fuel:0,parts:0,electronics:0},factories:{metal:0,fuel:0,parts:0,electronics:0},lastProduction:Date.now(),placements:[],construction:[],facilities:{garage:0,hangar:0},facilityJobs:[],roads:[],facilityLots:{storage:null,garage:null,hangar:null},territoryLevel:0});
 const safeNum=(v,fallback=0)=>Number.isFinite(v)&&v>=0?v:fallback;
 function safeParse(key){try{return JSON.parse(localStorage.getItem(key)||"null")}catch(e){return null}}
@@ -311,7 +318,7 @@ if([9,94,95,96,97,98,99].includes(raw.version)){
  }
 }
 if([94,95,96,97,98,99].includes(raw.version)&&Array.isArray(raw.roads)){
- const valid=new Set(roadSlots.map(s=>s.id));
+ const valid=new Set(roadSlots.filter(s=>roadUnlocked(s,raw.version===99?Math.min(2,Math.floor(safeNum(raw.territoryLevel))):0)).map(s=>s.id));
  result.roads=[...new Set(raw.roads.filter(n=>Number.isInteger(n)&&valid.has(n)))];
 }
 if(raw.version===99)result.territoryLevel=Math.min(2,Math.max(0,Math.floor(safeNum(raw.territoryLevel))));
@@ -391,8 +398,8 @@ advance();const def=definitions.find(x=>x.id===id);if(!def)return;
 const level=data.factories[id];
 if(level>=999)return;
 if(data.construction.some(j=>j.id===id)){status("Завод этого типа уже строится или улучшается");return}
-if(slot!==null&&(data.placements.some(p=>p.slot===slot)||data.construction.some(p=>p.slot===slot)||facilityAt(slot))){status("Участок занят");return}
-if(slot===null&&level===0){const free=Array.from({length:24},(_,i)=>i).find(i=>!data.placements.some(p=>p.slot===i)&&!data.construction.some(p=>p.slot===i)&&!facilityAt(i));if(free===undefined){status("Нет свободных участков");return}slot=free}
+if(slot!==null&&(!plotUnlocked(slot)||data.placements.some(p=>p.slot===slot)||data.construction.some(p=>p.slot===slot)||facilityAt(slot))){status("Участок занят");return}
+if(slot===null&&level===0){const free=Array.from({length:accessiblePlots()},(_,i)=>i).find(i=>!data.placements.some(p=>p.slot===i)&&!data.construction.some(p=>p.slot===i)&&!facilityAt(i));if(free===undefined){status("Нет свободных участков");return}slot=free}
 const price=Object.fromEntries(Object.entries(def.cost).map(([k,v])=>[k,Math.round(v*(1+level*.85))]));
 if(!canAfford(price)){status("Недостаточно материалов для "+def.title);render();return}
 spend(price);
@@ -433,7 +440,7 @@ function rectGap(a,b){
  return Math.hypot(dx,dy);
 }
 function connectedRoads(){
- const built=data.roads.map(id=>roadSlots.find(s=>s.id===id)).filter(Boolean);
+ const built=data.roads.map(id=>roadSlots.find(s=>s.id===id)).filter(s=>s&&roadUnlocked(s));
  const connected=new Set(),queue=[];
  const entry={x1:244,x2:244,y1:155,y2:155};
  for(const s of built){if(rectGap(roadBounds(s),entry)<=1){connected.add(s.id);queue.push(s)}}
@@ -467,21 +474,21 @@ function factoryConnectedCount(){
 function roadSvg(){
  if(!data.roads.length)return "";
  const network=connectedRoads();
- const built=data.roads.map(id=>roadSlots.find(s=>s.id===id)).filter(Boolean);
+ const built=data.roads.map(id=>roadSlots.find(s=>s.id===id)).filter(s=>s&&roadUnlocked(s));
  // All curbs, then all pavement, then lane markings: seamless shared joints.
  const paths=(className,items)=>items.map(s=>
   '<path class="'+className+'" d="'+roadSegmentArt(s)+'"/>').join("");
  const active=built.filter(s=>network.has(s.id));
  const inactive=built.filter(s=>!network.has(s.id));
  const layer=items=>paths("pavement",items)+paths("asphalt",items)+paths("marking",items);
- return '<svg class="roadnet" width="1100" height="760" viewBox="0 0 1100 760" aria-hidden="true">'+
+ return '<svg class="roadnet" width="1100" height="1050" viewBox="0 0 1100 1050" aria-hidden="true">'+
  '<g class="road-unconnected">'+layer(inactive)+'</g>'+
  '<g class="road-connected">'+layer(active)+'</g></svg>';
 }
 function buildRoad(id){
  if(!roadMode)return;
  const place=roadSlots.find(s=>s.id===id);
- if(!place||data.roads.includes(id))return;
+ if(!place||!roadUnlocked(place)||data.roads.includes(id))return;
  advance();
  if(data.resources.metal<ROAD_PRICE){status("Для дороги нужно "+ROAD_PRICE+" металла 🔩");return}
  data.resources.metal-=ROAD_PRICE;data.roads.push(id);
@@ -572,7 +579,14 @@ function showCard(){
  const {type,slot,id}=activeCard;
  let title="",html="",act=null;
  const button=(label,disabled=false)=>'<button class="btn" id="cardAction" '+(disabled?"disabled":"")+'>'+label+'</button>';
- if(type==="facility"){
+ if(type==="territory"){
+ title="🌿 Расширение базы";
+ const price=expansionPrice();
+ html='<p>Доступно: <b>'+accessiblePlots()+' из '+TOTAL_PLOTS+' участков</b></p>'+
+ (price?'<p>Открывает 6 новых участков для зданий и дорог.</p><p>Стоимость: <b>'+costLabel(price)+'</b></p>':'<p>Вся территория уже открыта.</p>')+
+ button(price?"🌿 Купить территорию":"Максимальное расширение",!price||!canAfford(price));
+ act=buildExpansion;
+ } else if(type==="facility"){
  const def=facilityDefs[id],level=data.facilities[id],job=data.facilityJobs.find(j=>j.id===id),cost=facilityCost(id);
  title=def.icon+" "+def.name;
  html='<p>Уровень: <b>'+level+' / 100</b></p><p>Назначение: '+def.purpose+'</p>'+(job?'<p>🏗️ Осталось: <b>'+clock(timeLeft(job))+'</b></p>':'<p>Стоимость: '+costLabel(cost)+'</p>')+'<p class="muted">'+(level===0?'Здание ещё не построено.':'Здание работает. Техника появится позже.')+'</p>'+button(job?"Строится…":level?"⬆️ Улучшить":"🏗️ Построить",!!job||level>=100||!canAfford(cost));
@@ -652,18 +666,18 @@ function terrainArt(){
  rocks.map(([x,y])=>'<span class="landmark rock" style="left:'+x+'px;top:'+y+'px"></span>').join("");
 }
 function renderMap(){
- const signature=JSON.stringify([data.placements,data.construction.map(j=>[j.id,j.slot]),data.baseLevel,data.storageLevel,data.facilities,data.facilityJobs.map(j=>j.id),data.roads,roadMode,movingFactory,movingFacility,data.facilityLots]);
+ const signature=JSON.stringify([data.placements,data.construction.map(j=>[j.id,j.slot]),data.baseLevel,data.storageLevel,data.facilities,data.facilityJobs.map(j=>j.id),data.roads,roadMode,movingFactory,movingFacility,data.facilityLots,data.territoryLevel]);
  if(mapSignature===signature)return;
  mapSignature=signature;
  const slots=[];
- for(let i=0;i<24;i++){
- const placed=data.placements.find(v=>v.slot===i),job=data.construction.find(v=>v.slot===i),def=placed&&definitions.find(d=>d.id===placed.id),facility=facilityAt(i);
+ for(let i=0;i<TOTAL_PLOTS;i++){
+ const placed=data.placements.find(v=>v.slot===i),job=data.construction.find(v=>v.slot===i),def=placed&&definitions.find(d=>d.id===placed.id),facility=facilityAt(i),locked=!plotUnlocked(i);
  const x=42+(i%6)*166,y=190+Math.floor(i/6)*136;
  const connected=def?isFactoryConnected(i):false;
- const label=facility?facilityName(facility):def?def.title+(connected?" · работает":" · нет дороги"):job?"Строится":"Свободный участок";
- slots.push('<button type="button" class="plot '+(placed||job||facility?"occupied":"")+(def&&!connected?" offline":"")+(movingFactory&&movingFactory.from===i||movingFacility&&data.facilityLots[movingFacility.id]===i?" move-source":"")+((movingFactory||movingFacility)&&!placed&&!job&&!facility?" move-target":"")+'" aria-label="'+label+'" data-slot="'+i+'" style="left:'+x+'px;top:'+y+'px">'+(facility?buildingArt(facility):def?buildingArt(def.id):job?buildingArt("construction"):'<strong>＋</strong>')+'<small>'+(facility?facilityName(facility):def?(connected?'✅ ':'🚫 ')+def.title.replace(" завод",""):job?"Строится":"Участок")+'</small></button>');
+ const label=locked?"Закрытая территория":facility?facilityName(facility):def?def.title+(connected?" · работает":" · нет дороги"):job?"Строится":"Свободный участок";
+ slots.push('<button type="button" class="plot '+(locked?" locked-land":placed||job||facility?"occupied":"")+(def&&!connected?" offline":"")+(movingFactory&&movingFactory.from===i||movingFacility&&data.facilityLots[movingFacility.id]===i?" move-source":"")+((movingFactory||movingFacility)&&!locked&&!placed&&!job&&!facility?" move-target":"")+'" aria-label="'+label+'" data-slot="'+i+'" style="left:'+x+'px;top:'+y+'px">'+(locked?'<strong>🔒</strong>':facility?buildingArt(facility):def?buildingArt(def.id):job?buildingArt("construction"):'<strong>＋</strong>')+'<small>'+(locked?"Открыть":facility?facilityName(facility):def?(connected?'✅ ':'🚫 ')+def.title.replace(" завод",""):job?"Строится":"Участок")+'</small></button>');
  }
- const roadControls=roadMode&&!movingFactory&&!movingFacility?roadSlots.filter(s=>!data.roads.includes(s.id)).map(s=>
+ const roadControls=roadMode&&!movingFactory&&!movingFacility?roadSlots.filter(s=>roadUnlocked(s)&&!data.roads.includes(s.id)).map(s=>
  '<button type="button" class="road-spot '+(s.v?'vertical':'horizontal')+'" data-road="'+s.id+
  '" style="left:'+(s.v?s.x-12:s.x)+'px;top:'+(s.v?(s.y+s.endY)/2-36:s.y-13)+
  'px" aria-label="Построить участок дороги за 12 металла"><span>＋</span></button>').join(""):"";
@@ -677,6 +691,7 @@ function renderMap(){
  document.querySelectorAll("[data-road]").forEach(btn=>btn.onclick=()=>buildRoad(Number(btn.dataset.road)));
  document.querySelectorAll("[data-slot]").forEach(btn=>btn.onclick=()=>{
   const slot=Number(btn.dataset.slot),placed=data.placements.find(v=>v.slot===slot),job=data.construction.find(v=>v.slot===slot);
+  if(!plotUnlocked(slot)){openCard("territory");return}
   if(movingFactory){moveFactory(slot);return}
   if(movingFacility){moveFacility(slot);return}
   const facility=facilityAt(slot);if(facility){openCard(facility==="storage"?"storage":"facility",slot,facility);return}
@@ -690,6 +705,7 @@ function render(){
  $("coins").textContent=format(data.coins);$("hq").textContent=format(data.baseLevel)+" / 1000";
  for(const name of Object.keys(data.resources))$("res-"+name).textContent=format(data.resources[name]);
  $("roadMode").textContent=roadMode?"✓ Готово · дорог "+data.roads.length:"🛣️ Дороги · "+ROAD_PRICE+" 🔩";
+ $("expandLand").textContent=data.territoryLevel===2?"🌿 Земля 36/36":"🌿 Земля "+accessiblePlots()+"/36";
  $("cancelMove").hidden=!(movingFactory||movingFacility);
  $("roadMode").setAttribute("aria-pressed",String(roadMode));
  $("roadHelp").hidden=!roadMode;
@@ -702,6 +718,7 @@ function showView(name){
  ["base","garage","hangar","missions","storage"].forEach(v=>{$("view-"+v).hidden=v!==name});
  closeCard();render();
 }
+$("expandLand").onclick=()=>openCard("territory");
 document.querySelectorAll("[data-view]").forEach(btn=>btn.onclick=()=>{if(movingFactory||movingFacility)cancelMovingFactory();showView(btn.dataset.view)});
 $("cancelMove").onclick=cancelMovingFactory;
 $("roadMode").onclick=()=>{if(movingFactory||movingFacility)cancelMovingFactory();roadMode=!roadMode;mapSignature="";render()};
