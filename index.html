@@ -249,7 +249,7 @@ function render(){
  $("coins").textContent=format(data.coins);$("hq").textContent=format(data.baseLevel)+" / 1000";
  for(const name of Object.keys(data.resources))$("res-"+name).textContent=format(data.resources[name]);
  $("resources").innerHTML=definitions.map(def=>'<div class="card"><b>'+labels[def.resource]+'</b><div class="symbol">'+format(data.resources[def.resource])+'</div><div class="detail">из '+format(capacity())+'</div></div>').join("");
- if(activeCard)showCard();
+ if(activeCard&&$("overlay").hidden===false&&activeCard.type==="construction")showCard();
 }
 function showView(name){
  document.querySelectorAll("[data-view]").forEach(b=>b.classList.toggle("on",b.dataset.view===name));
