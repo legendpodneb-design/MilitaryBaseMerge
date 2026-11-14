@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#172e25">
-<title>Военная база — 0.9.6 Дорожная сеть</title>
+<title>Военная база — 0.9.7 Планировка базы</title>
 <style>
 :root{color-scheme:dark;--bg:#14261d;--panel:#294536;--border:#688068;--text:#f1f4e9;--gold:#f4d384}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#426248,#152820 70%);color:var(--text);font:15px system-ui,-apple-system,sans-serif}main{max-width:720px;margin:auto;padding:14px 12px 100px}h1{text-align:center;font-size:clamp(23px,6vw,34px);margin:4px 0}.sub{text-align:center;color:#bfd3b9;font-size:12px;margin-bottom:12px}.tag{font-size:10px;letter-spacing:2px;text-align:center;color:#e3dcad;font-weight:800}.panel{background:linear-gradient(165deg,#31513b,#1c3327);border:1px solid #698368;border-radius:15px;padding:14px;margin:10px 0;box-shadow:0 4px 12px #0d1b1377}h2{font-size:17px;margin:0 0 8px}.muted{font-size:12px;color:#c0d0ba;line-height:1.5}.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.stat{background:#223e2e;border:1px solid #59785d;border-radius:12px;padding:12px}.stat small{display:block;color:#c5d2b7}.stat strong{font-size:21px}.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:12px}.card{border:1px solid #79916b;background:#344f3b;border-radius:13px;padding:11px;min-width:0}.card h3{margin:2px 0 7px;font-size:15px}.symbol{font-size:33px}.rate{color:#e5dd9d;font-size:12px}.btn{background:linear-gradient(#e4d293,#bfaa6e);color:#263123;border:0;border-radius:10px;padding:11px;font-size:13px;font-weight:800;cursor:pointer;touch-action:manipulation}.btn:disabled{opacity:.43}.card .btn{width:100%;margin-top:8px}.btn.alt{background:#44634a;color:#f4f6e7;border:1px solid #7c9878}.bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}.baseart{border-radius:12px;border:2px solid #829671;height:136px;background:repeating-linear-gradient(35deg,#89977129 0 22px,#b6c1a11f 23px 25px),linear-gradient(#8ea178,#547552);display:flex;align-items:end;justify-content:space-around;padding:14px 2px 8px;overflow:hidden}.building{text-align:center;min-width:0;flex:1;filter:drop-shadow(2px 3px 2px #182b22aa)}.building .roof{font-size:38px}.building small{display:block;color:#192c20;font-size:10px;font-weight:900;background:#cbd4a9;border-radius:5px;margin:3px auto;max-width:92px}.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,720px);padding:8px max(8px,env(safe-area-inset-right)) calc(7px + env(safe-area-inset-bottom));background:#183125f5;border:1px solid #58765d;display:grid;grid-template-columns:repeat(5,1fr);gap:3px;z-index:5}.nav button{background:transparent;border:0;color:#c3d3b7;border-radius:10px;padding:6px 2px;font:10px system-ui;cursor:pointer}.nav button span{display:block;font-size:21px}.nav button.on{background:#4a684e;color:#fff1c6}.view[hidden]{display:none!important}.notice{min-height:23px;color:#f1dc9b;font-size:12px}.save{margin-top:12px;display:flex;align-items:center;flex-wrap:wrap;gap:8px}.detail{font-size:12px;color:#d1e0c6}.chip{padding:4px 8px;border-radius:20px;background:#49664b;color:#eff1cf;font-size:11px}.locked{opacity:.78}.spinner{font-size:11px;color:#bcd5b4}footer{text-align:center;color:#a9bca8;font-size:11px;margin-top:20px}
@@ -209,18 +209,23 @@ linear-gradient(145deg,#a0ba77 0%,#76a068 47%,#4d8058 100%)}
 .road-connected{opacity:1}
 .road-spot.vertical{height:72px}
 .road-spot:focus-visible{outline:3px solid #f8e19c}
+.plot.move-target{border:2px solid #f3d780!important;background:#d9cd7180!important;box-shadow:0 0 0 3px #ffdb7550}
+.plot.move-source{outline:3px solid #f6cf7b}
+.cancel-move{position:absolute;left:max(9px,env(safe-area-inset-left));bottom:9px;z-index:7;padding:6px 10px}
+.cancel-move[hidden]{display:none}
+#moveFactoryBtn{width:100%;margin-top:8px}
 </style></head><body>
 <div id="rotate" class="rotate"><div>📱↻<h2>Поверните телефон горизонтально</h2><p>Вся военная база помещается на одном экране.</p></div></div>
 <div class="game" id="game">
  <header class="hud">
-  <b class="brand">🪖 ВОЕННАЯ БАЗА <small>0.9.6</small></b>
+  <b class="brand">🪖 ВОЕННАЯ БАЗА <small>0.9.7</small></b>
   <div class="meters"><span>🏛️ <b id="hq">1 / 1000</b></span><span>🪙 <b id="coins">0</b></span><span>🔩 <b id="res-metal">0</b></span><span>🛢️ <b id="res-fuel">0</b></span><span>⚙️ <b id="res-parts">0</b></span><span>🔌 <b id="res-electronics">0</b></span></div>
  </header>
  <main class="stage">
   <div id="view-base" class="view map-screen">
    <div class="world-wrap"><div class="world-scroll" id="worldscroll"><div class="world" id="world"></div></div></div>
    <div class="road-actions"><button class="btn alt" id="roadMode" aria-pressed="false">🛣️ Дороги · 12 🔩</button><span class="roadhelp" id="roadHelp" hidden>Касайся светлых участков дороги. 12 🔩 за участок.</span></div><div class="edge-actions"><button class="btn alt" id="zoomout" aria-label="Уменьшить">−</button><button class="btn alt" id="zoomin" aria-label="Увеличить">＋</button><span class="zoomreadout" id="zoomLevel" aria-live="off">100%</span><button class="btn alt" id="save" aria-label="Сохранить">💾</button></div>
-   <div class="hint" id="mapstatus">Заводы работают только с дорогой от штаба · 🛣️ строй дороги</div>
+   <div class="hint" id="mapstatus">Заводы работают только с дорогой от штаба · 🛣️ строй дороги</div><button class="btn cancel-move" id="cancelMove" hidden>Отмена перемещения</button>
   </div>
   <div id="view-storage" class="view aux" hidden><h2>📦 Склад</h2><p>Нажмите на склад на карте, чтобы улучшить его.</p><div class="cards" id="resources"></div><button class="btn" id="goStorageMap">🗺️ Вернуться к карте и складу</button></div>
   <div id="view-garage" class="view aux" hidden><h2>🚙 Гараж</h2><p>Постройте или улучшите гараж на карте.</p><div class="card" id="garageInfo"></div><button class="btn" id="goGarageMap">🗺️ Открыть гараж</button></div>
@@ -236,7 +241,7 @@ linear-gradient(145deg,#a0ba77 0%,#76a068 47%,#4d8058 100%)}
 <script>
 (()=>{
 "use strict";
-const KEY="mbm_save_v96",LEGACY=["mbm_save_v95","mbm_save_v94","mbm_save_v9","mbm_save_v81","mbm_save_v8","mbm_save_v7","mbm_save_v6","mbm_save_v51","mbm_save_v5","mbm_save_v4","mbm_save"],MAX_OFFLINE=480,MINUTE=60000;
+const KEY="mbm_save_v97",LEGACY=["mbm_save_v96","mbm_save_v95","mbm_save_v94","mbm_save_v9","mbm_save_v81","mbm_save_v8","mbm_save_v7","mbm_save_v6","mbm_save_v51","mbm_save_v5","mbm_save_v4","mbm_save"],MAX_OFFLINE=480,MINUTE=60000;
 const definitions=[
 {id:"metal",icon:"🏭",title:"Металлургический завод",resource:"metal",rate:10,cost:{metal:80}},
 {id:"fuel",icon:"🛢️",title:"Нефтеперерабатывающий завод",resource:"fuel",rate:8,cost:{metal:120}},
@@ -251,7 +256,7 @@ const roadSlots=[
   id:40+c*5+r,x,y:[155,306,445,581,715][r],endY:[306,445,581,715,750][r],v:true
  })))
 ];
-const defaults=()=>({version:96,coins:600,baseLevel:1,storageLevel:1,best:0,board:Array(25).fill(null),score:0,resources:{metal:300,fuel:0,parts:0,electronics:0},factories:{metal:0,fuel:0,parts:0,electronics:0},lastProduction:Date.now(),placements:[],construction:[],facilities:{garage:0,hangar:0},facilityJobs:[],roads:[]});
+const defaults=()=>({version:97,coins:600,baseLevel:1,storageLevel:1,best:0,board:Array(25).fill(null),score:0,resources:{metal:300,fuel:0,parts:0,electronics:0},factories:{metal:0,fuel:0,parts:0,electronics:0},lastProduction:Date.now(),placements:[],construction:[],facilities:{garage:0,hangar:0},facilityJobs:[],roads:[]});
 const safeNum=(v,fallback=0)=>Number.isFinite(v)&&v>=0?v:fallback;
 function safeParse(key){try{return JSON.parse(localStorage.getItem(key)||"null")}catch(e){return null}}
 function normalize(raw){
@@ -260,32 +265,32 @@ if(!raw||typeof raw!=="object")return result;
 result.coins=safeNum(raw.coins,600);result.baseLevel=Number.isInteger(raw.baseLevel)&&raw.baseLevel>=1&&raw.baseLevel<=1000?raw.baseLevel:1;
 result.best=safeNum(raw.best);result.score=safeNum(raw.score);
 result.board=Array.isArray(raw.board)&&raw.board.length===25?raw.board.slice():result.board;
-if([6,7,8,81,9,94,95,96].includes(raw.version)){
+if([6,7,8,81,9,94,95,96,97].includes(raw.version)){
  for(const name of Object.keys(result.resources)){
- result.resources[name]=Math.min(2000+1000*([8,81,9,94,95,96].includes(raw.version)?Math.max(0,Math.min(999,Math.floor(safeNum(raw.storageLevel,1))-1)):0),safeNum(raw.resources&&raw.resources[name]));
+ result.resources[name]=Math.min(2000+1000*([8,81,9,94,95,96,97].includes(raw.version)?Math.max(0,Math.min(999,Math.floor(safeNum(raw.storageLevel,1))-1)):0),safeNum(raw.resources&&raw.resources[name]));
  result.factories[name]=Math.min(999,Math.floor(safeNum(raw.factories&&raw.factories[name])));
  }
  result.lastProduction=Number.isFinite(raw.lastProduction)&&raw.lastProduction>0?Math.min(raw.lastProduction,Date.now()):Date.now();
-if([7,8,81,9,94,95,96].includes(raw.version)&&Array.isArray(raw.placements)){
+if([7,8,81,9,94,95,96,97].includes(raw.version)&&Array.isArray(raw.placements)){
 const used=new Set();
 result.placements=raw.placements.filter(v=>v&&Number.isInteger(v.slot)&&v.slot>=0&&v.slot<24&&["metal","fuel","parts","electronics"].includes(v.id)&&!used.has(v.slot)&&used.add(v.slot)).map(v=>({slot:v.slot,id:v.id}));
 }
 if(raw.version===6){let pos=0;for(const def of definitions)for(let i=0;i<result.factories[def.id]&&pos<24;i++)result.placements.push({slot:pos++,id:def.id});}
-if([8,81,9,94,95,96].includes(raw.version)){
+if([8,81,9,94,95,96,97].includes(raw.version)){
  result.storageLevel=Math.max(1,Math.min(1000,Math.floor(safeNum(raw.storageLevel,1))));
  const occupied=new Set(result.placements.map(p=>p.slot));
  if(Array.isArray(raw.construction)){
  result.construction=raw.construction.filter(j=>j&&definitions.some(d=>d.id===j.id)&&Number.isFinite(j.endsAt)&&j.endsAt>0&&(j.slot===null||(Number.isInteger(j.slot)&&j.slot>=0&&j.slot<24&&!occupied.has(j.slot)&&!occupied.add(j.slot)))).slice(0,24).map(j=>({id:j.id,slot:j.slot,endsAt:j.endsAt}));
  }
  }
-if([9,94,95,96].includes(raw.version)){
+if([9,94,95,96,97].includes(raw.version)){
  for(const id of ["garage","hangar"])result.facilities[id]=Math.min(100,Math.floor(safeNum(raw.facilities&&raw.facilities[id])));
  if(Array.isArray(raw.facilityJobs)){
   const seen=new Set();
   result.facilityJobs=raw.facilityJobs.filter(j=>j&&["garage","hangar"].includes(j.id)&&Number.isFinite(j.endsAt)&&j.endsAt>0&&!seen.has(j.id)&&seen.add(j.id)).map(j=>({id:j.id,endsAt:j.endsAt}));
  }
 }
-if([94,95,96].includes(raw.version)&&Array.isArray(raw.roads)){
+if([94,95,96,97].includes(raw.version)&&Array.isArray(raw.roads)){
  const valid=new Set(roadSlots.map(s=>s.id));
  result.roads=[...new Set(raw.roads.filter(n=>Number.isInteger(n)&&valid.has(n)))];
 }
@@ -294,15 +299,15 @@ return result;
 }
 let data;let selectedSlot=null,zoom=1;
 const current=safeParse(KEY);
-if(current&&current.version===96){data=normalize(current)}
+if(current&&current.version===97){data=normalize(current)}
 else{
  const prev=LEGACY.map(safeParse).find(v=>v&&typeof v==="object"&&([6,7,8].includes(v.version)||Array.isArray(v.board)&&v.board.length===25));
  data=normalize(prev);
- if(prev){try{localStorage.setItem("mbm_backup_before_v96",JSON.stringify(prev))}catch(e){}}
+ if(prev){try{localStorage.setItem("mbm_backup_before_v97",JSON.stringify(prev))}catch(e){}}
 }
 function format(n){return Math.floor(n).toLocaleString("ru-RU")}
 function status(message){$("notice").textContent=message;$("saveStatus").textContent=message}
-function save(manual=false){data.version=96;
+function save(manual=false){data.version=97;
  try{localStorage.setItem(KEY,JSON.stringify(data));$("saveStatus").textContent=manual?"✓ Сохранено вручную":"✓ Автосохранено";return true}
  catch(e){$("saveStatus").textContent="⚠️ Не удалось сохранить";return false}
 }
@@ -378,7 +383,7 @@ if(!canAfford(price)){status("Для склада недостаточно ре�
 spend(price);data.storageLevel++;status("📦 Вместимость склада увеличена до "+format(capacity()));save();render();
 }
 
-let activeCard=null,mapSignature="",roadMode=false;
+let activeCard=null,mapSignature="",roadMode=false,movingFactory=null;
 const ROAD_PRICE=12;
 // Road lanes occupy the gaps between building plots, never a plot itself.
 
@@ -455,6 +460,45 @@ function buildRoad(id){
  save();render();
 }
 
+// Relocation never changes factory levels or production counters.
+function beginMovingFactory(slot,id){
+ if(data.construction.some(j=>j.id===id)){
+  status("Дождись завершения строительства завода");return;
+ }
+ const placed=data.placements.find(p=>p.slot===slot&&p.id===id);
+ if(!placed)return;
+ movingFactory={from:slot,id};
+ roadMode=false;closeCard();mapSignature="";
+ $("mapstatus").textContent="🏗️ Перемещение: выбери свободный участок на карте или нажми «Отмена»";
+ status("Выбери свободный участок для "+definitions.find(d=>d.id===id).title);
+ render();
+}
+function cancelMovingFactory(){
+ movingFactory=null;mapSignature="";
+ $("mapstatus").textContent="Нажмите на здание, ＋ или «Дороги»";
+ render();
+}
+function moveFactory(toSlot){
+ if(!movingFactory)return;
+ const {from,id}=movingFactory;
+ if(!Number.isInteger(toSlot)||toSlot<0||toSlot>=24)return;
+ if(toSlot===from){cancelMovingFactory();return}
+ if(data.placements.some(p=>p.slot===toSlot)||data.construction.some(j=>j.slot===toSlot)){
+  status("Участок занят. Выбери свободный участок");return;
+ }
+ const current=data.placements.find(p=>p.slot===from&&p.id===id);
+ if(!current){cancelMovingFactory();return}
+ advance();
+ const oldActive=isFactoryConnected(from);
+ current.slot=toSlot;
+ // No retrospective production at the new road location.
+ data.lastProduction=Date.now();
+ const newActive=isFactoryConnected(toSlot);
+ movingFactory=null;mapSignature="";
+ $("mapstatus").textContent="Нажмите на здание, ＋ или «Дороги»";
+ status("🏗️ Завод перемещён · "+(newActive?"✅ дорога подключена":"🚫 нужна дорога от штаба"));
+ save();render();
+}
 function factoryCost(id){const d=definitions.find(x=>x.id===id);const level=data.factories[id];return Object.fromEntries(Object.entries(d.cost).map(([k,v])=>[k,Math.round(v*(1+level*.85))]))}
 function openCard(type,slot=null,id=null){activeCard={type,slot,id};showCard()}
 function closeCard(){$("overlay").hidden=true;activeCard=null}
@@ -499,6 +543,14 @@ function showCard(){
  $("sheetTitle").textContent=title;$("sheetBody").innerHTML=html;$("overlay").hidden=false;
  const action=$("cardAction");
  if(action)action.onclick=()=>{act();if(type!=="empty"&&type!=="factory"){showCard()}else if(type==="factory"){showCard()}else{closeCard()}};
+ if(type==="factory"){
+   const relocate=document.createElement("button");
+   relocate.className="btn alt";
+   relocate.id="moveFactoryBtn";
+   relocate.textContent="↔️ Переместить завод";
+   relocate.onclick=()=>beginMovingFactory(slot,id);
+   $("sheetBody").appendChild(relocate);
+ }
  if(type==="empty"){
  const choice=$("cardChoice");
  const refresh=()=>{const id=choice.value,job=data.construction.some(j=>j.id===id),cost=factoryCost(id);$("choiceCost").textContent="Цена: "+costLabel(cost)+(job?" · уже строится":"");$("cardAction").disabled=job||!canAfford(cost)};
@@ -517,7 +569,7 @@ function terrainArt(){
  rocks.map(([x,y])=>'<span class="landmark rock" style="left:'+x+'px;top:'+y+'px"></span>').join("");
 }
 function renderMap(){
- const signature=JSON.stringify([data.placements,data.construction.map(j=>[j.id,j.slot]),data.baseLevel,data.storageLevel,data.facilities,data.facilityJobs.map(j=>j.id),data.roads,roadMode]);
+ const signature=JSON.stringify([data.placements,data.construction.map(j=>[j.id,j.slot]),data.baseLevel,data.storageLevel,data.facilities,data.facilityJobs.map(j=>j.id),data.roads,roadMode,movingFactory]);
  if(mapSignature===signature)return;
  mapSignature=signature;
  const slots=[];
@@ -526,9 +578,9 @@ function renderMap(){
  const x=42+(i%6)*166,y=190+Math.floor(i/6)*136;
  const connected=def?isFactoryConnected(i):false;
  const label=def?def.title+(connected?" · работает":" · нет дороги"):job?"Строится":"Свободный участок";
- slots.push('<button type="button" class="plot '+(placed||job?"occupied":"")+(def&&!connected?" offline":"")+'" aria-label="'+label+'" data-slot="'+i+'" style="left:'+x+'px;top:'+y+'px">'+(def?buildingArt(def.id):job?buildingArt("construction"):'<strong>＋</strong>')+'<small>'+(def?(connected?'✅ ':'🚫 ')+def.title.replace(" завод",""):job?"Строится":"Участок")+'</small></button>');
+ slots.push('<button type="button" class="plot '+(placed||job?"occupied":"")+(def&&!connected?" offline":"")+(movingFactory&&movingFactory.from===i?" move-source":"")+(movingFactory&&!placed&&!job?" move-target":"")+'" aria-label="'+label+'" data-slot="'+i+'" style="left:'+x+'px;top:'+y+'px">'+(def?buildingArt(def.id):job?buildingArt("construction"):'<strong>＋</strong>')+'<small>'+(def?(connected?'✅ ':'🚫 ')+def.title.replace(" завод",""):job?"Строится":"Участок")+'</small></button>');
  }
- const roadControls=roadMode?roadSlots.filter(s=>!data.roads.includes(s.id)).map(s=>
+ const roadControls=roadMode&&!movingFactory?roadSlots.filter(s=>!data.roads.includes(s.id)).map(s=>
  '<button type="button" class="road-spot '+(s.v?'vertical':'horizontal')+'" data-road="'+s.id+
  '" style="left:'+(s.v?s.x-12:s.x)+'px;top:'+(s.v?(s.y+s.endY)/2-36:s.y-13)+
  'px" aria-label="Построить участок дороги за 12 металла"><span>＋</span></button>').join(""):"";
@@ -542,6 +594,7 @@ function renderMap(){
  document.querySelectorAll("[data-road]").forEach(btn=>btn.onclick=()=>buildRoad(Number(btn.dataset.road)));
  document.querySelectorAll("[data-slot]").forEach(btn=>btn.onclick=()=>{
   const slot=Number(btn.dataset.slot),placed=data.placements.find(v=>v.slot===slot),job=data.construction.find(v=>v.slot===slot);
+  if(movingFactory){moveFactory(slot);return}
   if(placed)openCard("factory",slot,placed.id);else if(job)openCard("construction",slot);else openCard("empty",slot);
  });
  $("mapHQ").onclick=()=>openCard("hq");$("mapStorage").onclick=()=>openCard("storage");
@@ -552,6 +605,7 @@ function render(){
  $("coins").textContent=format(data.coins);$("hq").textContent=format(data.baseLevel)+" / 1000";
  for(const name of Object.keys(data.resources))$("res-"+name).textContent=format(data.resources[name]);
  $("roadMode").textContent=roadMode?"✓ Готово · дорог "+data.roads.length:"🛣️ Дороги · "+ROAD_PRICE+" 🔩";
+ $("cancelMove").hidden=!movingFactory;
  $("roadMode").setAttribute("aria-pressed",String(roadMode));
  $("roadHelp").hidden=!roadMode;
  $("resources").innerHTML=definitions.map(def=>'<div class="card"><b>'+labels[def.resource]+'</b><div class="symbol">'+format(data.resources[def.resource])+'</div><div class="detail">из '+format(capacity())+'</div></div>').join("");
@@ -563,8 +617,9 @@ function showView(name){
  ["base","garage","hangar","missions","storage"].forEach(v=>{$("view-"+v).hidden=v!==name});
  closeCard();render();
 }
-document.querySelectorAll("[data-view]").forEach(btn=>btn.onclick=()=>showView(btn.dataset.view));
-$("roadMode").onclick=()=>{roadMode=!roadMode;mapSignature="";render()};
+document.querySelectorAll("[data-view]").forEach(btn=>btn.onclick=()=>{if(movingFactory)cancelMovingFactory();showView(btn.dataset.view)});
+$("cancelMove").onclick=cancelMovingFactory;
+$("roadMode").onclick=()=>{if(movingFactory)cancelMovingFactory();roadMode=!roadMode;mapSignature="";render()};
 $("goStorageMap").onclick=()=>{showView("base");openCard("storage")};for(const id of ["garage","hangar"])$("go"+(id==="garage"?"Garage":"Hangar")+"Map").onclick=()=>{showView("base");openCard("facility",null,id)};
 $("closeSheet").onclick=closeCard;
 $("overlay").onclick=e=>{if(e.target===$("overlay"))closeCard()};
