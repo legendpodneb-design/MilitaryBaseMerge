@@ -63,7 +63,7 @@ if(selected===i){selected=null;say("Выбор отменён.");render();return
 const adjacent=Math.abs(Math.floor(selected/5)-Math.floor(i/5))+Math.abs(selected%5-i%5)===1;
 if(!adjacent||board[selected]!==val){selected=i;say("Объекты должны быть одинаковыми и стоять рядом.");render();return}
 if(val===9){selected=null;say("Максимальный уровень уже достигнут!");render();return}
-board[selected]=val+1;merged=selected;board[i]=null;selected=null;const gained=25*(val+1);score+=gained;coins+=10+val*5;best=Math.max(best,score);say("🎉 "+names[val+1]+" создан! +"+gained+" очков");save();render()}
+board[i]=val+1;merged=i;board[selected]=null;selected=null;const gained=25*(val+1);score+=gained;coins+=10+val*5;best=Math.max(best,score);say("🎉 "+names[val+1]+" создан! +"+gained+" очков");save();render()}
 $("buy").onclick=()=>{const empty=board.flatMap((v,i)=>v===null?[i]:[]);if(!empty.length||coins<20)return;board[empty[Math.floor(Math.random()*empty.length)]]=next;coins-=20;next=random();selected=null;merged=-1;say("📦 Новая техника доставлена!");save();render()};
 $("restart").onclick=()=>{if(confirm("Начать новую игру?"))start()};
 try{const state=JSON.parse(localStorage.getItem("mbm_save")||"null");if(state&&Array.isArray(state.board)&&state.board.length===25&&state.board.every(v=>v===null||(Number.isInteger(v)&&v>=0&&v<10))){board=state.board;coins=state.coins;score=state.score;next=random();say("С возвращением! Твой прогресс сохранён.");render()}else start()}catch(e){start()}
