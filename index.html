@@ -65,7 +65,7 @@ result.best=safeNum(raw.best);result.score=safeNum(raw.score);
 result.board=Array.isArray(raw.board)&&raw.board.length===25?raw.board.slice():result.board;
 if([6,7,8].includes(raw.version)){
  for(const name of Object.keys(result.resources)){
- result.resources[name]=Math.min(2000+1000*(raw.version===8?Math.max(0,Math.floor(safeNum(raw.storageLevel,1))-1):0),safeNum(raw.resources&&raw.resources[name]));
+ result.resources[name]=Math.min(2000+1000*(raw.version===8?Math.max(0,Math.min(999,Math.floor(safeNum(raw.storageLevel,1))-1)):0),safeNum(raw.resources&&raw.resources[name]));
  result.factories[name]=Math.min(999,Math.floor(safeNum(raw.factories&&raw.factories[name])));
  }
  result.lastProduction=Number.isFinite(raw.lastProduction)&&raw.lastProduction>0?Math.min(raw.lastProduction,Date.now()):Date.now();
@@ -137,8 +137,8 @@ if(slot===null&&level===0){const free=Array.from({length:24},(_,i)=>i).find(i=>!
 const price=Object.fromEntries(Object.entries(def.cost).map(([k,v])=>[k,Math.round(v*(1+level*.85))]));
 if(!canAfford(price)){status("Недостаточно материалов для "+def.title);render();return}
 spend(price);
-const duration=level===0?45:Math.min(180,60+level*15);
-data.construction.push({id,slot:level===0?slot:null,endsAt:Date.now()+duration*1000});
+const duration=slot!==null?45:Math.min(180,60+level*15);
+data.construction.push({id,slot,endsAt:Date.now()+duration*1000});
 selectedSlot=null;status("🏗️ "+def.title+": строительство "+clock(duration));save();render();
 }
 function advance(now=Date.now()){const done=finishJobs(now);const made=accrue(now);if(done)save();return {done,made}}
