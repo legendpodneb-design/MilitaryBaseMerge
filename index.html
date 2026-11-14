@@ -231,6 +231,10 @@ const definitions=[
 ];
 const labels={metal:"🔩 Металл",fuel:"🛢️ Топливо",parts:"⚙️ Детали",electronics:"🔌 Электроника"};
 const $=id=>document.getElementById(id);
+const roadSlots=[
+ ...[155,306,445,581].flatMap((y,r)=>Array.from({length:10},(_,c)=>({id:r*10+c,x:46+c*103,y,h:false}))),
+ ...[185,517,849].flatMap((x,c)=>Array.from({length:5},(_,r)=>({id:40+c*5+r,x,y:184+r*104,h:false,v:true})))
+];
 const defaults=()=>({version:94,coins:600,baseLevel:1,storageLevel:1,best:0,board:Array(25).fill(null),score:0,resources:{metal:300,fuel:0,parts:0,electronics:0},factories:{metal:0,fuel:0,parts:0,electronics:0},lastProduction:Date.now(),placements:[],construction:[],facilities:{garage:0,hangar:0},facilityJobs:[],roads:[]});
 const safeNum=(v,fallback=0)=>Number.isFinite(v)&&v>=0?v:fallback;
 function safeParse(key){try{return JSON.parse(localStorage.getItem(key)||"null")}catch(e){return null}}
@@ -360,10 +364,7 @@ spend(price);data.storageLevel++;status("📦 Вместимость склад�
 let activeCard=null,mapSignature="",roadMode=false;
 const ROAD_PRICE=12;
 // Road lanes occupy the gaps between building plots, never a plot itself.
-const roadSlots=[
- ...[155,306,445,581].flatMap((y,r)=>Array.from({length:10},(_,c)=>({id:r*10+c,x:46+c*103,y,h:false}))),
- ...[185,517,849].flatMap((x,c)=>Array.from({length:5},(_,r)=>({id:40+c*5+r,x,y:184+r*104,h:false,v:true})))
-];
+
 function roadSegmentArt(slot){
  if(slot.v){const y2=Math.min(slot.y+104,704);return 'M '+slot.x+' '+slot.y+' L '+slot.x+' '+y2}
  return 'M '+slot.x+' '+slot.y+' L '+Math.min(slot.x+103,1075)+' '+slot.y;
