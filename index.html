@@ -418,7 +418,7 @@ linear-gradient(145deg,#a0ba77 0%,#76a068 47%,#4d8058 100%)}
 .convoy-route{position:absolute;z-index:3;left:0;top:150px;width:1100px;height:34px;background:linear-gradient(180deg,#53634c 0 18%,#39463c 18% 82%,#53634c 82%);border-top:2px solid #9d9b76;border-bottom:2px solid #9d9b76;overflow:hidden;pointer-events:none}
 .convoy-route:before{content:"";position:absolute;left:0;right:0;top:15px;border-top:2px dashed #e5d49b;opacity:.8}
 .convoy-route-label{position:absolute;left:12px;top:-1px;font-size:7px;letter-spacing:1px;color:#f1e6c1;background:#344b3c;padding:1px 4px;z-index:2}
-.moving-convoy{position:absolute;top:1px;left:-75px;display:flex;align-items:center;gap:3px;font-size:25px;line-height:29px;filter:drop-shadow(1px 2px 1px #1b2b20);animation:convoy-drive 13s linear infinite}
+.moving-convoy{position:absolute;top:1px;left:-75px;animation-delay:var(--delay,0s);display:flex;align-items:center;gap:3px;font-size:25px;line-height:29px;filter:drop-shadow(1px 2px 1px #1b2b20);animation:convoy-drive 13s linear infinite}
 .moving-convoy small{font-size:8px;font-weight:900;color:#fff2c9;background:#344b3c;padding:2px 4px;border-radius:4px}
 .moving-convoy.reverse{animation-name:convoy-drive-reverse;top:2px}
 @keyframes convoy-drive{from{transform:translateX(0)}to{transform:translateX(1220px)}}
@@ -532,7 +532,7 @@ if([6,7,8,81,9,94,95,96,97,98,99,110,113,114,115,116].includes(raw.version)){
   }
   result.lastTradeAt=Number.isFinite(raw.lastTradeAt)&&raw.lastTradeAt>0?Math.min(Date.now(),raw.lastTradeAt):Date.now();
   result.tradeEarned=Math.min(999999999,Math.floor(safeNum(raw.tradeEarned)));
-  if(raw.version===115){
+  if([115,116].includes(raw.version)){
    result.convoyEarned=Math.min(999999999,Math.floor(safeNum(raw.convoyEarned)));
    result.convoyTrips=Math.min(9999999,Math.floor(safeNum(raw.convoyTrips)));
    if(Array.isArray(raw.convoys))result.convoys=raw.convoys.filter(j=>
