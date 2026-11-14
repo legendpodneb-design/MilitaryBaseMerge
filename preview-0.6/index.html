@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#172e25">
+<title>Военная база — 0.6 Заводы</title>
+<style>
+:root{color-scheme:dark;--bg:#14261d;--panel:#294536;--border:#688068;--text:#f1f4e9;--gold:#f4d384}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#426248,#152820 70%);color:var(--text);font:15px system-ui,-apple-system,sans-serif}main{max-width:720px;margin:auto;padding:14px 12px 100px}h1{text-align:center;font-size:clamp(23px,6vw,34px);margin:4px 0}.sub{text-align:center;color:#bfd3b9;font-size:12px;margin-bottom:12px}.tag{font-size:10px;letter-spacing:2px;text-align:center;color:#e3dcad;font-weight:800}.panel{background:linear-gradient(165deg,#31513b,#1c3327);border:1px solid #698368;border-radius:15px;padding:14px;margin:10px 0;box-shadow:0 4px 12px #0d1b1377}h2{font-size:17px;margin:0 0 8px}.muted{font-size:12px;color:#c0d0ba;line-height:1.5}.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.stat{background:#223e2e;border:1px solid #59785d;border-radius:12px;padding:12px}.stat small{display:block;color:#c5d2b7}.stat strong{font-size:21px}.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:12px}.card{border:1px solid #79916b;background:#344f3b;border-radius:13px;padding:11px;min-width:0}.card h3{margin:2px 0 7px;font-size:15px}.symbol{font-size:33px}.rate{color:#e5dd9d;font-size:12px}.btn{background:linear-gradient(#e4d293,#bfaa6e);color:#263123;border:0;border-radius:10px;padding:11px;font-size:13px;font-weight:800;cursor:pointer;touch-action:manipulation}.btn:disabled{opacity:.43}.card .btn{width:100%;margin-top:8px}.btn.alt{background:#44634a;color:#f4f6e7;border:1px solid #7c9878}.bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}.baseart{border-radius:12px;border:2px solid #829671;height:136px;background:repeating-linear-gradient(35deg,#89977129 0 22px,#b6c1a11f 23px 25px),linear-gradient(#8ea178,#547552);display:flex;align-items:end;justify-content:space-around;padding:14px 2px 8px;overflow:hidden}.building{text-align:center;min-width:0;flex:1;filter:drop-shadow(2px 3px 2px #182b22aa)}.building .roof{font-size:38px}.building small{display:block;color:#192c20;font-size:10px;font-weight:900;background:#cbd4a9;border-radius:5px;margin:3px auto;max-width:92px}.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,720px);padding:8px max(8px,env(safe-area-inset-right)) calc(7px + env(safe-area-inset-bottom));background:#183125f5;border:1px solid #58765d;display:grid;grid-template-columns:repeat(5,1fr);gap:3px;z-index:5}.nav button{background:transparent;border:0;color:#c3d3b7;border-radius:10px;padding:6px 2px;font:10px system-ui;cursor:pointer}.nav button span{display:block;font-size:21px}.nav button.on{background:#4a684e;color:#fff1c6}.view[hidden]{display:none!important}.notice{min-height:23px;color:#f1dc9b;font-size:12px}.save{margin-top:12px;display:flex;align-items:center;flex-wrap:wrap;gap:8px}.detail{font-size:12px;color:#d1e0c6}.chip{padding:4px 8px;border-radius:20px;background:#49664b;color:#eff1cf;font-size:11px}.locked{opacity:.78}.spinner{font-size:11px;color:#bcd5b4}footer{text-align:center;color:#a9bca8;font-size:11px;margin-top:20px}
+@media(max-width:370px){.card{padding:8px}.panel{padding:11px}.btn{font-size:11px}.building .roof{font-size:31px}}
+</style></head><body><main>
+<div class="tag">MILITARY BASE • VERSION 0.6</div><h1>🪖 ВОЕННАЯ БАЗА</h1><div class="sub">Строй заводы • Производи материалы • Развивай базу</div>
+<div class="stats"><div class="stat"><small>🪙 Монеты</small><strong id="coins">0</strong></div><div class="stat"><small>🏛️ Уровень штаба</small><strong id="hq">1 / 1000</strong></div></div>
+<div id="view-base" class="view">
+<section class="panel"><div class="bar"><h2>🏕️ Командный центр</h2><span class="chip" id="look">Облик 1 / 34</span></div>
+<div class="baseart"><div class="building"><div class="roof">🏛️</div><small>ШТАБ</small></div><div class="building"><div class="roof">🏭</div><small>ЗАВОДЫ</small></div><div class="building"><div class="roof">📦</div><small>СКЛАД</small></div></div>
+<p class="muted">Заводы производят ресурсы автоматически, даже когда игра закрыта. Улучшение штаба за ресурсы появится в версии 0.8. Текущий уровень сохранён.</p><div class="notice" id="notice" role="status"></div></section>
+<section class="panel"><div class="bar"><h2>🏭 Производственный сектор</h2><span class="chip">До 8 часов офлайн</span></div><p class="muted">Построй завод за материалы. Каждый полный прошедший минутный интервал приносит ресурсы на склад.</p><div class="cards" id="factories"></div></section>
+</div>
+<div id="view-storage" class="view" hidden><section class="panel"><h2>📦 Склад ресурсов</h2><div class="cards" id="resources"></div><p class="muted">Вместимость каждого ресурса сейчас 2 000. Расширение склада запланировано на версию 0.7.</p><div class="save"><button class="btn" id="save">💾 Сохранить</button><small class="detail" id="saveStatus">Автосохранение включено</small></div><p class="muted">Сохранение локальное, в Safari. Удаление данных браузера может стереть прогресс. Облачный аккаунт будет позже.</p></section></div>
+<div id="view-garage" class="view" hidden><section class="panel"><h2>🚙 Гараж</h2><p class="muted">Гараж, хранение наземной техники и производство техники будут добавлены в версии 0.9.</p></section></div>
+<div id="view-hangar" class="view" hidden><section class="panel"><h2>🚁 Ангар</h2><p class="muted">Авиационный ангар и коллекция воздушной техники появятся в версии 0.9.</p></section></div>
+<div id="view-missions" class="view" hidden><section class="panel"><h2>🗺️ Задания</h2><p class="muted">Экспедиции и задания появятся в версии 1.0.</p></section></div>
+<footer>Версия 0.6 · Заводы и автоматическое производство · Мини-игры отложены</footer>
+</main><nav class="nav" aria-label="Главное меню">
+<button class="on" data-view="base"><span>🏕️</span>База</button><button data-view="garage"><span>🚙</span>Гараж</button><button data-view="hangar"><span>🚁</span>Ангар</button><button data-view="missions"><span>🗺️</span>Задания</button><button data-view="storage"><span>📦</span>Склад</button>
+</nav>
+<script>
+(()=>{
+"use strict";
+const KEY="mbm_save_v6",LEGACY=["mbm_save_v51","mbm_save_v5","mbm_save_v4","mbm_save"],LIMIT=2000,MAX_OFFLINE=480,MINUTE=60000;
+const definitions=[
+{id:"metal",icon:"🏭",title:"Металлургический завод",resource:"metal",rate:10,cost:{metal:80}},
+{id:"fuel",icon:"🛢️",title:"Нефтеперерабатывающий завод",resource:"fuel",rate:8,cost:{metal:120}},
+{id:"parts",icon:"⚙️",title:"Машиностроительный завод",resource:"parts",rate:5,cost:{metal:180}},
+{id:"electronics",icon:"🔌",title:"Электронный завод",resource:"electronics",rate:3,cost:{metal:240}}
+];
+const labels={metal:"🔩 Металл",fuel:"🛢️ Топливо",parts:"⚙️ Детали",electronics:"🔌 Электроника"};
+const $=id=>document.getElementById(id);
+const defaults=()=>({version:6,coins:600,baseLevel:1,best:0,board:Array(25).fill(null),score:0,resources:{metal:300,fuel:0,parts:0,electronics:0},factories:{metal:0,fuel:0,parts:0,electronics:0},lastProduction:Date.now()});
+const safeNum=(v,fallback=0)=>Number.isFinite(v)&&v>=0?v:fallback;
+function safeParse(key){try{return JSON.parse(localStorage.getItem(key)||"null")}catch(e){return null}}
+function normalize(raw){
+const result=defaults();
+if(!raw||typeof raw!=="object")return result;
+result.coins=safeNum(raw.coins,600);result.baseLevel=Number.isInteger(raw.baseLevel)&&raw.baseLevel>=1&&raw.baseLevel<=1000?raw.baseLevel:1;
+result.best=safeNum(raw.best);result.score=safeNum(raw.score);
+result.board=Array.isArray(raw.board)&&raw.board.length===25?raw.board.slice():result.board;
+if(raw.version===6){
+ for(const name of Object.keys(result.resources)){
+ result.resources[name]=Math.min(LIMIT,safeNum(raw.resources&&raw.resources[name]));
+ result.factories[name]=Math.min(999,Math.floor(safeNum(raw.factories&&raw.factories[name])));
+ }
+ result.lastProduction=Number.isFinite(raw.lastProduction)&&raw.lastProduction>0?Math.min(raw.lastProduction,Date.now()):Date.now();
+}
+return result;
+}
+let data;
+const current=safeParse(KEY);
+if(current&&current.version===6){data=normalize(current)}
+else{
+ const prev=LEGACY.map(safeParse).find(v=>v&&Array.isArray(v.board)&&v.board.length===25);
+ data=normalize(prev);
+ if(prev){try{localStorage.setItem("mbm_backup_before_v6",JSON.stringify(prev))}catch(e){}}
+}
+function format(n){return Math.floor(n).toLocaleString("ru-RU")}
+function status(message){$("notice").textContent=message;$("saveStatus").textContent=message}
+function save(manual=false){
+ try{localStorage.setItem(KEY,JSON.stringify(data));$("saveStatus").textContent=manual?"✓ Сохранено вручную":"✓ Автосохранено";return true}
+ catch(e){$("saveStatus").textContent="⚠️ Не удалось сохранить";return false}
+}
+function accrue(now=Date.now()){
+const elapsed=Math.max(0,Math.min(MAX_OFFLINE,Math.floor((now-data.lastProduction)/MINUTE)));
+if(!elapsed)return 0;
+let made=0;
+for(const def of definitions){
+ const old=data.resources[def.resource];
+ data.resources[def.resource]=Math.min(LIMIT,old+elapsed*def.rate*data.factories[def.id]);made+=data.resources[def.resource]-old;
+}
+data.lastProduction=(now-data.lastProduction)>MAX_OFFLINE*MINUTE ? now : data.lastProduction+elapsed*MINUTE;
+return made;
+}
+function canAfford(cost){return Object.entries(cost).every(([k,v])=>k==="coins"?data.coins>=v:data.resources[k]>=v)}
+function spend(cost){for(const [k,v]of Object.entries(cost)){if(k==="coins")data.coins-=v;else data.resources[k]-=v}}
+function build(id){
+accrue();const def=definitions.find(x=>x.id===id);if(!def)return;
+const level=data.factories[id];const price=Object.fromEntries(Object.entries(def.cost).map(([k,v])=>[k,Math.round(v*(1+level*0.85))]));
+if(!canAfford(price)){status("Недостаточно ресурсов для "+def.title);render();return}
+spend(price);data.factories[id]++;status(def.title+" улучшен: уровень "+data.factories[id]);save();render();
+}
+function render(){
+$("coins").textContent=format(data.coins);$("hq").textContent=format(data.baseLevel)+" / 1000";
+$("look").textContent="Облик "+Math.min(34,Math.floor((data.baseLevel-1)/30)+1)+" / 34";
+$("factories").innerHTML=definitions.map(def=>{
+const level=data.factories[def.id],price=Object.fromEntries(Object.entries(def.cost).map(([k,v])=>[k,Math.round(v*(1+level*0.85))]));
+const priceText=Object.entries(price).map(([k,v])=>format(v)+" "+(k==="coins"?"🪙":"🔩")).join(" + ");
+return '<article class="card"><div class="symbol">'+def.icon+'</div><h3>'+def.title+'</h3><div class="detail">Уровень '+level+'</div><div class="rate">+'+format(level*def.rate)+' / мин</div><div class="muted">Цена: '+priceText+'</div><button class="btn" data-build="'+def.id+'" '+(!canAfford(price)||level>=999?'disabled':'')+'>'+(level?"Улучшить":"Построить")+'</button></article>';
+}).join("");
+$("resources").innerHTML=definitions.map(def=>'<div class="card"><b>'+labels[def.resource]+'</b><div class="symbol">'+format(data.resources[def.resource])+'</div><div class="detail">из '+format(LIMIT)+'</div></div>').join("");
+document.querySelectorAll("[data-build]").forEach(btn=>btn.onclick=()=>build(btn.dataset.build));
+}
+document.querySelectorAll("[data-view]").forEach(btn=>btn.onclick=()=>{
+const name=btn.dataset.view;
+document.querySelectorAll("[data-view]").forEach(b=>b.classList.toggle("on",b===btn));
+["base","garage","hangar","missions","storage"].forEach(v=>$("view-"+v).hidden=v!==name);
+render();
+});
+$("save").onclick=()=>{accrue();save(true);render()};
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"){accrue();save()}else{const gained=accrue();if(gained)status("Производство принесло "+format(gained)+" ресурсов");save();render()}});
+window.addEventListener("pagehide",()=>{accrue();save()});
+const gained=accrue();if(gained)status("Пока тебя не было, заводы произвели "+format(gained)+" ресурсов");
+save();render();
+// Periodic refresh is for UI only; offline output depends on timestamps, not background timers.
+setInterval(()=>{const gained=accrue();if(gained){save();render();}},10000);
+})();
+</script></body></html>
