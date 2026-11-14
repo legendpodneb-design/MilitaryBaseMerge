@@ -427,12 +427,23 @@ linear-gradient(145deg,#a0ba77 0%,#76a068 47%,#4d8058 100%)}
 @keyframes factory-smoke{0%{opacity:0;transform:translate(0,8px) scale(.55)}35%{opacity:.65}100%{opacity:0;transform:translate(5px,-14px) scale(1.45)}}
 @media(prefers-reduced-motion:reduce){.moving-convoy,.asset.running:after{animation:none!important}}
 @media(orientation:portrait){.convoy-route{top:150px}.moving-convoy{font-size:23px}}
+/* 0.11.7 utility infrastructure */
+.poi.utility-poi{width:100px;height:100px;padding:4px}
+.poi.utility-poi .asset{transform:scale(.82);transform-origin:center bottom;margin-bottom:-6px}
+.poi.utility-poi small{font-size:9px}
+.asset.water .roof{background:linear-gradient(145deg,#a4e4da,#3b8594)!important}
+.asset.water .walls{background:linear-gradient(90deg,#a9d4ca,#4b9ca6)!important}
+.asset.water .detail-art{position:absolute;left:7px;bottom:8px;width:22px;height:30px;border:2px solid #ccece5;background:linear-gradient(90deg,#64adbb,#306a86);border-radius:11px 11px 4px 4px}
+.asset.electricity .roof{background:linear-gradient(145deg,#e4d799,#928f61)!important}
+.asset.electricity .walls{background:linear-gradient(90deg,#e0c88c,#987f53)!important}
+.asset.electricity .detail-art{position:absolute;right:10px;bottom:13px;width:21px;height:31px;background:repeating-linear-gradient(0deg,#c0bd9a 0 5px,#8e947b 5px 8px);border:2px solid #f2dc9b}
+#utilitySummary{border:1px solid #8bc8c8;background:linear-gradient(125deg,#214d52,#2b4d3a);margin-bottom:7px}
 </style></head><body>
 
 <div class="game" id="game">
  <header class="hud">
   <b class="brand">🪖 ВОЕННАЯ БАЗА <small>0.11.7</small></b>
-  <div class="meters"><span>🏛️ <b id="hq">1 / 1000</b></span><span>🪙 <b id="coins">0</b></span><span>🔩 <b id="res-metal">0</b></span><span>🛢️ <b id="res-fuel">0</b></span><span>⚙️ <b id="res-parts">0</b></span><span>🔌 <b id="res-electronics">0</b></span></div>
+  <div class="meters"><span>🏛️ <b id="hq">1 / 1000</b></span><span>🪙 <b id="coins">0</b></span><span>🔩 <b id="res-metal">0</b></span><span>🛢️ <b id="res-fuel">0</b></span><span>⚙️ <b id="res-parts">0</b></span><span>🔌 <b id="res-electronics">0</b></span><span>💧 <b id="res-water">0</b></span><span>⚡ <b id="res-electricity">0</b></span></div>
  </header>
  <main class="stage">
   <div id="view-base" class="view map-screen">
@@ -440,10 +451,10 @@ linear-gradient(145deg,#a0ba77 0%,#76a068 47%,#4d8058 100%)}
    <div class="road-actions"><button class="btn alt" id="roadMode" aria-pressed="false">🛣️ Дороги · 12 🔩</button><button class="btn alt" id="expandLand">🌿 Земля 24/36</button><button class="btn alt" id="openTest">🧪 Тест</button><span class="roadhelp" id="roadHelp" hidden>Касайся светлых участков дороги. 12 🔩 за участок.</span></div><div class="edge-actions"><button class="btn alt" id="zoomout" aria-label="Уменьшить">−</button><button class="btn alt" id="zoomin" aria-label="Увеличить">＋</button><span class="zoomreadout" id="zoomLevel" aria-live="off">100%</span><button class="btn alt" id="save" aria-label="Сохранить">💾</button></div>
    <div class="hint" id="mapstatus">Заводы работают только с дорогой от штаба · 🛣️ строй дороги</div><button class="btn cancel-move" id="cancelMove" hidden>Отмена перемещения</button>
   </div>
-  <div id="view-storage" class="view aux" hidden><h2>📦 Склад и торговля</h2><p>Заводы производят ресурсы, торговый центр автоматически продаёт излишки.</p><div class="card" id="marketSummary">🏪 Торговый центр</div><button class="btn alt" id="openMarket">🏪 Настроить торговлю</button><div id="convoyPanel"></div><div class="cards" id="resources"></div><button class="btn" id="goStorageMap">🗺️ Вернуться к карте и складу</button></div>
+  <div id="view-storage" class="view aux" hidden><h2>📦 Склад и торговля</h2><p>Заводы производят ресурсы, торговый центр автоматически продаёт излишки.</p><div class="card" id="utilitySummary">💧 Водоснабжение и ⚡ электричество</div><button class="btn alt" id="openWater">💧 Водоснабжение</button><button class="btn alt" id="openPower">⚡ Электростанция</button><div class="card" id="marketSummary">🏪 Торговый центр</div><button class="btn alt" id="openMarket">🏪 Настроить торговлю</button><div id="convoyPanel"></div><div class="cards" id="resources"></div><button class="btn" id="goStorageMap">🗺️ Вернуться к карте и складу</button></div>
   <div id="view-garage" class="view aux" hidden><h2>🚙 Гараж · техника</h2><p>Производство наземной техники. Для новых машин улучшай гараж и штаб.</p><div class="card" id="garageInfo"></div><div class="vehicle-grid" id="garageVehicles"></div><button class="btn alt" id="goGarageMap">🗺️ Открыть гараж</button></div>
   <div id="view-hangar" class="view aux" hidden><h2>🚁 Ангар · авиация</h2><p>Производство вертолётов и самолётов. Для новых моделей улучшай ангар и штаб.</p><div class="card" id="hangarInfo"></div><div class="vehicle-grid" id="hangarVehicles"></div><button class="btn alt" id="goHangarMap">🗺️ Открыть ангар</button></div>
-  <div id="view-missions" class="view aux" hidden><h2>🗺️ Задания</h2><div class="card"><b>🧪 Тестирование версии 0.11.0</b><p>Здесь можно пополнять ресурсы, открывать уровень штаба и ускорять стройки. Эти бонусы сохраняются только в тестовой версии.</p><div class="qa-actions"><button class="btn" id="testResources">🎁 +500 000 каждого ресурса</button><button class="btn alt" id="testHQ">🏛️ Штаб +10 уровней</button><button class="btn alt" id="testFinish">⏩ Завершить стройки</button></div><small>Тестовый склад до 10 000 000 каждого ресурса. При первом входе автоматически +500 000 каждого ресурса и +5 000 000 монет.</small></div><p>Экспедиции и задания появятся позже.</p><div class="card"><b>🚚 Торговые конвои</b><p>Открой раздел «Склад», отправляй грузовики с ресурсами и получай монеты через 5 минут. Возвращение работает даже после закрытия игры.</p></div><div class="card"><b>🏪 Автоматическая торговля</b><p>Построй торговый центр в командном секторе. Раз в 10 минут он продаёт излишки выбранных ресурсов, оставляя неснижаемый запас. Доход начисляется офлайн до 8 часов.</p></div><div class="card"><h3>🏭 Развитие производства</h3><p>Штаб 1 — металл · штаб 2 — переработка металла · штаб 3 — топливо · штаб 4 — терминал · штаб 6 — детали · штаб 7 — комплектующие · штаб 10 — электроника · штаб 11 — авиационный цех.</p><p>Завод должен иметь непрерывную дорогу до штаба. Ранее построенные заводы сохраняются.</p></div></div>
+  <div id="view-missions" class="view aux" hidden><h2>🗺️ Задания</h2><div class="card"><b>🧪 Тестирование версии 0.11.0</b><p>Здесь можно пополнять ресурсы, открывать уровень штаба и ускорять стройки. Эти бонусы сохраняются только в тестовой версии.</p><div class="qa-actions"><button class="btn" id="testResources">🎁 +500 000 каждого ресурса</button><button class="btn alt" id="testHQ">🏛️ Штаб +10 уровней</button><button class="btn alt" id="testFinish">⏩ Завершить стройки</button></div><small>Тестовый склад до 10 000 000 каждого ресурса, включая воду и электричество. При первом входе автоматически +500 000 каждого ресурса и +5 000 000 монет.</small></div><p>Экспедиции и задания появятся позже.</p><div class="card"><b>🚚 Торговые конвои</b><p>Открой раздел «Склад», отправляй грузовики с ресурсами и получай монеты через 5 минут. Возвращение работает даже после закрытия игры.</p></div><div class="card"><b>🏪 Автоматическая торговля</b><p>Построй торговый центр в командном секторе. Раз в 10 минут он продаёт излишки выбранных ресурсов, оставляя неснижаемый запас. Доход начисляется офлайн до 8 часов.</p></div><div class="card"><h3>🏭 Развитие производства</h3><p>Штаб 1 — металл · штаб 2 — переработка металла · штаб 3 — топливо · штаб 4 — терминал · штаб 6 — детали · штаб 7 — комплектующие · штаб 10 — электроника · штаб 11 — авиационный цех.</p><p>Завод должен иметь непрерывную дорогу до штаба. Ранее построенные заводы сохраняются.</p></div></div>
  </main>
  <nav class="nav" aria-label="Главное меню"><button class="on" data-view="base"><span>🏕️</span>База</button><button data-view="garage"><span>🚙</span>Гараж</button><button data-view="hangar"><span>🚁</span>Ангар</button><button data-view="missions"><span>🗺️</span>Задания</button><button data-view="storage"><span>📦</span>Склад</button></nav>
  <div class="toast" id="notice" role="status"></div><span id="saveStatus" hidden>Автосохранение</span>
@@ -541,7 +552,7 @@ if([6,7,8,81,9,94,95,96,97,98,99,110,113,114,115,116,117].includes(raw.version))
   }
   result.lastTradeAt=Number.isFinite(raw.lastTradeAt)&&raw.lastTradeAt>0?Math.min(Date.now(),raw.lastTradeAt):Date.now();
   result.tradeEarned=Math.min(999999999,Math.floor(safeNum(raw.tradeEarned)));
-  if([115,116].includes(raw.version)){
+  if([115,116,117].includes(raw.version)){
    result.convoyEarned=Math.min(999999999,Math.floor(safeNum(raw.convoyEarned)));
    result.convoyTrips=Math.min(9999999,Math.floor(safeNum(raw.convoyTrips)));
    if(Array.isArray(raw.convoys))result.convoys=raw.convoys.filter(j=>
@@ -760,21 +771,51 @@ function executeTrade(){
  }
  return coins;
 }
+function utilityDemand(network=connectedRoads()){
+ const levels=definitions.reduce((sum,def)=>sum+factoryActiveLevels(def.id,network),0);
+ return {water:levels*UTILITY_USE.water,electricity:levels*UTILITY_USE.electricity};
+}
+function utilitySupply(id){return data.utilities[id]*UTILITY_DEFS[id].rate}
+function utilitiesOperational(network=connectedRoads()){
+ const need=utilityDemand(network);
+ return Object.keys(UTILITY_DEFS).every(id=>data.resources[id]+utilitySupply(id)>=need[id]);
+}
+function utilityCost(id){
+ const level=data.utilities[id];
+ return {metal:UTILITY_DEFS[id].cost+level*110,...(level>=2?{parts:level*15}:{})};
+}
+function upgradeUtility(id){
+ const def=UTILITY_DEFS[id];if(!def)return;
+ advance();
+ if(data.utilities[id]>=50){status("Достигнут максимальный уровень");return}
+ const cost=utilityCost(id);
+ if(!canAfford(cost)){status("Недостаточно материалов для "+def.name);return}
+ spend(cost);data.utilities[id]++;
+ status(def.icon+" "+def.name+" · уровень "+data.utilities[id]+" · +"+utilitySupply(id)+"/мин");
+ mapSignature="";save();render();showCard();
+}
 function accrue(now=Date.now()){
  const elapsed=Math.max(0,Math.min(MAX_OFFLINE,Math.floor((now-data.lastProduction)/MINUTE)));
  if(!elapsed)return 0;
  let made=0;
  const network=connectedRoads();
- const rates=Object.fromEntries(Object.keys(data.resources).map(id=>[id,definitions.filter(d=>d.resource===id).reduce((sum,def)=>sum+def.rate*factoryActiveLevels(def.id,network),0)]));
+ const rates=Object.fromEntries(Object.keys(TRADE_PRICES).map(id=>[id,definitions.filter(d=>d.resource===id).reduce((sum,def)=>sum+def.rate*factoryActiveLevels(def.id,network),0)]));
+ const demand=utilityDemand(network);
  // Calculate production and each ten-minute sale in chronological order.
  // This prevents selling stock that had not yet been manufactured.
  let tick=data.lastProduction;
  for(let minute=0;minute<elapsed;minute++){
   tick+=MINUTE;
-  for(const id of Object.keys(rates)){
-   const old=data.resources[id];
-   data.resources[id]=Math.min(capacity(),old+rates[id]);
-   made+=data.resources[id]-old;
+  // Utilities generate first; factories only run when both balances cover the whole minute.
+  for(const id of Object.keys(UTILITY_DEFS))data.resources[id]=Math.min(capacity(),data.resources[id]+utilitySupply(id));
+  const powered=Object.keys(UTILITY_DEFS).every(id=>data.resources[id]>=demand[id]);
+  if(powered){
+   for(const id of Object.keys(UTILITY_DEFS))data.resources[id]-=demand[id];
+   for(const id of Object.keys(rates)){
+    const old=data.resources[id];
+    data.resources[id]=Math.min(capacity(),old+rates[id]);
+    made+=data.resources[id]-old;
+   }
   }
   if(data.marketLevel&&tick-data.lastTradeAt>=TRADE_INTERVAL){
    executeTrade();
@@ -992,7 +1033,16 @@ function showCard(){
  const {type,slot,id}=activeCard;
  let title="",html="",act=null;
  const button=(label,disabled=false)=>'<button class="btn" id="cardAction" '+(disabled?"disabled":"")+'>'+label+'</button>';
- if(type==="market"){
+ if(type==="utility"){
+  const def=UTILITY_DEFS[id],level=data.utilities[id],cost=utilityCost(id),demand=utilityDemand()[id];
+  title=def.icon+" "+def.name;
+  html='<p>Уровень: <b>'+level+' / 50</b></p><p>Производство: <b>+'+utilitySupply(id)+' / мин</b></p>'+
+   '<p>Расход заводов: <b>−'+demand+' / мин</b></p>'+
+   '<p>Запас: <b>'+format(data.resources[id])+'</b></p>'+
+   '<p class="muted">Без '+(id==="water"?'воды':'электричества')+' заводы останавливаются. Улучшай здание для увеличения снабжения.</p>'+
+   button(level?'⬆️ Улучшить · '+costLabel(cost):'🏗️ Построить · '+costLabel(cost),level>=50||!canAfford(cost));
+  act=()=>upgradeUtility(id);
+ }else if(type==="market"){
   title="🏪 Торговый центр";
   const cost=MARKET_COSTS[data.marketLevel],max=data.marketLevel>=TRADE_MAX_LEVEL;
   html='<p>Уровень: <b>'+data.marketLevel+' / '+TRADE_MAX_LEVEL+'</b> · Автопродажа раз в 10 минут</p>'+
@@ -1030,8 +1080,8 @@ function showCard(){
  } else if(type==="factory"){
  const def=definitions.find(x=>x.id===id),level=data.factories[id],job=data.construction.find(j=>j.id===id),price=factoryCost(id);
  title=def.icon+" "+def.title;
- const connected=isFactoryConnected(slot),activeLevel=factoryActiveLevels(id);
- html='<p>Уровень: <b>'+level+'</b> · Открывается на штабе '+def.requiredHQ+'</p><p>🚧 Дорога: <b>'+(connected?'✅ подключён':'❌ нет связи со штабом')+'</b></p><p>Производство: <b>+'+format(activeLevel*def.rate)+' '+labels[def.resource]+' / мин</b></p>'+(job?'<p>🏗️ Строительство: '+clock(timeLeft(job))+'</p>':'<p>Стоимость улучшения: '+costLabel(price)+'</p>')+button(job?"Строится…":"⬆️ Улучшить",!!job||level>=999||!canAfford(price));
+ const connected=isFactoryConnected(slot),activeLevel=utilitiesOperational()?factoryActiveLevels(id):0;
+ html='<p>Уровень: <b>'+level+'</b> · Открывается на штабе '+def.requiredHQ+'</p><p>🚧 Дорога: <b>'+(connected?'✅ подключён':'❌ нет связи со штабом')+'</b></p><p>💧⚡ Снабжение: '+(utilitiesOperational()?'✅ работает':'⛔ недостаточно воды или электричества')+'</p><p>Производство: <b>+'+format(activeLevel*def.rate)+' '+labels[def.resource]+' / мин</b></p>'+(job?'<p>🏗️ Строительство: '+clock(timeLeft(job))+'</p>':'<p>Стоимость улучшения: '+costLabel(price)+'</p>')+button(job?"Строится…":"⬆️ Улучшить",!!job||level>=999||!canAfford(price));
  act=()=>build(id);
  } else if(type==="construction"){
  const job=data.construction.find(j=>j.slot===slot);
@@ -1113,16 +1163,16 @@ function terrainArt(){
  rocks.map(([x,y])=>'<span class="landmark rock" style="left:'+x+'px;top:'+y+'px"></span>').join("");
 }
 function renderMap(){
- const signature=JSON.stringify([data.placements,data.construction.map(j=>[j.id,j.slot]),data.baseLevel,data.storageLevel,data.facilities,data.facilityJobs.map(j=>j.id),data.roads,roadMode,movingFactory,movingFacility,data.facilityLots,data.territoryLevel,data.vehicles,data.displayVehicles,data.marketLevel,data.convoys.map(j=>[j.resource,j.endsAt])]);
+ const signature=JSON.stringify([data.placements,data.construction.map(j=>[j.id,j.slot]),data.baseLevel,data.storageLevel,data.facilities,data.facilityJobs.map(j=>j.id),data.roads,roadMode,movingFactory,movingFacility,data.facilityLots,data.territoryLevel,data.vehicles,data.displayVehicles,data.marketLevel,data.convoys.map(j=>[j.resource,j.endsAt]),data.utilities,utilitiesOperational()]);
  if(mapSignature===signature)return;
  mapSignature=signature;
  const slots=[];
  for(let i=0;i<TOTAL_PLOTS;i++){
  const placed=data.placements.find(v=>v.slot===i),job=data.construction.find(v=>v.slot===i),def=placed&&definitions.find(d=>d.id===placed.id),facility=facilityAt(i),locked=!plotUnlocked(i);
  const x=42+(i%6)*166,y=190+Math.floor(i/6)*136;
- const connected=def?isFactoryConnected(i):false;
- const label=locked?"Закрытая территория":facility?facilityName(facility):def?def.title+(connected?" · работает":" · нет дороги"):job?"Строится":"Свободный участок";
- slots.push('<button type="button" class="plot '+(locked?" locked-land":placed||job||facility?"occupied":"")+(def&&!connected?" offline":"")+(movingFactory&&movingFactory.from===i||movingFacility&&data.facilityLots[movingFacility.id]===i?" move-source":"")+((movingFactory||movingFacility)&&!locked&&!placed&&!job&&!facility?" move-target":"")+'" aria-label="'+label+'" data-slot="'+i+'" style="left:'+x+'px;top:'+y+'px">'+(locked?'<strong>🔒</strong>':facility?buildingArt(facility):def?buildingArt(def.id,connected):job?buildingArt("construction"):'<strong>＋</strong>')+'<small>'+(locked?"Открыть":facility?facilityName(facility):def?(connected?'✅ ':'🚫 ')+def.title.replace(" завод",""):job?"Строится":"Участок")+'</small></button>');
+ const connected=def?isFactoryConnected(i):false,utilitiesOK=utilitiesOperational();
+ const label=locked?"Закрытая территория":facility?facilityName(facility):def?def.title+(!connected?" · нет дороги":!utilitiesOK?" · нет воды или электричества":" · работает"):job?"Строится":"Свободный участок";
+ slots.push('<button type="button" class="plot '+(locked?" locked-land":placed||job||facility?"occupied":"")+(def&&(!connected||!utilitiesOK)?" offline":"")+(movingFactory&&movingFactory.from===i||movingFacility&&data.facilityLots[movingFacility.id]===i?" move-source":"")+((movingFactory||movingFacility)&&!locked&&!placed&&!job&&!facility?" move-target":"")+'" aria-label="'+label+'" data-slot="'+i+'" style="left:'+x+'px;top:'+y+'px">'+(locked?'<strong>🔒</strong>':facility?buildingArt(facility):def?buildingArt(def.id,connected&&utilitiesOK):job?buildingArt("construction"):'<strong>＋</strong>')+'<small>'+(locked?"Открыть":facility?facilityName(facility):def?(connected&&utilitiesOK?'✅ ':'🚫 ')+def.title.replace(" завод",""):job?"Строится":"Участок")+'</small></button>');
  }
  const roadControls=roadMode&&!movingFactory&&!movingFacility?roadSlots.filter(s=>roadUnlocked(s)&&!data.roads.includes(s.id)).map(s=>
  '<button type="button" class="road-spot '+(s.v?'vertical':'horizontal')+'" data-road="'+s.id+
@@ -1133,6 +1183,8 @@ function renderMap(){
   return '<button class="poi" id="map-'+id+'" '+(data.facilityLots[id]!==null?'hidden ':'')+'style="left:'+(i===0?770:938)+'px;top:25px" aria-label="Открыть '+d.name+'">'+buildingArt(job?"construction":id)+'<small>'+d.name+' · '+(job?'стройка':level||'построить')+'</small></button>';
  }).join("");
  $("world").innerHTML=terrainArt()+roadControls+slots.join("")+convoyTrafficArt()+vehicleParking()+
+ '<button class="poi utility-poi" id="map-water" style="left:12px;top:25px" aria-label="Водоснабжение">'+buildingArt("water")+'<small>💧 Вода · '+(data.utilities.water||'построить')+'</small></button>'+
+ '<button class="poi utility-poi" id="map-electricity" style="left:655px;top:25px" aria-label="Электростанция">'+buildingArt("electricity")+'<small>⚡ Энергия · '+(data.utilities.electricity||'построить')+'</small></button>'+
  '<button class="poi" id="mapMarket" style="left:365px;top:25px" aria-label="Открыть торговый центр">'+buildingArt("market")+'<small>Торговля · '+(data.marketLevel||'построить')+'</small></button>'+
  '<button class="poi" id="mapHQ" style="left:183px;top:25px" aria-label="Открыть штаб">'+buildingArt("hq")+'<small>Штаб · '+data.baseLevel+'</small></button>'+
  '<button class="poi" id="mapStorage" '+(data.facilityLots.storage!==null?'hidden ':'')+'style="left:530px;top:25px" aria-label="Открыть склад">'+buildingArt("storage")+'<small>Склад · '+data.storageLevel+'</small></button>'+facilityArt;
@@ -1149,6 +1201,7 @@ function renderMap(){
   const facility=facilityAt(slot);if(facility){openCard(facility==="storage"?"storage":"facility",slot,facility);return}
   if(placed)openCard("factory",slot,placed.id);else if(job)openCard("construction",slot);else openCard("empty",slot);
  });
+ for(const id of Object.keys(UTILITY_DEFS))$("map-"+id).onclick=()=>openCard("utility",null,id);
  $("mapMarket").onclick=()=>openCard("market");
  $("mapHQ").onclick=()=>openCard("hq");$("mapStorage").onclick=()=>openCard("storage");
  for(const id of ["garage","hangar"])$("map-"+id).onclick=()=>openCard("facility",null,id);
@@ -1157,6 +1210,9 @@ function render(){
  renderMap();
  $("coins").textContent=format(data.coins);$("hq").textContent=format(data.baseLevel)+" / 1000";
  for(const name of Object.keys(data.resources))$("res-"+name).textContent=format(data.resources[name]);
+ const need=utilityDemand();
+ const ready=utilitiesOperational();
+ $("utilitySummary").textContent=(ready?"✅":"⛔")+" Снабжение заводов · 💧 "+format(data.resources.water)+" (+"+utilitySupply("water")+" / −"+need.water+" в мин) · ⚡ "+format(data.resources.electricity)+" (+"+utilitySupply("electricity")+" / −"+need.electricity+" в мин)";
  $("marketSummary").textContent="🏪 Торговый центр · уровень "+data.marketLevel+" · заработано "+format(data.tradeEarned)+" 🪙 · "+(data.marketLevel?"продажа каждые 10 минут":"ещё не построен");
  $("roadMode").textContent=roadMode?"✓ Готово · дорог "+data.roads.length:"🛣️ Дороги · "+ROAD_PRICE+" 🔩";
  $("expandLand").textContent=data.territoryLevel===2?"🌿 Земля 36/36":"🌿 Земля "+accessiblePlots()+"/36";
@@ -1166,7 +1222,7 @@ function render(){
  $("convoyPanel").innerHTML=convoyPanel();
  $("resources").innerHTML=Object.keys(data.resources).map(id=>{
   const defs=definitions.filter(def=>def.resource===id);
-  const rate=defs.reduce((sum,def)=>sum+def.rate*factoryActiveLevels(def.id),0);
+  const rate=id==="water"||id==="electricity"?utilitySupply(id):utilitiesOperational()?defs.reduce((sum,def)=>sum+def.rate*factoryActiveLevels(def.id),0):0;
   return '<div class="card"><b>'+labels[id]+'</b><div class="symbol">'+format(data.resources[id])+'</div>'+
   '<div class="detail">🏭 Производство: +'+format(rate)+'/мин · Вместимость '+format(capacity())+'</div></div>';
  }).join("");
@@ -1187,6 +1243,8 @@ function showView(name){
 }
 $("expandLand").onclick=()=>openCard("territory");
 $("openMarket").onclick=()=>openCard("market");
+ $("openWater").onclick=()=>openCard("utility",null,"water");
+ $("openPower").onclick=()=>openCard("utility",null,"electricity");
 $("openTest").onclick=()=>showView("missions");
 $("testResources").onclick=testResources;
 $("testHQ").onclick=testHQ;
