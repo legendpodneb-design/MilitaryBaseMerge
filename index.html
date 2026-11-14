@@ -405,6 +405,15 @@ linear-gradient(145deg,#a0ba77 0%,#76a068 47%,#4d8058 100%)}
 .market-line input[type=number]{width:100%;min-width:0;padding:7px;background:#152b23;border:1px solid #779475;color:#f7eed1;border-radius:7px;font-size:13px}
 .market-line input[type=checkbox]{width:17px;height:17px;accent-color:#d7bb72;flex-shrink:0}
 @media(max-width:460px){.market-grid{grid-template-columns:1fr}}
+
+/* 0.11.5 trading convoy missions and garage activity */
+.convoy-panel{margin:10px 0;background:linear-gradient(130deg,#3b563e,#233d32);border-color:#baae80}
+.convoy-panel h3{font-size:15px;margin:0 0 6px}
+.convoy-panel p{font-size:12px;line-height:1.35;margin:5px 0}
+.convoy-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:9px 0}
+.convoy-choices .btn{font-size:11px;padding:9px 4px;white-space:normal}
+.convoy-traffic{font-size:11px;color:#f0dba0;display:grid;gap:5px}
+@media(orientation:portrait){.convoy-choices{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style></head><body>
 
 <div class="game" id="game">
@@ -418,10 +427,10 @@ linear-gradient(145deg,#a0ba77 0%,#76a068 47%,#4d8058 100%)}
    <div class="road-actions"><button class="btn alt" id="roadMode" aria-pressed="false">🛣️ Дороги · 12 🔩</button><button class="btn alt" id="expandLand">🌿 Земля 24/36</button><button class="btn alt" id="openTest">🧪 Тест</button><span class="roadhelp" id="roadHelp" hidden>Касайся светлых участков дороги. 12 🔩 за участок.</span></div><div class="edge-actions"><button class="btn alt" id="zoomout" aria-label="Уменьшить">−</button><button class="btn alt" id="zoomin" aria-label="Увеличить">＋</button><span class="zoomreadout" id="zoomLevel" aria-live="off">100%</span><button class="btn alt" id="save" aria-label="Сохранить">💾</button></div>
    <div class="hint" id="mapstatus">Заводы работают только с дорогой от штаба · 🛣️ строй дороги</div><button class="btn cancel-move" id="cancelMove" hidden>Отмена перемещения</button>
   </div>
-  <div id="view-storage" class="view aux" hidden><h2>📦 Склад и торговля</h2><p>Заводы производят ресурсы, торговый центр автоматически продаёт излишки.</p><div class="card" id="marketSummary">🏪 Торговый центр</div><button class="btn alt" id="openMarket">🏪 Настроить торговлю</button><div class="cards" id="resources"></div><button class="btn" id="goStorageMap">🗺️ Вернуться к карте и складу</button></div>
+  <div id="view-storage" class="view aux" hidden><h2>📦 Склад и торговля</h2><p>Заводы производят ресурсы, торговый центр автоматически продаёт излишки.</p><div class="card" id="marketSummary">🏪 Торговый центр</div><button class="btn alt" id="openMarket">🏪 Настроить торговлю</button><div id="convoyPanel"></div><div class="cards" id="resources"></div><button class="btn" id="goStorageMap">🗺️ Вернуться к карте и складу</button></div>
   <div id="view-garage" class="view aux" hidden><h2>🚙 Гараж · техника</h2><p>Производство наземной техники. Для новых машин улучшай гараж и штаб.</p><div class="card" id="garageInfo"></div><div class="vehicle-grid" id="garageVehicles"></div><button class="btn alt" id="goGarageMap">🗺️ Открыть гараж</button></div>
   <div id="view-hangar" class="view aux" hidden><h2>🚁 Ангар · авиация</h2><p>Производство вертолётов и самолётов. Для новых моделей улучшай ангар и штаб.</p><div class="card" id="hangarInfo"></div><div class="vehicle-grid" id="hangarVehicles"></div><button class="btn alt" id="goHangarMap">🗺️ Открыть ангар</button></div>
-  <div id="view-missions" class="view aux" hidden><h2>🗺️ Задания</h2><div class="card"><b>🧪 Тестирование версии 0.11.0</b><p>Здесь можно пополнять ресурсы, открывать уровень штаба и ускорять стройки. Эти бонусы сохраняются только в тестовой версии.</p><div class="qa-actions"><button class="btn" id="testResources">🎁 +500 000 каждого ресурса</button><button class="btn alt" id="testHQ">🏛️ Штаб +10 уровней</button><button class="btn alt" id="testFinish">⏩ Завершить стройки</button></div><small>Тестовый склад до 10 000 000 каждого ресурса. При первом входе автоматически +500 000 каждого ресурса и +5 000 000 монет.</small></div><p>Экспедиции и задания появятся позже.</p><div class="card"><b>🏪 Автоматическая торговля</b><p>Построй торговый центр в командном секторе. Раз в 10 минут он продаёт излишки выбранных ресурсов, оставляя неснижаемый запас. Доход начисляется офлайн до 8 часов.</p></div><div class="card"><h3>🏭 Развитие производства</h3><p>Штаб 1 — металл · штаб 2 — переработка металла · штаб 3 — топливо · штаб 4 — терминал · штаб 6 — детали · штаб 7 — комплектующие · штаб 10 — электроника · штаб 11 — авиационный цех.</p><p>Завод должен иметь непрерывную дорогу до штаба. Ранее построенные заводы сохраняются.</p></div></div>
+  <div id="view-missions" class="view aux" hidden><h2>🗺️ Задания</h2><div class="card"><b>🧪 Тестирование версии 0.11.0</b><p>Здесь можно пополнять ресурсы, открывать уровень штаба и ускорять стройки. Эти бонусы сохраняются только в тестовой версии.</p><div class="qa-actions"><button class="btn" id="testResources">🎁 +500 000 каждого ресурса</button><button class="btn alt" id="testHQ">🏛️ Штаб +10 уровней</button><button class="btn alt" id="testFinish">⏩ Завершить стройки</button></div><small>Тестовый склад до 10 000 000 каждого ресурса. При первом входе автоматически +500 000 каждого ресурса и +5 000 000 монет.</small></div><p>Экспедиции и задания появятся позже.</p><div class="card"><b>🚚 Торговые конвои</b><p>Открой раздел «Склад», отправляй грузовики с ресурсами и получай монеты через 5 минут. Возвращение работает даже после закрытия игры.</p></div><div class="card"><b>🏪 Автоматическая торговля</b><p>Построй торговый центр в командном секторе. Раз в 10 минут он продаёт излишки выбранных ресурсов, оставляя неснижаемый запас. Доход начисляется офлайн до 8 часов.</p></div><div class="card"><h3>🏭 Развитие производства</h3><p>Штаб 1 — металл · штаб 2 — переработка металла · штаб 3 — топливо · штаб 4 — терминал · штаб 6 — детали · штаб 7 — комплектующие · штаб 10 — электроника · штаб 11 — авиационный цех.</p><p>Завод должен иметь непрерывную дорогу до штаба. Ранее построенные заводы сохраняются.</p></div></div>
  </main>
  <nav class="nav" aria-label="Главное меню"><button class="on" data-view="base"><span>🏕️</span>База</button><button data-view="garage"><span>🚙</span>Гараж</button><button data-view="hangar"><span>🚁</span>Ангар</button><button data-view="missions"><span>🗺️</span>Задания</button><button data-view="storage"><span>📦</span>Склад</button></nav>
  <div class="toast" id="notice" role="status"></div><span id="saveStatus" hidden>Автосохранение</span>
@@ -678,6 +687,40 @@ function finishJobs(now=Date.now()){
  if(facilityDone.length)data.facilityJobs=data.facilityJobs.filter(j=>j.endsAt>now);
  return completed.length+facilityDone.length;
 }
+const CONVOY_LOAD=500,CONVOY_DURATION=5*MINUTE;
+function convoySlots(){return data.marketLevel>=4?3:data.marketLevel>=2?2:data.marketLevel>=1?1:0}
+function convoyRewards(id){return TRADE_PRICES[id]*10+20}
+function dispatchConvoy(resource){
+ advance();
+ if(!Object.hasOwn(TRADE_PRICES,resource))return;
+ if(!data.marketLevel){status("🏪 Сначала построй торговый центр");return}
+ if(data.convoys.length>=convoySlots()){status("🚚 Все торговые конвои уже в пути");return}
+ if(data.resources[resource]<CONVOY_LOAD){status("Недостаточно ресурсов для погрузки конвоя");return}
+ data.resources[resource]-=CONVOY_LOAD;
+ data.convoys.push({resource,endsAt:Date.now()+CONVOY_DURATION,reward:convoyRewards(resource)});
+ status("🚚 Конвой отправлен: 500 "+labels[resource]+" · вернётся через 5 минут");
+ save();render();
+}
+function completeConvoys(now=Date.now()){
+ const arrived=data.convoys.filter(j=>j.endsAt<=now);
+ if(!arrived.length)return 0;
+ const amount=arrived.reduce((sum,j)=>sum+j.reward,0);
+ data.coins=Math.min(999999999,data.coins+amount);
+ data.convoyEarned+=amount;data.convoyTrips+=arrived.length;
+ data.convoys=data.convoys.filter(j=>j.endsAt>now);
+ status("🚚 Вернулось конвоев: "+arrived.length+" · получено +"+format(amount)+" 🪙");
+ return arrived.length;
+}
+function convoyPanel(){
+ return '<div class="card convoy-panel"><h3>🚚 Торговые конвои</h3>'+
+ '<p>Загрузка: 500 единиц · рейс: 5 минут · одновременно: '+data.convoys.length+'/'+convoySlots()+'</p>'+
+ '<p>Рейсов завершено: '+format(data.convoyTrips)+' · заработано: '+format(data.convoyEarned)+' 🪙</p>'+
+ (data.marketLevel?'': '<p>Построй торговый центр, чтобы открыть конвои.</p>')+
+ '<div class="convoy-choices">'+Object.keys(TRADE_PRICES).map(id=>
+ '<button class="btn alt" data-convoy="'+id+'" '+(!data.marketLevel||data.convoys.length>=convoySlots()||data.resources[id]<CONVOY_LOAD?'disabled':'')+'>'+
+ labels[id]+' · +'+convoyRewards(id)+' 🪙</button>').join('')+'</div>'+
+ '<div class="convoy-traffic">'+data.convoys.map(j=>'<div>🚛 '+labels[j.resource]+' · возврат через '+clock(timeLeft(j))+'</div>').join('')+'</div></div>';
+}
 function executeTrade(){
  if(!data.marketLevel)return 0;
  let coins=0;
@@ -755,7 +798,7 @@ const duration=slot!==null?45:Math.min(180,60+level*15);
 data.construction.push({id,slot,endsAt:Date.now()+duration*1000});
 selectedSlot=null;status("🏗️ "+def.title+": строительство "+clock(duration));save();render();
 }
-function advance(now=Date.now()){const done=finishJobs(now);const made=accrue(now);if(done)save();return {done,made}}
+function advance(now=Date.now()){const done=finishJobs(now);const made=accrue(now);const arrived=completeConvoys(now);if(done||arrived)save();return {done:done+arrived,made}}
 function upgradeHQ(){
 advance();if(data.baseLevel>=1000)return;const price=hqCost(data.baseLevel);
 if(!canAfford(price)){status("Для штаба недостаточно ресурсов");return}
@@ -1043,7 +1086,7 @@ function terrainArt(){
  rocks.map(([x,y])=>'<span class="landmark rock" style="left:'+x+'px;top:'+y+'px"></span>').join("");
 }
 function renderMap(){
- const signature=JSON.stringify([data.placements,data.construction.map(j=>[j.id,j.slot]),data.baseLevel,data.storageLevel,data.facilities,data.facilityJobs.map(j=>j.id),data.roads,roadMode,movingFactory,movingFacility,data.facilityLots,data.territoryLevel,data.vehicles,data.displayVehicles,data.marketLevel]);
+ const signature=JSON.stringify([data.placements,data.construction.map(j=>[j.id,j.slot]),data.baseLevel,data.storageLevel,data.facilities,data.facilityJobs.map(j=>j.id),data.roads,roadMode,movingFactory,movingFacility,data.facilityLots,data.territoryLevel,data.vehicles,data.displayVehicles,data.marketLevel,data.convoys.length]);
  if(mapSignature===signature)return;
  mapSignature=signature;
  const slots=[];
@@ -1093,6 +1136,7 @@ function render(){
  $("cancelMove").hidden=!(movingFactory||movingFacility);
  $("roadMode").setAttribute("aria-pressed",String(roadMode));
  $("roadHelp").hidden=!roadMode;
+ $("convoyPanel").innerHTML=convoyPanel();
  $("resources").innerHTML=Object.keys(data.resources).map(id=>{
   const defs=definitions.filter(def=>def.resource===id);
   const rate=defs.reduce((sum,def)=>sum+def.rate*factoryActiveLevels(def.id),0);
@@ -1104,6 +1148,7 @@ function render(){
   $(id+"Info").textContent=facilityDefs[id].icon+" "+facilityDefs[id].name+" · уровень "+data.facilities[id]+(job?" · строится "+clock(timeLeft(job)):"")+" · единиц техники "+vehicleDefs.filter(v=>v.kind===id).reduce((n,v)=>n+data.vehicles[v.id],0);
   $(id+"Vehicles").innerHTML=vehicleList(id);
  }
+ document.querySelectorAll("[data-convoy]").forEach(btn=>btn.onclick=()=>dispatchConvoy(btn.dataset.convoy));
  document.querySelectorAll("[data-buyvehicle]").forEach(btn=>btn.onclick=()=>buyVehicle(btn.dataset.buyvehicle));
  document.querySelectorAll("[data-showvehicle]").forEach(btn=>btn.onclick=()=>toggleVehicleDisplay(btn.dataset.showvehicle));
  if(activeCard&&$("overlay").hidden===false&&(activeCard.type==="construction"||activeCard.type==="facility"&&data.facilityJobs.some(j=>j.id===activeCard.id)))showCard();
