@@ -25,7 +25,7 @@ body{font:14px system-ui,-apple-system,sans-serif;background:#101e18;color:#eff5
 .game{position:fixed;inset:0;display:grid;grid-template-rows:auto minmax(0,1fr) auto;overflow:hidden}
 .hud{padding:calc(5px + env(safe-area-inset-top)) calc(10px + env(safe-area-inset-right)) 5px calc(10px + env(safe-area-inset-left));display:flex;align-items:center;gap:12px;background:#1b3225eF;border-bottom:1px solid #77926f;min-height:40px;z-index:4}
 .brand{white-space:nowrap;font-size:13px}.brand small{font-size:10px;color:#d4dba1}
-.meters{flex:1;display:flex;justify-content:flex-end;gap:7px;align-items:center;flex-wrap:wrap;font-size:11px}.meters span{white-space:nowrap;background:#314e38;border-radius:7px;padding:3px 6px}
+.meters{flex:1;display:flex;justify-content:flex-end;gap:6px;align-items:center;flex-wrap:wrap;font-size:11px;max-width:100%;min-width:0}.meters span{white-space:nowrap;background:#314e38;border-radius:7px;padding:3px 6px}
 .stage{position:relative;min-width:0;min-height:0;padding:0;margin:0;max-width:none;overflow:hidden}
 .map-screen{position:absolute;inset:0;overflow:hidden}
 .world-wrap{position:absolute;inset:0!important;height:auto!important;min-height:0!important;border:0;border-radius:0;overflow:hidden;background:#365f46}
@@ -428,6 +428,7 @@ linear-gradient(145deg,#a0ba77 0%,#76a068 47%,#4d8058 100%)}
 @media(prefers-reduced-motion:reduce){.moving-convoy,.asset.running:after{animation:none!important}}
 @media(orientation:portrait){.convoy-route{top:150px}.moving-convoy{font-size:23px}}
 /* 0.11.7 utility infrastructure */
+@media(orientation:landscape) and (max-height:440px){.meters{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.meters span{flex-shrink:0}.meters::-webkit-scrollbar{display:none}}
 .poi.utility-poi{width:100px;height:100px;padding:4px}
 .poi.utility-poi .asset{transform:scale(.82);transform-origin:center bottom;margin-bottom:-6px}
 .poi.utility-poi small{font-size:9px}
@@ -861,7 +862,13 @@ const duration=slot!==null?45:Math.min(180,60+level*15);
 data.construction.push({id,slot,endsAt:Date.now()+duration*1000});
 selectedSlot=null;status("🏗️ "+def.title+": строительство "+clock(duration));save();render();
 }
-function advance(now=Date.now()){const done=finishJobs(now);const made=accrue(now);const arrived=completeConvoys(now);if(done||arrived)save();return {done:done+arrived,made}}
+function advance(now=Date.now()){
+ const before=data.resources.water+data.resources.electricity;
+ const done=finishJobs(now),made=accrue(now),arrived=completeConvoys(now);
+ const utilityChanged=before!==data.resources.water+data.resources.electricity;
+ if(done||arrived)save();
+ return {done:done+arrived,made,utilityChanged};
+}
 function upgradeHQ(){
 advance();if(data.baseLevel>=1000)return;const price=hqCost(data.baseLevel);
 if(!canAfford(price)){status("Для штаба недостаточно ресурсов");return}
@@ -1370,6 +1377,6 @@ window.addEventListener("pagehide",()=>{advance();save()});
 const gained=advance().made;if(gained)status("Пока тебя не было, заводы произвели "+format(gained)+" ресурсов");
 save();render();centerMap();
 // Periodic refresh is for UI only; offline output depends on timestamps, not background timers.
-setInterval(()=>{const result=advance();if(result.made||result.done)save();render();},1000);
+setInterval(()=>{const result=advance();if(result.made||result.done||result.utilityChanged)save();render();},1000);
 })();
 </script></body></html>
