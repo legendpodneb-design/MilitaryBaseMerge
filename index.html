@@ -1,43 +1,71 @@
 <!doctype html>
-<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#17251e"><title>Военная база: Merge</title>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#142820"><title>Военная база: Merge 0.2</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#263c2d,#101a15 65%);color:#f1f4e9;font:16px system-ui,sans-serif}
-main{max-width:700px;margin:auto;padding:20px 14px}h1{text-align:center;font-size:clamp(23px,6vw,36px)}.sub{text-align:center;color:#b5c3ae;font-size:13px}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat,.panel{background:#1d2d23;border:1px solid #405744;border-radius:14px;padding:13px;margin:10px 0}
-.stat{text-align:center}.stat small{display:block;color:#b5c3ae;font-size:11px}.stat strong{font-size:21px}
-.board{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;margin-top:12px}.cell{aspect-ratio:1;border-radius:10px;border:1px solid #50664d;background:#344936;color:white;position:relative;display:grid;place-items:center;font-size:clamp(22px,7vw,42px);cursor:pointer;touch-action:manipulation;padding:0}.cell.empty{background:#18271d;border-style:dashed}.cell.selected{outline:3px solid #e8c76a}.cell .lv{position:absolute;bottom:2px;right:3px;background:#122119d9;color:#fff;font-size:10px;padding:2px 4px;border-radius:5px}
-.actions{display:flex;gap:8px;margin-top:10px}.actions button{flex:1}button.action{background:#8fb774;color:#132019;border:0;border-radius:10px;padding:12px;font-size:14px;font-weight:bold}button.secondary{background:#344a39;color:#fff;border:1px solid #526b54}button:disabled{opacity:.45}.message{color:#e8c76a;font-size:14px;min-height:40px;margin-top:10px}.hint{color:#b5c3ae;font-size:13px}.levels{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:10px}.level{background:#293e30;text-align:center;border-radius:8px;padding:7px 2px}.level b{font-size:24px;display:block}.level small{font-size:10px;color:#c0cabc}.next{font-size:32px}footer{text-align:center;color:#a9b4a1;font-size:11px}
-</style></head><body><main>
-<h1>🪖 ВОЕННАЯ БАЗА: MERGE</h1><div class="sub">Объединяй технику • Развивай базу</div>
-<div class="stats"><div class="stat"><small>МОНЕТЫ</small><strong id="coins"></strong></div><div class="stat"><small>ОЧКИ</small><strong id="score"></strong></div><div class="stat"><small>РЕКОРД</small><strong id="best"></strong></div></div>
-<section class="panel"><b>Тактическая площадка 5 × 5</b><div class="hint">Выбирай два одинаковых соседних объекта</div><div id="board" class="board"></div><div id="message" class="message"></div><div class="actions"><button class="action" id="buy">➕ Техника · 20 🪙</button><button class="action secondary" id="restart">↻ Заново</button></div></section>
-<section class="panel">Следующий объект: <span class="next" id="next"></span></section>
-<section class="panel"><b>Коллекция техники</b><div id="levels" class="levels"></div></section><footer>Прототип 0.1 · Прогресс сохраняется в браузере</footer>
+:root{--ink:#eef5df;--muted:#b6cbb0;--lime:#d6e994;--border:#516d4c;--sand:#ddba75}
+*{box-sizing:border-box}html{background:#102218}body{margin:0;color:var(--ink);background:radial-gradient(ellipse at 48% 0%,#426044 0%,#1e3829 38%,#0f2118 85%);font:15px system-ui,-apple-system,sans-serif}button{font:inherit;touch-action:manipulation}
+main{width:min(100%,650px);margin:auto;padding:12px 12px calc(18px + env(safe-area-inset-bottom))}
+header{text-align:center;margin:0 0 10px}header .eyebrow{font-weight:800;letter-spacing:.23em;color:#b9d6a4;font-size:10px}h1{margin:3px 0;font-size:clamp(23px,5.5vw,33px);line-height:1.1;text-shadow:0 2px 8px #102418}header .sub{font-size:11px;color:#c9d8c2}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:9px}.stat{border:1px solid #66815c;background:linear-gradient(150deg,#3b5940,#253b2e);padding:8px 3px;border-radius:13px;text-align:center;box-shadow:0 4px 10px #0b150e60}.stat small{display:block;font-size:10px;letter-spacing:.08em;color:#c0d4b7}.stat strong{font-size:21px;color:#f4e9b9}
+.panel{background:linear-gradient(175deg,#2d4836,#192d22);border:1px solid #587353;border-radius:16px;padding:11px;margin:9px 0;box-shadow:0 5px 16px #0a191185}
+.paneltitle{display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:7px}.paneltitle b{font-size:14px}.pill{background:#6c7844;color:#f4f0c8;border:1px solid #899666;padding:3px 7px;border-radius:12px;font-size:10px;white-space:nowrap}
+.base{height:112px;overflow:hidden;position:relative;border-radius:12px;border:2px solid #76875a;background:repeating-linear-gradient(45deg,transparent 0 22px,#d7cb9b0b 22px 24px),linear-gradient(165deg,#879766,#556e48);display:flex;justify-content:space-evenly;align-items:end;padding:8px 5px 13px}
+.base:before{content:"";position:absolute;inset:auto -10% -26px;background:#c6b88b;height:39px;transform:rotate(-4deg);border-top:3px dashed #dfd5af}
+.building{z-index:1;text-align:center;position:relative;width:31%;max-width:130px;filter:drop-shadow(3px 5px 2px #2d3d2c66)}.building svg{width:100%;height:67px}.building span{display:inline-block;background:#1a3024dd;border:1px solid #9fa77a;border-radius:5px;padding:2px 5px;font-size:10px;font-weight:700;position:relative;top:-6px}.flag{position:absolute;right:9px;top:7px;font-size:10px;color:#e7edb6;font-weight:800}
+.board{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;margin-top:8px}.cell{width:100%;aspect-ratio:1;border:1px solid #748862;border-radius:10px;background:linear-gradient(155deg,#58704c,#3b513c);display:flex;align-items:center;justify-content:center;position:relative;cursor:pointer;padding:2px;min-width:0;color:#e5eddb;box-shadow:inset 0 -3px #223e31,0 2px 2px #102017}.cell.empty{background:#223829;border:1px dashed #63785c;box-shadow:inset 0 2px 5px #101d15}.cell.empty .plus{font-size:23px;color:#6f916f}.cell.selected{outline:3px solid #f5d177;outline-offset:0;background:#75834e}.cell svg{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 3px 1px #182419a8)}.cell .lv{position:absolute;right:2px;bottom:2px;background:#132c24de;color:#f5eed3;font-size:9px;padding:1px 4px;border-radius:6px}.cell.justmerged{animation:pop .32s ease-out}@keyframes pop{0%{transform:scale(.85)}55%{transform:scale(1.09)}100%{transform:scale(1)}}
+.hint{font-size:11px;color:var(--muted);line-height:1.35}.message{font-size:12px;color:#e9d58e;min-height:30px;display:flex;align-items:center;margin-top:5px}
+.actions{display:grid;grid-template-columns:1.5fr 1fr;gap:7px}.action{border:0;background:linear-gradient(#d8e39a,#98b968);color:#23341f;border-radius:11px;padding:12px 5px;font-size:13px;font-weight:800;box-shadow:inset 0 -3px #68894b}.action.secondary{background:linear-gradient(#4d6850,#314b3a);color:#ecf2de;box-shadow:inset 0 -3px #1f3428;border:1px solid #769073}.action:disabled{opacity:.45}
+.nextwrap{display:flex;align-items:center;justify-content:space-between;padding:2px}.nextitem{display:flex;align-items:center;gap:8px}.nextitem svg{width:64px;height:43px;background:#486348;border-radius:9px;padding:2px}.collection{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.collect{background:#304b39;border-radius:8px;border:1px solid #557450;text-align:center;padding:3px 1px}.collect svg{width:100%;height:36px}.collect small{display:block;font-size:9px;color:#b5c8ae}.collect.locked{opacity:.42}footer{text-align:center;color:#91aa90;font-size:10px;margin:10px 0}
+@media(min-width:600px){main{padding-top:23px}.base{height:145px}.building svg{height:90px}.board{gap:9px}.cell{border-radius:13px}.collect svg{height:52px}}
+@media(max-height:750px){main{padding-top:7px}.base{height:92px}.building svg{height:54px}header{margin-bottom:6px}.panel{margin:7px 0;padding:9px}}
+</style></head>
+<body><main>
+<header><div class="eyebrow">TACTICAL MERGE • 0.2</div><h1>🪖 ВОЕННАЯ БАЗА</h1><div class="sub">Объединяй технику — развивай свою базу</div></header>
+<div class="stats"><div class="stat"><small>🪙 МОНЕТЫ</small><strong id="coins">120</strong></div><div class="stat"><small>⭐ ОЧКИ</small><strong id="score">0</strong></div><div class="stat"><small>🏆 РЕКОРД</small><strong id="best">0</strong></div></div>
+<section class="panel"><div class="paneltitle"><b>🏕️ Твоя военная база</b><span class="pill">Штаб • ур. 1</span></div><div class="base">
+<div class="building"><svg viewBox="0 0 100 75"><path d="M11 30L51 10 90 29 50 49Z" fill="#65775b" stroke="#253e2a" stroke-width="3"/><path d="M11 30v27l39 16V49Z" fill="#84916b"/><path d="M90 29v29L50 73V49Z" fill="#506a52"/><path d="M60 52l21-9v18l-21 8Z" fill="#243f33"/><path d="M20 42l19 8v13l-19-8Z" fill="#c5d2a4"/></svg><span>ШТАБ</span></div>
+<div class="building"><svg viewBox="0 0 100 75"><path d="M9 32L51 9 93 32 51 50Z" fill="#7a8260" stroke="#344631" stroke-width="3"/><path d="M9 32v30l42 12V50Z" fill="#c0ba8e"/><path d="M93 32v30L51 74V50Z" fill="#7b8763"/><path d="M62 51l24-10v20L62 69Z" fill="#283e33"/></svg><span>ГАРАЖ</span></div>
+<div class="building"><svg viewBox="0 0 100 75"><path d="M10 33L48 12 91 32 50 53Z" fill="#70815f" stroke="#354934" stroke-width="3"/><path d="M10 33v29l40 12V53Z" fill="#929d73"/><path d="M91 32v29L50 74V53Z" fill="#647754"/><path d="M61 54l21-10v16l-21 9Z" fill="#293c2d"/><path d="M49 10V0" stroke="#eae2a7" stroke-width="3"/><path d="M49 0l20 5-20 5" fill="#d7b268"/></svg><span>СКЛАД</span></div>
+</div></section>
+<section class="panel"><div class="paneltitle"><b>⚙️ Сборочная площадка</b><span class="pill">5 × 5</span></div><div class="hint">Выбери две одинаковые машины на соседних клетках</div><div class="board" id="board"></div><div class="message" id="message" aria-live="polite"></div><div class="actions"><button class="action" id="buy">＋ Техника · 20 🪙</button><button class="action secondary" id="restart">↻ Заново</button></div></section>
+<section class="panel nextwrap"><div><b>Следующая техника</b><div class="hint">Появится на случайной свободной клетке</div></div><div class="nextitem" id="next"></div></section>
+<section class="panel"><div class="paneltitle"><b>🎖️ Коллекция техники</b><span class="pill" id="progress">1 / 10</span></div><div class="collection" id="levels"></div></section>
+<footer>Версия 0.2 · Сохранения остаются на этом устройстве</footer>
 </main><script>
 (()=>{
-const units=[["Разведджип","🚙"],["Бронемашина","🚐"],["БТР","🚛"],["Лёгкий танк","🛡️"],["Основной танк","🚜"],["Тяжёлый танк","🎖️"],["Вертолёт","🚁"],["Истребитель","🛩️"],["Командный центр","🏢"],["Главная база","🏰"]];
-const $=id=>document.getElementById(id), random=()=>Math.random()<.82?0:1;
-let board,coins=120,score=0,best=Number(localStorage.getItem("mbm_best")||0),selected=null,next=0;
-const adjacent=(a,b)=>Math.abs(Math.floor(a/5)-Math.floor(b/5))+Math.abs(a%5-b%5)===1;
+const names=["Разведджип","Бронемашина","БТР","Лёгкий танк","Основной танк","Тяжёлый танк","Вертолёт","Штурмовик","Командный штаб","Главная база"];
+const $=id=>document.getElementById(id),random=()=>Math.random()<.82?0:1;
+let board,coins=120,score=0,best=Number(localStorage.getItem("mbm_best")||0),selected=null,next=0,merged=-1;
+function vehicle(n){
+ const palette=["#c4d78d","#9ebc72","#b0b66e","#8fa466","#6d955d","#778b56","#85a5a7","#9eb4ba","#cbba84","#dfbe76"];
+ const c=palette[n], edge="#324b3b", windowColor="#b7dce0";
+ const wheels='<circle cx="29" cy="48" r="9" fill="#23332e" stroke="#8a967b" stroke-width="2"/><circle cx="75" cy="48" r="9" fill="#23332e" stroke="#8a967b" stroke-width="2"/><circle cx="29" cy="48" r="3" fill="#c8bfa1"/><circle cx="75" cy="48" r="3" fill="#c8bfa1"/>';
+ const track='<path d="M14 40h72a12 12 0 0 1 0 24H14a12 12 0 0 1 0-24Z" fill="#304039" stroke="#c3c4a0" stroke-width="2"/>'+[22,38,54,70,83].map(x=>'<circle cx="'+x+'" cy="52" r="7" fill="#7d9270" stroke="#283c33" stroke-width="2"/>').join('');
+ let body='';
+ if(n<=2)body='<path d="M12 38L22 23h47l17 14 7 10H10Z" fill="'+c+'" stroke="'+edge+'" stroke-width="3"/><path d="M30 26h17v12H23Z M51 26h15l12 12H51Z" fill="'+windowColor+'" stroke="'+edge+'" stroke-width="2"/>'+wheels+'<rect x="4" y="40" width="9" height="6" rx="2" fill="#e8ca84"/>';
+ else if(n<=5)body=track+'<path d="M13 37h76l-7 13H18Z" fill="'+c+'" stroke="'+edge+'" stroke-width="3"/><path d="M30 28h42l9 10H21Z" fill="'+c+'" stroke="'+edge+'" stroke-width="3"/><path d="M48 27h23v-5H48Z" fill="#536f50"/><path d="M66 23h36v4H66Z" fill="#414c3a"/>';
+ else if(n<=7)body=n===6?'<path d="M16 34q0-15 22-16h34q18 3 12 21l-15 9H29Z" fill="'+c+'" stroke="'+edge+'" stroke-width="3"/><path d="M48 22h20l8 12H48Z" fill="'+windowColor+'"/><path d="M6 32h18v6H6Z" fill="'+c+'"/><path d="M35 53h45" stroke="#2f4337" stroke-width="4"/><path d="M52 16V9 M15 9h75" stroke="#273e32" stroke-width="4" stroke-linecap="round"/>':'<path d="M5 39l40-12 12-22 11 1-4 22 29 11-2 9-32-3-14 17-10-1 4-20L6 46Z" fill="'+c+'" stroke="'+edge+'" stroke-width="3"/><path d="M45 24l12-12-2 19Z" fill="'+windowColor+'"/>';
+ else body='<path d="M14 39L51 15 90 39 50 59Z" fill="'+c+'" stroke="'+edge+'" stroke-width="3"/><path d="M14 39v19l36 14V59Z" fill="#a4ad78"/><path d="M90 39v19L50 72V59Z" fill="#607750"/><rect x="42" y="5" width="20" height="17" rx="3" fill="#9baf8d" stroke="'+edge+'" stroke-width="2"/><path d="M52 5V0" stroke="'+edge+'" stroke-width="3"/><path d="M52 0l17 5-17 3Z" fill="#e9c47c"/>';
+ return '<svg viewBox="0 0 106 76" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="'+names[n]+'"><ellipse cx="54" cy="64" rx="46" ry="7" fill="#1f322955"/>'+body+'</svg>';
+}
 function say(s){$("message").textContent=s}
 function save(){localStorage.setItem("mbm_best",best);localStorage.setItem("mbm_save",JSON.stringify({board,coins,score}))}
 function render(){
-$("board").replaceChildren();
-board.forEach((value,i)=>{const el=document.createElement("button");el.className="cell"+(value===null?" empty":"")+(selected===i?" selected":"");el.setAttribute("aria-label",value===null?"Пустая клетка":units[value][0]);el.innerHTML=value===null?"＋":units[value][1]+'<span class="lv">УР. '+(value+1)+'</span>';el.onclick=()=>tap(i);$("board").append(el)});
-$("coins").textContent=coins;$("score").textContent=score;$("best").textContent=best;$("next").textContent=units[next][1];$("buy").disabled=coins<20||!board.includes(null);
-$("levels").innerHTML=units.map((u,i)=>'<div class="level"><b>'+u[1]+'</b><small>'+(i+1)+'. '+u[0]+'</small></div>').join("");
+$("board").replaceChildren();board.forEach((v,i)=>{const el=document.createElement("button");el.className="cell"+(v===null?" empty":"")+(selected===i?" selected":"")+(merged===i?" justmerged":"");el.setAttribute("aria-label",v===null?"Пустая клетка":names[v]);el.innerHTML=v===null?'<span class="plus">＋</span>':vehicle(v)+'<span class="lv">'+(v+1)+'</span>';el.onclick=()=>tap(i);$("board").append(el)});
+$("coins").textContent=coins;$("score").textContent=score;$("best").textContent=best;$("next").innerHTML=vehicle(next);$("buy").disabled=coins<20||!board.includes(null);
+let max=Math.max(0,...board.filter(v=>v!==null));$("progress").textContent=(max+1)+" / 10";
+$("levels").innerHTML=names.map((name,i)=>'<div class="collect'+(i>max?' locked':'')+'">'+vehicle(i)+'<small>УР. '+(i+1)+'</small></div>').join("");
 }
-function start(){board=Array(25).fill(null);[2,5,8,11,14,17,20,23].forEach(i=>board[i]=random());coins=120;score=0;selected=null;next=random();say("Нажми на объект, затем на такой же рядом.");save();render()}
-function tap(i){
-const val=board[i];if(val===null){selected=null;say("Пустая клетка. Добавь технику кнопкой ниже.");render();return}
-if(selected===null){selected=i;say("Теперь выбери такой же соседний объект.");render();return}
+function start(){board=Array(25).fill(null);[2,5,8,11,14,17,20,23].forEach(i=>board[i]=random());coins=120;score=0;selected=null;next=random();merged=-1;say("Нажми на технику, затем на такую же рядом.");save();render()}
+function tap(i){const val=board[i];merged=-1;if(val===null){selected=null;say("Пустая клетка. Добавь технику кнопкой ниже.");render();return}
+if(selected===null){selected=i;say("Выбери такой же объект на соседней клетке.");render();return}
 if(selected===i){selected=null;say("Выбор отменён.");render();return}
-if(!adjacent(selected,i)||board[selected]!==val){selected=i;say("Нужны одинаковые объекты на соседних клетках.");render();return}
-if(val===9){selected=null;say("Максимальный уровень уже достигнут.");render();return}
-board[selected]=val+1;board[i]=null;selected=null;let gained=25*(val+1);score+=gained;coins+=10+val*5;best=Math.max(best,score);say(units[val+1][0]+" создан! +"+gained+" очков");save();render();
-}
-$("buy").onclick=()=>{const cells=board.flatMap((v,i)=>v===null?[i]:[]);if(!cells.length||coins<20)return;const pos=cells[Math.floor(Math.random()*cells.length)];board[pos]=next;coins-=20;next=random();selected=null;say("Новая техника доставлена!");save();render()};
+const adjacent=Math.abs(Math.floor(selected/5)-Math.floor(i/5))+Math.abs(selected%5-i%5)===1;
+if(!adjacent||board[selected]!==val){selected=i;say("Объекты должны быть одинаковыми и стоять рядом.");render();return}
+if(val===9){selected=null;say("Максимальный уровень уже достигнут!");render();return}
+board[selected]=val+1;merged=selected;board[i]=null;selected=null;const gained=25*(val+1);score+=gained;coins+=10+val*5;best=Math.max(best,score);say("🎉 "+names[val+1]+" создан! +"+gained+" очков");save();render()}
+$("buy").onclick=()=>{const empty=board.flatMap((v,i)=>v===null?[i]:[]);if(!empty.length||coins<20)return;board[empty[Math.floor(Math.random()*empty.length)]]=next;coins-=20;next=random();selected=null;merged=-1;say("📦 Новая техника доставлена!");save();render()};
 $("restart").onclick=()=>{if(confirm("Начать новую игру?"))start()};
-try{const state=JSON.parse(localStorage.getItem("mbm_save")||"null");if(state&&Array.isArray(state.board)&&state.board.length===25){board=state.board;coins=state.coins;score=state.score;next=random();say("С возвращением! Продолжай развивать базу.");render()}else start()}catch(e){start()}
+try{const state=JSON.parse(localStorage.getItem("mbm_save")||"null");if(state&&Array.isArray(state.board)&&state.board.length===25&&state.board.every(v=>v===null||(Number.isInteger(v)&&v>=0&&v<10))){board=state.board;coins=state.coins;score=state.score;next=random();say("С возвращением! Твой прогресс сохранён.");render()}else start()}catch(e){start()}
 })();
 </script></body></html>
