@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#172e25">
-<title>Военная база — 0.9.2 Графика базы</title>
+<title>Военная база — 0.9.3 Изометрический городок</title>
 <style>
 :root{color-scheme:dark;--bg:#14261d;--panel:#294536;--border:#688068;--text:#f1f4e9;--gold:#f4d384}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#426248,#152820 70%);color:var(--text);font:15px system-ui,-apple-system,sans-serif}main{max-width:720px;margin:auto;padding:14px 12px 100px}h1{text-align:center;font-size:clamp(23px,6vw,34px);margin:4px 0}.sub{text-align:center;color:#bfd3b9;font-size:12px;margin-bottom:12px}.tag{font-size:10px;letter-spacing:2px;text-align:center;color:#e3dcad;font-weight:800}.panel{background:linear-gradient(165deg,#31513b,#1c3327);border:1px solid #698368;border-radius:15px;padding:14px;margin:10px 0;box-shadow:0 4px 12px #0d1b1377}h2{font-size:17px;margin:0 0 8px}.muted{font-size:12px;color:#c0d0ba;line-height:1.5}.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.stat{background:#223e2e;border:1px solid #59785d;border-radius:12px;padding:12px}.stat small{display:block;color:#c5d2b7}.stat strong{font-size:21px}.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:12px}.card{border:1px solid #79916b;background:#344f3b;border-radius:13px;padding:11px;min-width:0}.card h3{margin:2px 0 7px;font-size:15px}.symbol{font-size:33px}.rate{color:#e5dd9d;font-size:12px}.btn{background:linear-gradient(#e4d293,#bfaa6e);color:#263123;border:0;border-radius:10px;padding:11px;font-size:13px;font-weight:800;cursor:pointer;touch-action:manipulation}.btn:disabled{opacity:.43}.card .btn{width:100%;margin-top:8px}.btn.alt{background:#44634a;color:#f4f6e7;border:1px solid #7c9878}.bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}.baseart{border-radius:12px;border:2px solid #829671;height:136px;background:repeating-linear-gradient(35deg,#89977129 0 22px,#b6c1a11f 23px 25px),linear-gradient(#8ea178,#547552);display:flex;align-items:end;justify-content:space-around;padding:14px 2px 8px;overflow:hidden}.building{text-align:center;min-width:0;flex:1;filter:drop-shadow(2px 3px 2px #182b22aa)}.building .roof{font-size:38px}.building small{display:block;color:#192c20;font-size:10px;font-weight:900;background:#cbd4a9;border-radius:5px;margin:3px auto;max-width:92px}.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,720px);padding:8px max(8px,env(safe-area-inset-right)) calc(7px + env(safe-area-inset-bottom));background:#183125f5;border:1px solid #58765d;display:grid;grid-template-columns:repeat(5,1fr);gap:3px;z-index:5}.nav button{background:transparent;border:0;color:#c3d3b7;border-radius:10px;padding:6px 2px;font:10px system-ui;cursor:pointer}.nav button span{display:block;font-size:21px}.nav button.on{background:#4a684e;color:#fff1c6}.view[hidden]{display:none!important}.notice{min-height:23px;color:#f1dc9b;font-size:12px}.save{margin-top:12px;display:flex;align-items:center;flex-wrap:wrap;gap:8px}.detail{font-size:12px;color:#d1e0c6}.chip{padding:4px 8px;border-radius:20px;background:#49664b;color:#eff1cf;font-size:11px}.locked{opacity:.78}.spinner{font-size:11px;color:#bcd5b4}footer{text-align:center;color:#a9bca8;font-size:11px;margin-top:20px}
@@ -120,11 +120,76 @@ linear-gradient(145deg,#a0ba77 0%,#76a068 47%,#4d8058 100%)}
 .rock{width:22px;height:14px;background:linear-gradient(140deg,#d0c7a0,#687f6d);clip-path:polygon(26% 0%,80% 8%,100% 75%,70% 100%,0 86%);opacity:.85}
 .dirt{position:absolute;z-index:0;pointer-events:none;border-radius:50%;background:#d2be8570;filter:blur(3px)}
 .map-mark{z-index:2;background:#214d309c}
+
+/* 0.9.3: original compact isometric city-builder art. All building art stays DOM based and tappable. */
+.world{background:
+ radial-gradient(ellipse at 12% 34%,#c9dba19c 0,transparent 38%),
+ radial-gradient(ellipse at 83% 84%,#3b745a65 0,transparent 38%),
+ repeating-linear-gradient(140deg,#d3e7b318 0 1px,transparent 1px 48px),
+ linear-gradient(125deg,#9ebd83 0%,#82aa78 46%,#65966d 100%)}
+.world:before,.world:after{display:none}
+.roadnet{position:absolute;inset:0;z-index:1;pointer-events:none;filter:drop-shadow(3px 4px 2px #254d3690)}
+.roadnet .pavement{stroke:#6b7c66;stroke-width:47;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.roadnet .asphalt{stroke:#afa68b;stroke-width:35;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.roadnet .edge{stroke:#d1c7ab;stroke-width:2.4;fill:none;stroke-dasharray:8 12;opacity:.78}
+.roadnet .marking{stroke:#efe9c4;stroke-width:1.5;fill:none;stroke-dasharray:14 23;opacity:.74}
+.plot{transition:background .14s,border-color .14s;z-index:3}
+.plot:not(.occupied){border:1px solid #e4e9c338;background:#d3e4ac12;box-shadow:inset 0 0 0 2px #527b5540}
+.plot:not(.occupied) strong{background:#3e744d8a;border:1px solid #d0e0b39a;color:#fff6da}
+.plot:not(.occupied) small{color:#eff9e5aa;border:0;background:#27482f72}
+.plot.occupied{background:transparent}
+.plot.occupied .asset{transform:scale(1.03)}
+.poi{height:120px;z-index:4}
+.poi:active .asset,.plot.occupied:active .asset{transform:translateY(2px) scale(.98)}
+.poi .asset{transform:scale(1.12)}
+#mapHQ .asset{transform:scale(1.29);transform-origin:50% 100%}
+#mapHQ .asset .ground{background:#8c9472;border-color:#ddd6b2}
+#mapHQ small{margin-top:5px}
+.asset{height:78px;width:111px;filter:drop-shadow(5px 9px 3px #27472ca8);overflow:visible}
+.asset .ground{left:3px;right:4px;bottom:0;height:34px;border-radius:4px;background:linear-gradient(135deg,#c1bc96,#788d73);border:1px solid #ecdfab;transform:skew(-25deg) rotate(-2deg);box-shadow:2px 4px 0 #405e48}
+.asset .walls{left:14px;right:21px;bottom:16px;height:38px;transform:skewY(10deg);border:1px solid #4d6554;border-radius:2px;background:linear-gradient(90deg,#b9bb9c 0%,#9eae93 58%,#667f71 59%,#516f60)}
+.asset .roof{left:14px;right:21px;bottom:48px;height:21px;transform:skew(-35deg) rotate(-4deg);background:linear-gradient(145deg,#aab0a0,#6c8575);border:2px solid #dae0ba;border-radius:4px;box-shadow:3px 4px 0 #415e4c}
+.asset .door{left:39px;bottom:15px;width:27px;height:23px;background:repeating-linear-gradient(0deg,#446357 0 5px,#648473 5px 7px);border:1px solid #d4dbb9}
+.asset .window{left:20px;bottom:32px;width:13px;height:11px;background:#d4eabf;border:2px solid #3b6153;box-shadow:52px 2px 0 -2px #bfdcaf}
+.asset .detail-art{position:absolute;z-index:4;pointer-events:none}
+.asset.hq .walls{height:54px;left:25px;right:28px;bottom:16px;background:linear-gradient(90deg,#ded3ad 0 51%,#bbc19b 51% 70%,#7c9981 71%);border-color:#768a6d}
+.asset.hq .roof{bottom:65px;left:21px;right:28px;height:21px;background:linear-gradient(140deg,#c7c397,#708773)}
+.asset.hq .door{left:43px;bottom:17px;width:21px;height:30px;background:#53665a}
+.asset.hq .window{left:30px;bottom:45px;width:11px;height:10px;box-shadow:35px 0 0 -1px #f3e5ae}
+.asset.hq .detail-art{left:60px;top:-26px;width:3px;height:31px;background:#d8dbbd;box-shadow:8px 6px 0 -1px #d9d9ad}
+.asset.hq .detail-art:after{content:"";position:absolute;left:-14px;top:-2px;width:29px;height:10px;border:2px solid #e6e7c7;border-radius:50%;transform:rotate(-16deg)}
+.asset.storage .roof{background:linear-gradient(130deg,#dfbd80,#918c6f);border-color:#ffdc9c}
+.asset.storage .walls{background:linear-gradient(90deg,#ddcc9f 0 54%,#8f9a82 55%)}
+.asset.storage .detail-art{bottom:5px;left:7px;width:22px;height:21px;background:linear-gradient(145deg,#cc9f61,#916842);box-shadow:77px -3px 0 -3px #c4a173;border:1px solid #e2cb91}
+.asset.storage .door{width:39px;left:38px;background:repeating-linear-gradient(0deg,#988a6f 0 4px,#d5c4a1 4px 6px)}
+.asset.garage .roof{background:linear-gradient(130deg,#9aaf9b,#566f62)}
+.asset.garage .walls{background:linear-gradient(90deg,#a8bdac 0 40%,#698774 41%)}
+.asset.garage .door{left:21px;width:70px;height:28px;bottom:15px;background:repeating-linear-gradient(90deg,#4c6558 0 18px,#b3bda6 18px 20px);border:2px solid #d3d9b8}
+.asset.garage .detail-art{left:28px;bottom:11px;width:50px;height:7px;background:#52655a;border:1px solid #a1ad9b;border-radius:4px}
+.asset.hangar .roof{left:8px;right:8px;bottom:43px;height:34px;border-radius:50% 50% 4px 4px;transform:skew(-7deg);background:linear-gradient(120deg,#c2cbc0,#758e7d 63%,#526f60)}
+.asset.hangar .walls{left:12px;right:10px;height:35px;background:linear-gradient(90deg,#9fb4a3,#60796a)}
+.asset.hangar .door{left:21px;width:72px;height:27px;background:repeating-linear-gradient(90deg,#456253 0 17px,#b6c5b0 17px 19px)}
+.asset.metal .roof{background:linear-gradient(130deg,#b5b9aa,#6a8281)}
+.asset.metal .detail-art{right:9px;top:4px;width:12px;height:49px;background:linear-gradient(90deg,#947e72,#c3ac8a);border:2px solid #715f57;box-shadow:-20px 13px 0 -2px #897b6d}
+.asset.parts .detail-art{right:8px;top:15px;width:18px;height:27px;border-radius:2px;background:#7c8b7b;border:2px solid #dae3c6;box-shadow:-24px -8px 0 -4px #d4d6b6}
+.asset.fuel .detail-art{left:3px;bottom:17px;width:33px;height:30px;background:linear-gradient(90deg,#d9dbbb,#7f9e8e);border:2px solid #526d5d;border-radius:50% 50% 12% 12%;box-shadow:48px -5px 0 -1px #b4c6ae}
+.asset.electronics .roof{background:linear-gradient(125deg,#aec5c3,#5c8c94)}
+.asset.electronics .walls{background:linear-gradient(90deg,#b9d2c6,#668f8e)}
+.asset.electronics .detail-art{right:12px;top:-6px;width:3px;height:24px;background:#d2e2d4}
+.asset.electronics .detail-art:after{content:"";position:absolute;left:-8px;top:-3px;width:19px;height:7px;border-radius:50%;border:2px solid #e6f0da}
+.asset.construction .detail-art{right:10px;top:0;width:6px;height:54px;background:#e7c76c;box-shadow:-24px 6px 0 -2px #efcf70}
+.asset.construction .detail-art:after{content:"";position:absolute;right:-3px;top:0;width:68px;height:6px;background:#ebce74;transform:rotate(-9deg)}
+.asset.construction .walls{background:repeating-linear-gradient(45deg,#e8c65a 0 9px,#59634e 9px 14px);height:12px}
+.asset.construction .roof{display:none}
+.landmark.tree{transform:scale(1.13);filter:drop-shadow(6px 9px 2px #264b318a)}
+.lamp{position:absolute;z-index:2;pointer-events:none;width:4px;height:26px;background:#647963;box-shadow:2px 2px 1px #305b39}
+.lamp:before{content:"";position:absolute;top:-3px;left:-4px;width:13px;height:5px;background:#e6e0b5;border-radius:3px;box-shadow:0 0 9px #e8e3b955}
+.fence{position:absolute;z-index:2;pointer-events:none;height:5px;border-top:2px dashed #c8c7aa;border-bottom:1px solid #71906b;opacity:.65}
 </style></head><body>
 <div id="rotate" class="rotate"><div>📱↻<h2>Поверните телефон горизонтально</h2><p>Вся военная база помещается на одном экране.</p></div></div>
 <div class="game" id="game">
  <header class="hud">
-  <b class="brand">🪖 ВОЕННАЯ БАЗА <small>0.9.2</small></b>
+  <b class="brand">🪖 ВОЕННАЯ БАЗА <small>0.9.3</small></b>
   <div class="meters"><span>🏛️ <b id="hq">1 / 1000</b></span><span>🪙 <b id="coins">0</b></span><span>🔩 <b id="res-metal">0</b></span><span>🛢️ <b id="res-fuel">0</b></span><span>⚙️ <b id="res-parts">0</b></span><span>🔌 <b id="res-electronics">0</b></span></div>
  </header>
  <main class="stage">
@@ -329,12 +394,15 @@ function showCard(){
  }
 }
 function buildingArt(type){
- return '<span class="asset '+type+'" aria-hidden="true"><i class="ground"></i><i class="walls"></i><i class="roof"></i><i class="door"></i><i class="window"></i></span>';
+ return '<span class="asset '+type+'" aria-hidden="true"><i class="ground"></i><i class="walls"></i><i class="roof"></i><i class="door"></i><i class="window"></i><i class="detail-art"></i></span>';
 }
 function terrainArt(){
  const trees=[[29,97],[394,82],[737,73],[1049,207],[97,716],[1085,720],[17,447],[889,721],[467,743],[1051,445]];
  const rocks=[[122,129],[322,717],[819,145],[1066,608],[572,180]];
- return '<span class="map-mark" style="left:25px;top:15px">Командный сектор</span><span class="dirt" style="left:90px;top:327px;width:230px;height:130px"></span><span class="dirt" style="left:778px;top:398px;width:245px;height:96px"></span>'+
+ const paths=["M 85 154 L 1018 154","M 246 154 L 246 201 L 246 617","M 591 154 L 591 202 L 591 615","M 871 154 L 871 201 L 871 617","M 85 616 L 1018 616"];
+ const roads='<svg class="roadnet" width="1100" height="760" viewBox="0 0 1100 760" aria-hidden="true">'+
+ paths.map(d=>'<path class="pavement" d="'+d+'"/><path class="asphalt" d="'+d+'"/><path class="marking" d="'+d+'"/>').join("")+'</svg>';
+ return roads+'<span class="map-mark" style="left:25px;top:15px">Командный сектор</span><span class="dirt" style="left:90px;top:327px;width:230px;height:130px"></span><span class="dirt" style="left:778px;top:398px;width:245px;height:96px"></span><span class="fence" style="left:25px;top:15px;width:990px"></span><span class="lamp" style="left:87px;top:131px"></span><span class="lamp" style="left:445px;top:131px"></span><span class="lamp" style="left:964px;top:131px"></span>'+
  trees.map(([x,y])=>'<span class="landmark tree" style="left:'+x+'px;top:'+y+'px"></span>').join("")+
  rocks.map(([x,y])=>'<span class="landmark rock" style="left:'+x+'px;top:'+y+'px"></span>').join("");
 }
