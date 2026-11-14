@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#172e25">
-<title>Военная база — 0.8.1 Полный экран</title>
+<title>Военная база — 0.8.2 Карта базы</title>
 <style>
 :root{color-scheme:dark;--bg:#14261d;--panel:#294536;--border:#688068;--text:#f1f4e9;--gold:#f4d384}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#426248,#152820 70%);color:var(--text);font:15px system-ui,-apple-system,sans-serif}main{max-width:720px;margin:auto;padding:14px 12px 100px}h1{text-align:center;font-size:clamp(23px,6vw,34px);margin:4px 0}.sub{text-align:center;color:#bfd3b9;font-size:12px;margin-bottom:12px}.tag{font-size:10px;letter-spacing:2px;text-align:center;color:#e3dcad;font-weight:800}.panel{background:linear-gradient(165deg,#31513b,#1c3327);border:1px solid #698368;border-radius:15px;padding:14px;margin:10px 0;box-shadow:0 4px 12px #0d1b1377}h2{font-size:17px;margin:0 0 8px}.muted{font-size:12px;color:#c0d0ba;line-height:1.5}.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.stat{background:#223e2e;border:1px solid #59785d;border-radius:12px;padding:12px}.stat small{display:block;color:#c5d2b7}.stat strong{font-size:21px}.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:12px}.card{border:1px solid #79916b;background:#344f3b;border-radius:13px;padding:11px;min-width:0}.card h3{margin:2px 0 7px;font-size:15px}.symbol{font-size:33px}.rate{color:#e5dd9d;font-size:12px}.btn{background:linear-gradient(#e4d293,#bfaa6e);color:#263123;border:0;border-radius:10px;padding:11px;font-size:13px;font-weight:800;cursor:pointer;touch-action:manipulation}.btn:disabled{opacity:.43}.card .btn{width:100%;margin-top:8px}.btn.alt{background:#44634a;color:#f4f6e7;border:1px solid #7c9878}.bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}.baseart{border-radius:12px;border:2px solid #829671;height:136px;background:repeating-linear-gradient(35deg,#89977129 0 22px,#b6c1a11f 23px 25px),linear-gradient(#8ea178,#547552);display:flex;align-items:end;justify-content:space-around;padding:14px 2px 8px;overflow:hidden}.building{text-align:center;min-width:0;flex:1;filter:drop-shadow(2px 3px 2px #182b22aa)}.building .roof{font-size:38px}.building small{display:block;color:#192c20;font-size:10px;font-weight:900;background:#cbd4a9;border-radius:5px;margin:3px auto;max-width:92px}.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,720px);padding:8px max(8px,env(safe-area-inset-right)) calc(7px + env(safe-area-inset-bottom));background:#183125f5;border:1px solid #58765d;display:grid;grid-template-columns:repeat(5,1fr);gap:3px;z-index:5}.nav button{background:transparent;border:0;color:#c3d3b7;border-radius:10px;padding:6px 2px;font:10px system-ui;cursor:pointer}.nav button span{display:block;font-size:21px}.nav button.on{background:#4a684e;color:#fff1c6}.view[hidden]{display:none!important}.notice{min-height:23px;color:#f1dc9b;font-size:12px}.save{margin-top:12px;display:flex;align-items:center;flex-wrap:wrap;gap:8px}.detail{font-size:12px;color:#d1e0c6}.chip{padding:4px 8px;border-radius:20px;background:#49664b;color:#eff1cf;font-size:11px}.locked{opacity:.78}.spinner{font-size:11px;color:#bcd5b4}footer{text-align:center;color:#a9bca8;font-size:11px;margin-top:20px}
@@ -49,18 +49,37 @@ body{font:14px system-ui,-apple-system,sans-serif;background:#101e18;color:#eff5
 .rotate{display:none}
 @media(orientation:portrait){.game{display:none}.rotate{display:grid;position:fixed;inset:0;place-items:center;padding:24px;text-align:center;background:#1a3729}.rotate h2{font-size:20px;margin:8px 0}.rotate p{color:#c5d1b9}}
 @media(max-height:410px) and (orientation:landscape){.hud{min-height:32px;padding-top:2px;padding-bottom:2px}.brand{font-size:11px}.meters{gap:3px;font-size:10px}.meters span{padding:2px 4px}.nav{min-height:35px}.nav button span{font-size:13px}.sheet{padding:8px}.sheetbody{font-size:12px}.sheetbody p{margin:5px 0}}
+
+/* 0.8.2: a planned base layout; decorative ground is noninteractive. */
+.world{width:1100px;height:760px;background:
+ radial-gradient(ellipse at 19% 45%,#a5bf7c80 0 12%,transparent 30%),
+ radial-gradient(ellipse at 70% 68%,#3b6a4b55 0 18%,transparent 39%),
+ repeating-linear-gradient(25deg,#b7d29109 0px,#b7d29109 2px,transparent 2px,transparent 45px),
+ linear-gradient(137deg,#82a66c,#59895d 58%,#517d55)}
+.world:before{left:15px;top:134px;width:1040px;height:29px;transform:rotate(0deg);background:#b4a584;box-shadow:0 4px 0 #6c7e5b80;z-index:1;pointer-events:none}
+.world:after{left:687px;top:148px;width:29px;height:660px;transform:rotate(-7deg);background:#b4a584;z-index:1;pointer-events:none}
+.plot{width:114px;height:92px;border-radius:14px}
+.plot:not(.occupied){background:#3f684326;border:1px dashed #ebf2bd55;box-shadow:none;color:#edf5d3c9;text-shadow:1px 1px #30533c}
+.plot:not(.occupied) strong{font-size:23px;background:#294c35bb;border-radius:50%;width:34px;height:34px;line-height:32px}
+.plot:not(.occupied) small{font-size:10px;background:none;max-width:106px;color:#e7f1ce99;font-weight:500;letter-spacing:.2px;padding:1px}
+.plot.occupied{background:#a8b87f9c;box-shadow:0 6px 0 #345a3b99,0 8px 14px #1c3b2e80}
+.plot.occupied strong{font-size:38px}
+.poi{width:130px;height:103px;transform:none;border:2px solid #e5ddae;background:linear-gradient(140deg,#aab789cc,#4f7950dc);box-shadow:0 9px 12px #233f2b99}
+.poi:active,.plot:active{filter:brightness(1.15)}
+.map-tree{position:absolute;z-index:2;pointer-events:none;font-size:29px;filter:drop-shadow(4px 5px 3px #1d462b77)}
+.map-mark{position:absolute;z-index:2;pointer-events:none;font-size:10px;letter-spacing:1px;color:#e4ecca;background:#20492b9a;border-radius:10px;padding:5px 10px;text-transform:uppercase}
 </style></head><body>
 <div id="rotate" class="rotate"><div>📱↻<h2>Поверните телефон горизонтально</h2><p>Вся военная база помещается на одном экране.</p></div></div>
 <div class="game" id="game">
  <header class="hud">
-  <b class="brand">🪖 ВОЕННАЯ БАЗА <small>0.8.1</small></b>
+  <b class="brand">🪖 ВОЕННАЯ БАЗА <small>0.8.2</small></b>
   <div class="meters"><span>🏛️ <b id="hq">1 / 1000</b></span><span>🪙 <b id="coins">0</b></span><span>🔩 <b id="res-metal">0</b></span><span>🛢️ <b id="res-fuel">0</b></span><span>⚙️ <b id="res-parts">0</b></span><span>🔌 <b id="res-electronics">0</b></span></div>
  </header>
  <main class="stage">
   <div id="view-base" class="view map-screen">
    <div class="world-wrap"><div class="world-scroll" id="worldscroll"><div class="world" id="world"></div></div></div>
    <div class="edge-actions"><button class="btn alt" id="zoomout" aria-label="Уменьшить">−</button><button class="btn alt" id="zoomin" aria-label="Увеличить">＋</button><button class="btn alt" id="save" aria-label="Сохранить">💾</button></div>
-   <div class="hint" id="mapstatus">Нажмите на здание или свободный участок карты</div>
+   <div class="hint" id="mapstatus">Нажмите на здание или значок ＋ для строительства</div>
   </div>
   <div id="view-storage" class="view aux" hidden><h2>📦 Склад</h2><p>Нажмите на склад на карте, чтобы улучшить его.</p><div class="cards" id="resources"></div><button class="btn" id="goStorageMap">🗺️ Вернуться к карте и складу</button></div>
   <div id="view-garage" class="view aux" hidden><h2>🚙 Гараж</h2><p>Гараж появится в следующем большом обновлении.</p></div>
@@ -236,11 +255,11 @@ function renderMap(){
  for(let i=0;i<24;i++){
  const placed=data.placements.find(v=>v.slot===i),job=data.construction.find(v=>v.slot===i);
  const def=placed&&definitions.find(d=>d.id===placed.id);
- const x=34+(i%6)*142,y=30+Math.floor(i/6)*133;
+ const x=42+(i%6)*166,y=190+Math.floor(i/6)*136;
  const label=def?def.title:job?"Строится":"Свободный участок";
- slots.push('<button type="button" class="plot '+(placed||job?"occupied":"")+'" aria-label="'+label+'" data-slot="'+i+'" style="left:'+x+'px;top:'+y+'px"><strong>'+(def?def.icon:job?"🏗️":"＋")+'</strong><small>'+(def?def.title.replace(" завод",""):job?"Строится":"Строить")+'</small></button>');
+ slots.push('<button type="button" class="plot '+(placed||job?"occupied":"")+'" aria-label="'+label+'" data-slot="'+i+'" style="left:'+x+'px;top:'+y+'px"><strong>'+(def?def.icon:job?"🏗️":"＋")+'</strong><small>'+(def?def.title.replace(" завод",""):job?"Строится":"Участок")+'</small></button>');
  }
- $("world").innerHTML=slots.join("")+'<button class="poi" id="mapHQ" style="left:375px;top:250px" aria-label="Открыть штаб"><strong>🏛️</strong><small>Штаб · '+data.baseLevel+'</small></button><button class="poi" id="mapStorage" style="left:690px;top:456px" aria-label="Открыть склад"><strong>📦</strong><small>Склад · '+data.storageLevel+'</small></button>';
+ $("world").innerHTML='<span class="map-mark" style="left:25px;top:15px">Командный сектор</span><span class="map-tree" style="left:62px;top:76px">🌲</span><span class="map-tree" style="left:394px;top:51px">🌳</span><span class="map-tree" style="left:773px;top:65px">🌲</span><span class="map-tree" style="left:1016px;top:235px">🌳</span><span class="map-tree" style="left:107px;top:730px">🌲</span>'+slots.join("")+'<button class="poi" id="mapHQ" style="left:183px;top:25px" aria-label="Открыть штаб"><strong>🏛️</strong><small>Штаб · '+data.baseLevel+'</small></button><button class="poi" id="mapStorage" style="left:530px;top:25px" aria-label="Открыть склад"><strong>📦</strong><small>Склад · '+data.storageLevel+'</small></button>';
  document.querySelectorAll("[data-slot]").forEach(btn=>btn.onclick=()=>{const slot=Number(btn.dataset.slot),placed=data.placements.find(v=>v.slot===slot),job=data.construction.find(v=>v.slot===slot);if(placed)openCard("factory",slot,placed.id);else if(job)openCard("construction",slot);else openCard("empty",slot)});
  $("mapHQ").onclick=()=>openCard("hq");$("mapStorage").onclick=()=>openCard("storage");
 }
