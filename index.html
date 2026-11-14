@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#172e25">
-<title>Военная база — 0.11.5 Торговые конвои</title>
+<title>Военная база — 0.11.6 Живая база и анимация конвоев</title>
 <style>
 :root{color-scheme:dark;--bg:#14261d;--panel:#294536;--border:#688068;--text:#f1f4e9;--gold:#f4d384}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#426248,#152820 70%);color:var(--text);font:15px system-ui,-apple-system,sans-serif}main{max-width:720px;margin:auto;padding:14px 12px 100px}h1{text-align:center;font-size:clamp(23px,6vw,34px);margin:4px 0}.sub{text-align:center;color:#bfd3b9;font-size:12px;margin-bottom:12px}.tag{font-size:10px;letter-spacing:2px;text-align:center;color:#e3dcad;font-weight:800}.panel{background:linear-gradient(165deg,#31513b,#1c3327);border:1px solid #698368;border-radius:15px;padding:14px;margin:10px 0;box-shadow:0 4px 12px #0d1b1377}h2{font-size:17px;margin:0 0 8px}.muted{font-size:12px;color:#c0d0ba;line-height:1.5}.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.stat{background:#223e2e;border:1px solid #59785d;border-radius:12px;padding:12px}.stat small{display:block;color:#c5d2b7}.stat strong{font-size:21px}.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:12px}.card{border:1px solid #79916b;background:#344f3b;border-radius:13px;padding:11px;min-width:0}.card h3{margin:2px 0 7px;font-size:15px}.symbol{font-size:33px}.rate{color:#e5dd9d;font-size:12px}.btn{background:linear-gradient(#e4d293,#bfaa6e);color:#263123;border:0;border-radius:10px;padding:11px;font-size:13px;font-weight:800;cursor:pointer;touch-action:manipulation}.btn:disabled{opacity:.43}.card .btn{width:100%;margin-top:8px}.btn.alt{background:#44634a;color:#f4f6e7;border:1px solid #7c9878}.bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}.baseart{border-radius:12px;border:2px solid #829671;height:136px;background:repeating-linear-gradient(35deg,#89977129 0 22px,#b6c1a11f 23px 25px),linear-gradient(#8ea178,#547552);display:flex;align-items:end;justify-content:space-around;padding:14px 2px 8px;overflow:hidden}.building{text-align:center;min-width:0;flex:1;filter:drop-shadow(2px 3px 2px #182b22aa)}.building .roof{font-size:38px}.building small{display:block;color:#192c20;font-size:10px;font-weight:900;background:#cbd4a9;border-radius:5px;margin:3px auto;max-width:92px}.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,720px);padding:8px max(8px,env(safe-area-inset-right)) calc(7px + env(safe-area-inset-bottom));background:#183125f5;border:1px solid #58765d;display:grid;grid-template-columns:repeat(5,1fr);gap:3px;z-index:5}.nav button{background:transparent;border:0;color:#c3d3b7;border-radius:10px;padding:6px 2px;font:10px system-ui;cursor:pointer}.nav button span{display:block;font-size:21px}.nav button.on{background:#4a684e;color:#fff1c6}.view[hidden]{display:none!important}.notice{min-height:23px;color:#f1dc9b;font-size:12px}.save{margin-top:12px;display:flex;align-items:center;flex-wrap:wrap;gap:8px}.detail{font-size:12px;color:#d1e0c6}.chip{padding:4px 8px;border-radius:20px;background:#49664b;color:#eff1cf;font-size:11px}.locked{opacity:.78}.spinner{font-size:11px;color:#bcd5b4}footer{text-align:center;color:#a9bca8;font-size:11px;margin-top:20px}
@@ -414,11 +414,24 @@ linear-gradient(145deg,#a0ba77 0%,#76a068 47%,#4d8058 100%)}
 .convoy-choices .btn{font-size:11px;padding:9px 4px;white-space:normal}
 .convoy-traffic{font-size:11px;color:#f0dba0;display:grid;gap:5px}
 @media(orientation:portrait){.convoy-choices{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* 0.11.6 — moving convoy sprites and active factory production effects */
+.convoy-route{position:absolute;z-index:3;left:0;top:150px;width:1100px;height:34px;background:linear-gradient(180deg,#53634c 0 18%,#39463c 18% 82%,#53634c 82%);border-top:2px solid #9d9b76;border-bottom:2px solid #9d9b76;overflow:hidden;pointer-events:none}
+.convoy-route:before{content:"";position:absolute;left:0;right:0;top:15px;border-top:2px dashed #e5d49b;opacity:.8}
+.convoy-route-label{position:absolute;left:12px;top:-1px;font-size:7px;letter-spacing:1px;color:#f1e6c1;background:#344b3c;padding:1px 4px;z-index:2}
+.moving-convoy{position:absolute;top:1px;left:-75px;display:flex;align-items:center;gap:3px;font-size:25px;line-height:29px;filter:drop-shadow(1px 2px 1px #1b2b20);animation:convoy-drive 13s linear infinite}
+.moving-convoy small{font-size:8px;font-weight:900;color:#fff2c9;background:#344b3c;padding:2px 4px;border-radius:4px}
+.moving-convoy.reverse{animation-name:convoy-drive-reverse;top:2px}
+@keyframes convoy-drive{from{transform:translateX(0)}to{transform:translateX(1220px)}}
+@keyframes convoy-drive-reverse{from{transform:translateX(1220px) scaleX(-1)}to{transform:translateX(0) scaleX(-1)}}
+.asset.running:after{content:"";position:absolute;right:10px;top:-15px;width:12px;height:17px;border-radius:50%;background:radial-gradient(ellipse,#d7ddce8c 0 25%,#d7ddce45 55%,transparent 75%);animation:factory-smoke 2.8s ease-in-out infinite;pointer-events:none}
+@keyframes factory-smoke{0%{opacity:0;transform:translate(0,8px) scale(.55)}35%{opacity:.65}100%{opacity:0;transform:translate(5px,-14px) scale(1.45)}}
+@media(prefers-reduced-motion:reduce){.moving-convoy,.asset.running:after{animation:none!important}}
+@media(orientation:portrait){.convoy-route{top:150px}.moving-convoy{font-size:23px}}
 </style></head><body>
 
 <div class="game" id="game">
  <header class="hud">
-  <b class="brand">🪖 ВОЕННАЯ БАЗА <small>0.11.5</small></b>
+  <b class="brand">🪖 ВОЕННАЯ БАЗА <small>0.11.6</small></b>
   <div class="meters"><span>🏛️ <b id="hq">1 / 1000</b></span><span>🪙 <b id="coins">0</b></span><span>🔩 <b id="res-metal">0</b></span><span>🛢️ <b id="res-fuel">0</b></span><span>⚙️ <b id="res-parts">0</b></span><span>🔌 <b id="res-electronics">0</b></span></div>
  </header>
  <main class="stage">
@@ -441,7 +454,7 @@ linear-gradient(145deg,#a0ba77 0%,#76a068 47%,#4d8058 100%)}
 <script>
 (()=>{
 "use strict";
-const KEY="mbm_save_v115_convoys",LEGACY=["mbm_save_v114_testbonus","mbm_save_v113_trade","mbm_save_v110_test","mbm_save_v99","mbm_save_v98","mbm_save_v97","mbm_save_v96","mbm_save_v95","mbm_save_v94","mbm_save_v9","mbm_save_v81","mbm_save_v8","mbm_save_v7","mbm_save_v6","mbm_save_v51","mbm_save_v5","mbm_save_v4","mbm_save"],MAX_OFFLINE=480,MINUTE=60000;
+const KEY="mbm_save_v116_livebase",LEGACY=["mbm_save_v115_convoys","mbm_save_v114_testbonus","mbm_save_v113_trade","mbm_save_v110_test","mbm_save_v99","mbm_save_v98","mbm_save_v97","mbm_save_v96","mbm_save_v95","mbm_save_v94","mbm_save_v9","mbm_save_v81","mbm_save_v8","mbm_save_v7","mbm_save_v6","mbm_save_v51","mbm_save_v5","mbm_save_v4","mbm_save"],MAX_OFFLINE=480,MINUTE=60000;
 const definitions=[
 {id:"metal",requiredHQ:1,icon:"🏭",title:"Металлургический завод",resource:"metal",rate:10,cost:{metal:80}},
 {id:"fuel",requiredHQ:3,icon:"🛢️",title:"Нефтеперерабатывающий завод",resource:"fuel",rate:8,cost:{metal:120}},
@@ -492,7 +505,7 @@ function buildExpansion(){
  save();render();showCard();
 }
 function roadUnlocked(s,level=data.territoryLevel){return !s.extension||level>=s.extension}
-const defaults=()=>({version:115,coins:600,baseLevel:1,storageLevel:1,best:0,board:Array(25).fill(null),score:0,resources:{metal:300,fuel:0,parts:0,electronics:0},factories:{metal:0,fuel:0,parts:0,electronics:0,scrap:0,terminal:0,components:0,avionics:0},lastProduction:Date.now(),placements:[],construction:[],facilities:{garage:0,hangar:0},facilityJobs:[],roads:[],facilityLots:{storage:null,garage:null,hangar:null},territoryLevel:0,testMode:false,vehicles:{scout:0,apc:0,tank:0,reconHeli:0,attackHeli:0,transport:0},displayVehicles:[],marketLevel:0,marketReserve:{metal:500,fuel:500,parts:500,electronics:500},marketEnabled:{metal:true,fuel:false,parts:false,electronics:false},lastTradeAt:Date.now(),tradeEarned:0,testBonusGranted:false,convoys:[],convoyEarned:0,convoyTrips:0});
+const defaults=()=>({version:116,coins:600,baseLevel:1,storageLevel:1,best:0,board:Array(25).fill(null),score:0,resources:{metal:300,fuel:0,parts:0,electronics:0},factories:{metal:0,fuel:0,parts:0,electronics:0,scrap:0,terminal:0,components:0,avionics:0},lastProduction:Date.now(),placements:[],construction:[],facilities:{garage:0,hangar:0},facilityJobs:[],roads:[],facilityLots:{storage:null,garage:null,hangar:null},territoryLevel:0,testMode:false,vehicles:{scout:0,apc:0,tank:0,reconHeli:0,attackHeli:0,transport:0},displayVehicles:[],marketLevel:0,marketReserve:{metal:500,fuel:500,parts:500,electronics:500},marketEnabled:{metal:true,fuel:false,parts:false,electronics:false},lastTradeAt:Date.now(),tradeEarned:0,testBonusGranted:false,convoys:[],convoyEarned:0,convoyTrips:0});
 const safeNum=(v,fallback=0)=>Number.isFinite(v)&&v>=0?v:fallback;
 function safeParse(key){try{return JSON.parse(localStorage.getItem(key)||"null")}catch(e){return null}}
 function normalize(raw){
@@ -501,17 +514,17 @@ if(!raw||typeof raw!=="object")return result;
 result.coins=safeNum(raw.coins,600);result.baseLevel=Number.isInteger(raw.baseLevel)&&raw.baseLevel>=1&&raw.baseLevel<=1000?raw.baseLevel:1;
 result.best=safeNum(raw.best);result.score=safeNum(raw.score);
 result.board=Array.isArray(raw.board)&&raw.board.length===25?raw.board.slice():result.board;
-if([6,7,8,81,9,94,95,96,97,98,99,110,113,114,115].includes(raw.version)){
+if([6,7,8,81,9,94,95,96,97,98,99,110,113,114,115,116].includes(raw.version)){
  for(const name of Object.keys(result.resources)){
- result.resources[name]=Math.min([110,113,114,115].includes(raw.version)&&raw.testMode===true?10000000:2000+1000*([8,81,9,94,95,96,97,98,99,110,113,114,115].includes(raw.version)?Math.max(0,Math.min(999,Math.floor(safeNum(raw.storageLevel,1))-1)):0),safeNum(raw.resources&&raw.resources[name]));
+ result.resources[name]=Math.min([110,113,114,115,116].includes(raw.version)&&raw.testMode===true?10000000:2000+1000*([8,81,9,94,95,96,97,98,99,110,113,114,115,116].includes(raw.version)?Math.max(0,Math.min(999,Math.floor(safeNum(raw.storageLevel,1))-1)):0),safeNum(raw.resources&&raw.resources[name]));
  result.factories[name]=Math.min(999,Math.floor(safeNum(raw.factories&&raw.factories[name])));
  }
- if([110,113,114,115].includes(raw.version)){
+ if([110,113,114,115,116].includes(raw.version)){
  for(const def of definitions)result.factories[def.id]=Math.min(999,Math.floor(safeNum(raw.factories&&raw.factories[def.id])));
  result.testMode=raw.testMode===true;
- result.testBonusGranted=[114,115].includes(raw.version)&&raw.testBonusGranted===true;
+ result.testBonusGranted=[114,115,116].includes(raw.version)&&raw.testBonusGranted===true;
  for(const v of vehicleDefs)result.vehicles[v.id]=Math.min(9999,Math.floor(safeNum(raw.vehicles&&raw.vehicles[v.id])));
- if([113,114,115].includes(raw.version)){
+ if([113,114,115,116].includes(raw.version)){
   result.marketLevel=Math.max(0,Math.min(TRADE_MAX_LEVEL,Math.floor(safeNum(raw.marketLevel))));
   for(const id of Object.keys(result.resources)){
    result.marketReserve[id]=Math.min(100000,Math.floor(safeNum(raw.marketReserve&&raw.marketReserve[id],500)));
@@ -534,31 +547,31 @@ if([6,7,8,81,9,94,95,96,97,98,99,110,113,114,115].includes(raw.version)){
  }
 }
 result.lastProduction=Number.isFinite(raw.lastProduction)&&raw.lastProduction>0?Math.min(raw.lastProduction,Date.now()):Date.now();
-if([7,8,81,9,94,95,96,97,98,99,110,113,114,115].includes(raw.version)&&Array.isArray(raw.placements)){
+if([7,8,81,9,94,95,96,97,98,99,110,113,114,115,116].includes(raw.version)&&Array.isArray(raw.placements)){
 const used=new Set();
-result.placements=raw.placements.filter(v=>v&&Number.isInteger(v.slot)&&v.slot>=0&&v.slot<([99,110,113,114,115].includes(raw.version)?24+Math.min(2,Math.floor(safeNum(raw.territoryLevel)))*6:24)&&definitions.some(d=>d.id===v.id)&&!used.has(v.slot)&&used.add(v.slot)).map(v=>({slot:v.slot,id:v.id}));
+result.placements=raw.placements.filter(v=>v&&Number.isInteger(v.slot)&&v.slot>=0&&v.slot<([99,110,113,114,115,116].includes(raw.version)?24+Math.min(2,Math.floor(safeNum(raw.territoryLevel)))*6:24)&&definitions.some(d=>d.id===v.id)&&!used.has(v.slot)&&used.add(v.slot)).map(v=>({slot:v.slot,id:v.id}));
 }
 if(raw.version===6){let pos=0;for(const def of definitions)for(let i=0;i<result.factories[def.id]&&pos<24;i++)result.placements.push({slot:pos++,id:def.id});}
-if([8,81,9,94,95,96,97,98,99,110,113,114,115].includes(raw.version)){
+if([8,81,9,94,95,96,97,98,99,110,113,114,115,116].includes(raw.version)){
  result.storageLevel=Math.max(1,Math.min(1000,Math.floor(safeNum(raw.storageLevel,1))));
  const occupied=new Set(result.placements.map(p=>p.slot));
  if(Array.isArray(raw.construction)){
- result.construction=raw.construction.filter(j=>j&&definitions.some(d=>d.id===j.id)&&Number.isFinite(j.endsAt)&&j.endsAt>0&&(j.slot===null||(Number.isInteger(j.slot)&&j.slot>=0&&j.slot<([99,110,113,114,115].includes(raw.version)?24+Math.min(2,Math.floor(safeNum(raw.territoryLevel)))*6:24)&&!occupied.has(j.slot)&&occupied.add(j.slot)))).slice(0,24).map(j=>({id:j.id,slot:j.slot,endsAt:j.endsAt}));
+ result.construction=raw.construction.filter(j=>j&&definitions.some(d=>d.id===j.id)&&Number.isFinite(j.endsAt)&&j.endsAt>0&&(j.slot===null||(Number.isInteger(j.slot)&&j.slot>=0&&j.slot<([99,110,113,114,115,116].includes(raw.version)?24+Math.min(2,Math.floor(safeNum(raw.territoryLevel)))*6:24)&&!occupied.has(j.slot)&&occupied.add(j.slot)))).slice(0,24).map(j=>({id:j.id,slot:j.slot,endsAt:j.endsAt}));
  }
  }
-if([9,94,95,96,97,98,99,110,113,114,115].includes(raw.version)){
+if([9,94,95,96,97,98,99,110,113,114,115,116].includes(raw.version)){
  for(const id of ["garage","hangar"])result.facilities[id]=Math.min(100,Math.floor(safeNum(raw.facilities&&raw.facilities[id])));
  if(Array.isArray(raw.facilityJobs)){
   const seen=new Set();
   result.facilityJobs=raw.facilityJobs.filter(j=>j&&["garage","hangar"].includes(j.id)&&Number.isFinite(j.endsAt)&&j.endsAt>0&&!seen.has(j.id)&&seen.add(j.id)).map(j=>({id:j.id,endsAt:j.endsAt}));
  }
 }
-if([94,95,96,97,98,99,110,113,114,115].includes(raw.version)&&Array.isArray(raw.roads)){
- const valid=new Set(roadSlots.filter(s=>roadUnlocked(s,[99,110,113,114,115].includes(raw.version)?Math.min(2,Math.floor(safeNum(raw.territoryLevel))):0)).map(s=>s.id));
+if([94,95,96,97,98,99,110,113,114,115,116].includes(raw.version)&&Array.isArray(raw.roads)){
+ const valid=new Set(roadSlots.filter(s=>roadUnlocked(s,[99,110,113,114,115,116].includes(raw.version)?Math.min(2,Math.floor(safeNum(raw.territoryLevel))):0)).map(s=>s.id));
  result.roads=[...new Set(raw.roads.filter(n=>Number.isInteger(n)&&valid.has(n)))];
 }
-if([99,110,113,114,115].includes(raw.version))result.territoryLevel=Math.min(2,Math.max(0,Math.floor(safeNum(raw.territoryLevel))));
-if([98,99,110,113,114,115].includes(raw.version)&&raw.facilityLots&&typeof raw.facilityLots==="object"){
+if([99,110,113,114,115,116].includes(raw.version))result.territoryLevel=Math.min(2,Math.max(0,Math.floor(safeNum(raw.territoryLevel))));
+if([98,99,110,113,114,115,116].includes(raw.version)&&raw.facilityLots&&typeof raw.facilityLots==="object"){
  const occupied=new Set(result.placements.map(p=>p.slot).concat(result.construction.filter(j=>j.slot!==null).map(j=>j.slot)));
  for(const id of ["storage","garage","hangar"]){
   const lot=raw.facilityLots[id];
@@ -573,11 +586,11 @@ return result;
 }
 let data;let selectedSlot=null,zoom=1;
 const current=safeParse(KEY);
-if(current&&current.version===115){data=normalize(current)}
+if(current&&current.version===116){data=normalize(current)}
 else{
- const prev=LEGACY.map(safeParse).find(v=>v&&typeof v==="object"&&([6,7,8,81,9,94,95,96,97,98,99,110,113,114,115].includes(v.version)||Array.isArray(v.board)&&v.board.length===25));
+ const prev=LEGACY.map(safeParse).find(v=>v&&typeof v==="object"&&([6,7,8,81,9,94,95,96,97,98,99,110,113,114,115,116].includes(v.version)||Array.isArray(v.board)&&v.board.length===25));
  data=normalize(prev);
- if(prev){try{localStorage.setItem("mbm_backup_before_v115",JSON.stringify(prev))}catch(e){}}
+ if(prev){try{localStorage.setItem("mbm_backup_before_v116",JSON.stringify(prev))}catch(e){}}
 }
 // One-time test grant on first entry to this preview; older saves stay untouched.
 if(!data.testBonusGranted){
@@ -587,7 +600,7 @@ if(!data.testBonusGranted){
 }
 function format(n){return Math.floor(n).toLocaleString("ru-RU")}
 function status(message){$("notice").textContent=message;$("saveStatus").textContent=message}
-function save(manual=false){data.version=115;
+function save(manual=false){data.version=116;
  try{localStorage.setItem(KEY,JSON.stringify(data));$("saveStatus").textContent=manual?"✓ Сохранено вручную":"✓ Автосохранено";return true}
  catch(e){$("saveStatus").textContent="⚠️ Не удалось сохранить";return false}
 }
@@ -1070,8 +1083,13 @@ function showCard(){
  choice.onchange=refresh;refresh();
  }
 }
-function buildingArt(type){
- return '<span class="asset '+type+'" aria-hidden="true"><i class="ground"></i><i class="walls"></i><i class="roof"></i><i class="door"></i><i class="window"></i><i class="detail-art"></i><i class="trim"></i><i class="emblem"></i><i class="equipment"></i></span>';
+function buildingArt(type,running=false){
+ return '<span class="asset '+type+(running?' running':'')+'" aria-hidden="true"><i class="ground"></i><i class="walls"></i><i class="roof"></i><i class="door"></i><i class="window"></i><i class="detail-art"></i><i class="trim"></i><i class="emblem"></i><i class="equipment"></i></span>';
+}
+function convoyTrafficArt(){
+ if(!data.convoys.length)return "";
+ return '<div class="convoy-route" aria-label="Торговые конвои в пути"><span class="convoy-route-label">ЛОГИСТИЧЕСКИЙ МАРШРУТ</span>'+
+ data.convoys.map((job,i)=>'<span class="moving-convoy '+(i%2?"reverse":"")+'" style="--delay:-'+(i*2)+'s" title="Конвой: '+labels[job.resource]+'">🚚<small>'+labels[job.resource]+'</small></span>').join("")+'</div>';
 }
 function terrainArt(){
  const trees=[[29,97],[394,82],[737,73],[1049,207],[97,716],[1085,720],[17,447],[889,721],[467,743],[1051,445],[66,920],[264,987],[620,986],[1022,963],[1090,863],[12,794]];
@@ -1086,7 +1104,7 @@ function terrainArt(){
  rocks.map(([x,y])=>'<span class="landmark rock" style="left:'+x+'px;top:'+y+'px"></span>').join("");
 }
 function renderMap(){
- const signature=JSON.stringify([data.placements,data.construction.map(j=>[j.id,j.slot]),data.baseLevel,data.storageLevel,data.facilities,data.facilityJobs.map(j=>j.id),data.roads,roadMode,movingFactory,movingFacility,data.facilityLots,data.territoryLevel,data.vehicles,data.displayVehicles,data.marketLevel,data.convoys.length]);
+ const signature=JSON.stringify([data.placements,data.construction.map(j=>[j.id,j.slot]),data.baseLevel,data.storageLevel,data.facilities,data.facilityJobs.map(j=>j.id),data.roads,roadMode,movingFactory,movingFacility,data.facilityLots,data.territoryLevel,data.vehicles,data.displayVehicles,data.marketLevel,data.convoys.map(j=>[j.resource,j.endsAt])]);
  if(mapSignature===signature)return;
  mapSignature=signature;
  const slots=[];
@@ -1095,7 +1113,7 @@ function renderMap(){
  const x=42+(i%6)*166,y=190+Math.floor(i/6)*136;
  const connected=def?isFactoryConnected(i):false;
  const label=locked?"Закрытая территория":facility?facilityName(facility):def?def.title+(connected?" · работает":" · нет дороги"):job?"Строится":"Свободный участок";
- slots.push('<button type="button" class="plot '+(locked?" locked-land":placed||job||facility?"occupied":"")+(def&&!connected?" offline":"")+(movingFactory&&movingFactory.from===i||movingFacility&&data.facilityLots[movingFacility.id]===i?" move-source":"")+((movingFactory||movingFacility)&&!locked&&!placed&&!job&&!facility?" move-target":"")+'" aria-label="'+label+'" data-slot="'+i+'" style="left:'+x+'px;top:'+y+'px">'+(locked?'<strong>🔒</strong>':facility?buildingArt(facility):def?buildingArt(def.id):job?buildingArt("construction"):'<strong>＋</strong>')+'<small>'+(locked?"Открыть":facility?facilityName(facility):def?(connected?'✅ ':'🚫 ')+def.title.replace(" завод",""):job?"Строится":"Участок")+'</small></button>');
+ slots.push('<button type="button" class="plot '+(locked?" locked-land":placed||job||facility?"occupied":"")+(def&&!connected?" offline":"")+(movingFactory&&movingFactory.from===i||movingFacility&&data.facilityLots[movingFacility.id]===i?" move-source":"")+((movingFactory||movingFacility)&&!locked&&!placed&&!job&&!facility?" move-target":"")+'" aria-label="'+label+'" data-slot="'+i+'" style="left:'+x+'px;top:'+y+'px">'+(locked?'<strong>🔒</strong>':facility?buildingArt(facility):def?buildingArt(def.id,connected):job?buildingArt("construction"):'<strong>＋</strong>')+'<small>'+(locked?"Открыть":facility?facilityName(facility):def?(connected?'✅ ':'🚫 ')+def.title.replace(" завод",""):job?"Строится":"Участок")+'</small></button>');
  }
  const roadControls=roadMode&&!movingFactory&&!movingFacility?roadSlots.filter(s=>roadUnlocked(s)&&!data.roads.includes(s.id)).map(s=>
  '<button type="button" class="road-spot '+(s.v?'vertical':'horizontal')+'" data-road="'+s.id+
@@ -1105,7 +1123,7 @@ function renderMap(){
   const d=facilityDefs[id],level=data.facilities[id],job=data.facilityJobs.find(j=>j.id===id);
   return '<button class="poi" id="map-'+id+'" '+(data.facilityLots[id]!==null?'hidden ':'')+'style="left:'+(i===0?770:938)+'px;top:25px" aria-label="Открыть '+d.name+'">'+buildingArt(job?"construction":id)+'<small>'+d.name+' · '+(job?'стройка':level||'построить')+'</small></button>';
  }).join("");
- $("world").innerHTML=terrainArt()+roadControls+slots.join("")+vehicleParking()+
+ $("world").innerHTML=terrainArt()+roadControls+slots.join("")+convoyTrafficArt()+vehicleParking()+
  '<button class="poi" id="mapMarket" style="left:365px;top:25px" aria-label="Открыть торговый центр">'+buildingArt("market")+'<small>Торговля · '+(data.marketLevel||'построить')+'</small></button>'+
  '<button class="poi" id="mapHQ" style="left:183px;top:25px" aria-label="Открыть штаб">'+buildingArt("hq")+'<small>Штаб · '+data.baseLevel+'</small></button>'+
  '<button class="poi" id="mapStorage" '+(data.facilityLots.storage!==null?'hidden ':'')+'style="left:530px;top:25px" aria-label="Открыть склад">'+buildingArt("storage")+'<small>Склад · '+data.storageLevel+'</small></button>'+facilityArt;
