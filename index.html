@@ -313,6 +313,25 @@ linear-gradient(145deg,#a0ba77 0%,#76a068 47%,#4d8058 100%)}
 .qa-actions{display:flex;gap:8px;flex-wrap:wrap;margin:9px 0}
 .qa-actions .btn{font-size:12px;min-height:35px}
 #view-missions>.card:first-of-type{border:2px solid #d9c084;background:linear-gradient(125deg,#4b5234,#2b4837)}
+
+/* Distinct silhouettes for the four new enterprise families */
+.asset.scrap .roof{background:linear-gradient(120deg,#c0b39a,#738b7d,#435f57)}
+.asset.scrap .walls{background:repeating-linear-gradient(90deg,#b6b5a0 0 13px,#839789 13px 17px)}
+.asset.scrap .detail-art{left:7px;bottom:5px;width:24px;height:23px;background:linear-gradient(145deg,#a07d65,#635c54);border:2px solid #dcc6a1;transform:skew(-8deg)}
+.asset.scrap .equipment{right:5px;bottom:9px;width:19px;height:16px;background:#b0ac88;border:2px dashed #707e6f}
+.asset.terminal .roof{background:linear-gradient(120deg,#a9bbaa,#638e83)}
+.asset.terminal .walls{background:linear-gradient(90deg,#8ea69a,#4c7667)}
+.asset.terminal .detail-art{left:3px;bottom:11px;width:27px;height:34px;border-radius:50% 50% 10% 10%;border:3px solid #557a70;background:linear-gradient(90deg,#c7cdb9,#829b92);box-shadow:68px 0 0 -2px #c1cbba}
+.asset.terminal .equipment{right:7px;bottom:0;width:6px;height:35px;background:#cad6bd;box-shadow:7px -1px 0 -2px #e3e7cc}
+.asset.components .roof{background:linear-gradient(120deg,#c6c6b2,#748b83,#5b7367)}
+.asset.components .walls{background:repeating-linear-gradient(90deg,#b3b9a4 0 11px,#7c9488 11px 14px)}
+.asset.components .detail-art{right:5px;top:4px;width:18px;height:34px;border:3px solid #556d61;background:#a5bcb2}
+.asset.components .equipment{left:6px;bottom:7px;width:28px;height:12px;background:repeating-linear-gradient(90deg,#d2bd8d 0 7px,#77745a 7px 9px)}
+.asset.avionics .roof{background:linear-gradient(120deg,#b5d6d0,#6eaaa7,#467c82)}
+.asset.avionics .walls{background:linear-gradient(90deg,#bfd6c9,#7ca6a2,#568988)}
+.asset.avionics .detail-art{right:13px;top:-11px;width:4px;height:27px;background:#d9e8d8;box-shadow:11px 7px 0 -1px #bfe5d8}
+.asset.avionics .equipment{right:3px;bottom:17px;width:25px;height:10px;border:2px solid #d0f1e5;background:#729e9c;border-radius:50%;transform:rotate(-20deg)}
+#openTest{border:1px solid #f3da90;color:#ffe4a0;background:#4a5140}
 </style></head><body>
 <div id="rotate" class="rotate"><div>📱↻<h2>Поверните телефон горизонтально</h2><p>Вся военная база помещается на одном экране.</p></div></div>
 <div class="game" id="game">
@@ -323,13 +342,13 @@ linear-gradient(145deg,#a0ba77 0%,#76a068 47%,#4d8058 100%)}
  <main class="stage">
   <div id="view-base" class="view map-screen">
    <div class="world-wrap"><div class="world-scroll" id="worldscroll"><div class="world-canvas" id="worldcanvas"><div class="world" id="world"></div></div></div></div>
-   <div class="road-actions"><button class="btn alt" id="roadMode" aria-pressed="false">🛣️ Дороги · 12 🔩</button><button class="btn alt" id="expandLand">🌿 Земля 24/36</button><span class="roadhelp" id="roadHelp" hidden>Касайся светлых участков дороги. 12 🔩 за участок.</span></div><div class="edge-actions"><button class="btn alt" id="zoomout" aria-label="Уменьшить">−</button><button class="btn alt" id="zoomin" aria-label="Увеличить">＋</button><span class="zoomreadout" id="zoomLevel" aria-live="off">100%</span><button class="btn alt" id="save" aria-label="Сохранить">💾</button></div>
+   <div class="road-actions"><button class="btn alt" id="roadMode" aria-pressed="false">🛣️ Дороги · 12 🔩</button><button class="btn alt" id="expandLand">🌿 Земля 24/36</button><button class="btn alt" id="openTest">🧪 Тест</button><span class="roadhelp" id="roadHelp" hidden>Касайся светлых участков дороги. 12 🔩 за участок.</span></div><div class="edge-actions"><button class="btn alt" id="zoomout" aria-label="Уменьшить">−</button><button class="btn alt" id="zoomin" aria-label="Увеличить">＋</button><span class="zoomreadout" id="zoomLevel" aria-live="off">100%</span><button class="btn alt" id="save" aria-label="Сохранить">💾</button></div>
    <div class="hint" id="mapstatus">Заводы работают только с дорогой от штаба · 🛣️ строй дороги</div><button class="btn cancel-move" id="cancelMove" hidden>Отмена перемещения</button>
   </div>
   <div id="view-storage" class="view aux" hidden><h2>📦 Склад</h2><p>Нажмите на склад на карте, чтобы улучшить его.</p><div class="cards" id="resources"></div><button class="btn" id="goStorageMap">🗺️ Вернуться к карте и складу</button></div>
   <div id="view-garage" class="view aux" hidden><h2>🚙 Гараж · техника</h2><p>Производство наземной техники. Для новых машин улучшай гараж и штаб.</p><div class="card" id="garageInfo"></div><div class="vehicle-grid" id="garageVehicles"></div><button class="btn alt" id="goGarageMap">🗺️ Открыть гараж</button></div>
   <div id="view-hangar" class="view aux" hidden><h2>🚁 Ангар · авиация</h2><p>Производство вертолётов и самолётов. Для новых моделей улучшай ангар и штаб.</p><div class="card" id="hangarInfo"></div><div class="vehicle-grid" id="hangarVehicles"></div><button class="btn alt" id="goHangarMap">🗺️ Открыть ангар</button></div>
-  <div id="view-missions" class="view aux" hidden><h2>🗺️ Задания</h2><div class="card"><b>🧪 Тестирование версии 0.11.0</b><p>Здесь можно пополнять ресурсы, открывать уровень штаба и ускорять стройки. Эти бонусы сохраняются только в тестовой версии.</p><div class="qa-actions"><button class="btn" id="testResources">🎁 +50 000 каждого ресурса</button><button class="btn alt" id="testHQ">🏛️ Штаб +10 уровней</button><button class="btn alt" id="testFinish">⏩ Завершить стройки</button></div><small>Тестовые ресурсы: склад до 100 000 единиц на каждый вид.</small></div><p>Экспедиции и задания появятся позже.</p><div class="card"><h3>🏭 Развитие производства</h3><p>Штаб 1 — металл · штаб 3 — топливо · штаб 6 — детали · штаб 10 — электроника.</p><p>Завод должен иметь непрерывную дорогу до штаба. Ранее построенные заводы сохраняются.</p></div></div>
+  <div id="view-missions" class="view aux" hidden><h2>🗺️ Задания</h2><div class="card"><b>🧪 Тестирование версии 0.11.0</b><p>Здесь можно пополнять ресурсы, открывать уровень штаба и ускорять стройки. Эти бонусы сохраняются только в тестовой версии.</p><div class="qa-actions"><button class="btn" id="testResources">🎁 +50 000 каждого ресурса</button><button class="btn alt" id="testHQ">🏛️ Штаб +10 уровней</button><button class="btn alt" id="testFinish">⏩ Завершить стройки</button></div><small>Тестовые ресурсы: склад до 100 000 единиц на каждый вид.</small></div><p>Экспедиции и задания появятся позже.</p><div class="card"><h3>🏭 Развитие производства</h3><p>Штаб 1 — металл · штаб 2 — переработка металла · штаб 3 — топливо · штаб 4 — терминал · штаб 6 — детали · штаб 7 — комплектующие · штаб 10 — электроника · штаб 11 — авиационный цех.</p><p>Завод должен иметь непрерывную дорогу до штаба. Ранее построенные заводы сохраняются.</p></div></div>
  </main>
  <nav class="nav" aria-label="Главное меню"><button class="on" data-view="base"><span>🏕️</span>База</button><button data-view="garage"><span>🚙</span>Гараж</button><button data-view="hangar"><span>🚁</span>Ангар</button><button data-view="missions"><span>🗺️</span>Задания</button><button data-view="storage"><span>📦</span>Склад</button></nav>
  <div class="toast" id="notice" role="status"></div><span id="saveStatus" hidden>Автосохранение</span>
@@ -741,7 +760,7 @@ function showCard(){
  } else if(type==="facility"){
  const def=facilityDefs[id],level=data.facilities[id],job=data.facilityJobs.find(j=>j.id===id),cost=facilityCost(id);
  title=def.icon+" "+def.name;
- html='<p>Уровень: <b>'+level+' / 100</b></p><p>Назначение: '+def.purpose+'</p>'+(job?'<p>🏗️ Осталось: <b>'+clock(timeLeft(job))+'</b></p>':'<p>Стоимость: '+costLabel(cost)+'</p>')+'<p class="muted">'+(level===0?'Здание ещё не построено.':'Здание работает. Техника появится позже.')+'</p>'+button(job?"Строится…":level?"⬆️ Улучшить":"🏗️ Построить",!!job||level>=100||!canAfford(cost));
+ html='<p>Уровень: <b>'+level+' / 100</b></p><p>Назначение: '+def.purpose+'</p>'+(job?'<p>🏗️ Осталось: <b>'+clock(timeLeft(job))+'</b></p>':'<p>Стоимость: '+costLabel(cost)+'</p>')+'<p class="muted">'+(level===0?'Здание ещё не построено.':'Здание работает. Открой раздел техники, чтобы производить машины.')+'</p>'+button(job?"Строится…":level?"⬆️ Улучшить":"🏗️ Построить",!!job||level>=100||!canAfford(cost));
  act=()=>buildFacility(id);
  } else if(type==="hq"){
  title="🏛️ Командный штаб";
@@ -889,6 +908,7 @@ function showView(name){
  closeCard();render();
 }
 $("expandLand").onclick=()=>openCard("territory");
+$("openTest").onclick=()=>showView("missions");
 $("testResources").onclick=testResources;
 $("testHQ").onclick=testHQ;
 $("testFinish").onclick=testFinish;
