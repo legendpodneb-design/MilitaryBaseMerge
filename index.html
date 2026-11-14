@@ -421,7 +421,7 @@ linear-gradient(145deg,#a0ba77 0%,#76a068 47%,#4d8058 100%)}
   <div id="view-storage" class="view aux" hidden><h2>📦 Склад и торговля</h2><p>Заводы производят ресурсы, торговый центр автоматически продаёт излишки.</p><div class="card" id="marketSummary">🏪 Торговый центр</div><button class="btn alt" id="openMarket">🏪 Настроить торговлю</button><div class="cards" id="resources"></div><button class="btn" id="goStorageMap">🗺️ Вернуться к карте и складу</button></div>
   <div id="view-garage" class="view aux" hidden><h2>🚙 Гараж · техника</h2><p>Производство наземной техники. Для новых машин улучшай гараж и штаб.</p><div class="card" id="garageInfo"></div><div class="vehicle-grid" id="garageVehicles"></div><button class="btn alt" id="goGarageMap">🗺️ Открыть гараж</button></div>
   <div id="view-hangar" class="view aux" hidden><h2>🚁 Ангар · авиация</h2><p>Производство вертолётов и самолётов. Для новых моделей улучшай ангар и штаб.</p><div class="card" id="hangarInfo"></div><div class="vehicle-grid" id="hangarVehicles"></div><button class="btn alt" id="goHangarMap">🗺️ Открыть ангар</button></div>
-  <div id="view-missions" class="view aux" hidden><h2>🗺️ Задания</h2><div class="card"><b>🧪 Тестирование версии 0.11.0</b><p>Здесь можно пополнять ресурсы, открывать уровень штаба и ускорять стройки. Эти бонусы сохраняются только в тестовой версии.</p><div class="qa-actions"><button class="btn" id="testResources">🎁 +50 000 каждого ресурса</button><button class="btn alt" id="testHQ">🏛️ Штаб +10 уровней</button><button class="btn alt" id="testFinish">⏩ Завершить стройки</button></div><small>Тестовые ресурсы: склад до 100 000 единиц на каждый вид.</small></div><p>Экспедиции и задания появятся позже.</p><div class="card"><h3>🏭 Развитие производства</h3><p>Штаб 1 — металл · штаб 2 — переработка металла · штаб 3 — топливо · штаб 4 — терминал · штаб 6 — детали · штаб 7 — комплектующие · штаб 10 — электроника · штаб 11 — авиационный цех.</p><p>Завод должен иметь непрерывную дорогу до штаба. Ранее построенные заводы сохраняются.</p></div></div>
+  <div id="view-missions" class="view aux" hidden><h2>🗺️ Задания</h2><div class="card"><b>🧪 Тестирование версии 0.11.0</b><p>Здесь можно пополнять ресурсы, открывать уровень штаба и ускорять стройки. Эти бонусы сохраняются только в тестовой версии.</p><div class="qa-actions"><button class="btn" id="testResources">🎁 +50 000 каждого ресурса</button><button class="btn alt" id="testHQ">🏛️ Штаб +10 уровней</button><button class="btn alt" id="testFinish">⏩ Завершить стройки</button></div><small>Тестовые ресурсы: склад до 100 000 единиц на каждый вид.</small></div><p>Экспедиции и задания появятся позже.</p><div class="card"><b>🏪 Автоматическая торговля</b><p>Построй торговый центр в командном секторе. Раз в 10 минут он продаёт излишки выбранных ресурсов, оставляя неснижаемый запас. Доход начисляется офлайн до 8 часов.</p></div><div class="card"><h3>🏭 Развитие производства</h3><p>Штаб 1 — металл · штаб 2 — переработка металла · штаб 3 — топливо · штаб 4 — терминал · штаб 6 — детали · штаб 7 — комплектующие · штаб 10 — электроника · штаб 11 — авиационный цех.</p><p>Завод должен иметь непрерывную дорогу до штаба. Ранее построенные заводы сохраняются.</p></div></div>
  </main>
  <nav class="nav" aria-label="Главное меню"><button class="on" data-view="base"><span>🏕️</span>База</button><button data-view="garage"><span>🚙</span>Гараж</button><button data-view="hangar"><span>🚁</span>Ангар</button><button data-view="missions"><span>🗺️</span>Задания</button><button data-view="storage"><span>📦</span>Склад</button></nav>
  <div class="toast" id="notice" role="status"></div><span id="saveStatus" hidden>Автосохранение</span>
@@ -698,7 +698,7 @@ function accrue(now=Date.now()){
   }
  }
  data.lastProduction=(now-data.lastProduction)>MAX_OFFLINE*MINUTE?now:tick;
- if(data.marketLevel&&now-tick>MAX_OFFLINE*MINUTE)data.lastTradeAt=now;
+ if(data.marketLevel&&now-tick>=MINUTE)data.lastTradeAt=now;
  return made;
 }
 function upgradeMarket(){
@@ -1024,7 +1024,7 @@ function terrainArt(){
  rocks.map(([x,y])=>'<span class="landmark rock" style="left:'+x+'px;top:'+y+'px"></span>').join("");
 }
 function renderMap(){
- const signature=JSON.stringify([data.placements,data.construction.map(j=>[j.id,j.slot]),data.baseLevel,data.storageLevel,data.facilities,data.facilityJobs.map(j=>j.id),data.roads,roadMode,movingFactory,movingFacility,data.facilityLots,data.territoryLevel,data.vehicles,data.displayVehicles]);
+ const signature=JSON.stringify([data.placements,data.construction.map(j=>[j.id,j.slot]),data.baseLevel,data.storageLevel,data.facilities,data.facilityJobs.map(j=>j.id),data.roads,roadMode,movingFactory,movingFacility,data.facilityLots,data.territoryLevel,data.vehicles,data.displayVehicles,data.marketLevel]);
  if(mapSignature===signature)return;
  mapSignature=signature;
  const slots=[];
