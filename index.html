@@ -462,7 +462,7 @@ linear-gradient(145deg,#a0ba77 0%,#76a068 47%,#4d8058 100%)}
   <div id="view-base" class="view map-screen">
    <div class="world-wrap"><div class="world-scroll" id="worldscroll"><div class="world-canvas" id="worldcanvas"><div class="world" id="world"></div></div></div></div>
    <div class="road-actions"><button class="btn alt" id="roadMode" aria-pressed="false">🛣️ Дороги · 12 🔩</button><button class="btn alt" id="waterMode">💧 Трубы</button><button class="btn alt" id="powerMode">⚡ Кабели</button><button class="btn alt" id="expandLand">🌿 Земля 24/36</button><button class="btn alt" id="openTest">🧪 Тест</button><span class="roadhelp" id="roadHelp" hidden>Касайся светлых участков дороги. 12 🔩 за участок.</span></div><div class="edge-actions"><button class="btn alt" id="zoomout" aria-label="Уменьшить">−</button><button class="btn alt" id="zoomin" aria-label="Увеличить">＋</button><span class="zoomreadout" id="zoomLevel" aria-live="off">100%</span><button class="btn alt" id="save" aria-label="Сохранить">💾</button></div>
-   <div class="hint" id="mapstatus">Заводы работают только с дорогой от штаба · 🛣️ строй дороги</div><button class="btn cancel-move" id="cancelMove" hidden>Отмена перемещения</button>
+   <div class="hint" id="mapstatus">Заводам нужны дорога, 💧 водопровод и ⚡ кабель</div><button class="btn cancel-move" id="cancelMove" hidden>Отмена перемещения</button>
   </div>
   <div id="view-storage" class="view aux" hidden><h2>📦 Склад и торговля</h2><p>Заводы производят ресурсы, торговый центр автоматически продаёт излишки.</p><div class="card" id="utilitySummary">💧 Водоснабжение и ⚡ электричество</div><button class="btn alt" id="openWater">💧 Водоснабжение</button><button class="btn alt" id="openPower">⚡ Электростанция</button><div class="qa-actions"><button class="btn alt" id="fillWaterLines">💧 Провести трубы вдоль дорог</button><button class="btn alt" id="fillPowerLines">⚡ Проложить кабели вдоль дорог</button></div><div class="card" id="marketSummary">🏪 Торговый центр</div><button class="btn alt" id="openMarket">🏪 Настроить торговлю</button><div id="convoyPanel"></div><div class="cards" id="resources"></div><button class="btn" id="goStorageMap">🗺️ Вернуться к карте и складу</button></div>
   <div id="view-garage" class="view aux" hidden><h2>🚙 Гараж · техника</h2><p>Производство наземной техники. Для новых машин улучшай гараж и штаб.</p><div class="card" id="garageInfo"></div><div class="vehicle-grid" id="garageVehicles"></div><button class="btn alt" id="goGarageMap">🗺️ Открыть гараж</button></div>
@@ -1157,7 +1157,7 @@ function showCard(){
  const def=definitions.find(x=>x.id===id),level=data.factories[id],job=data.construction.find(j=>j.id===id),price=factoryCost(id);
  title=def.icon+" "+def.title;
  const connected=isFactoryConnected(slot),waterConnected=utilityConnected(slot,"water"),powerConnected=utilityConnected(slot,"electricity"),activeLevel=utilitiesOperational()?factoryServedLevels(id):0;
- html='<p>Уровень: <b>'+level+'</b> · Открывается на штабе '+def.requiredHQ+'</p><p>🚧 Дорога: <b>'+(connected?'✅ подключён':'❌ нет связи со штабом')+'</b></p><p>💧⚡ Снабжение: '+(utilitiesOperational()?'✅ работает':'⛔ недостаточно воды или электричества')+'</p><p>Производство: <b>+'+format(activeLevel*def.rate)+' '+labels[def.resource]+' / мин</b></p>'+(job?'<p>🏗️ Строительство: '+clock(timeLeft(job))+'</p>':'<p>Стоимость улучшения: '+costLabel(price)+'</p>')+button(job?"Строится…":"⬆️ Улучшить",!!job||level>=999||!canAfford(price));
+ html='<p>Уровень: <b>'+level+'</b> · Открывается на штабе '+def.requiredHQ+'</p><p>🚧 Дорога: <b>'+(connected?'✅ подключён':'❌ нет связи со штабом')+'</b></p><p>💧 Водопровод: '+(waterConnected?'✅ подключён':'❌ нет подключения')+' · ⚡ Электросеть: '+(powerConnected?'✅ подключена':'❌ нет подключения')+'</p><p>Ресурсы снабжения: '+(utilitiesOperational()?'✅ хватает':'⛔ дефицит')+'</p><p>Производство: <b>+'+format(activeLevel*def.rate)+' '+labels[def.resource]+' / мин</b></p>'+(job?'<p>🏗️ Строительство: '+clock(timeLeft(job))+'</p>':'<p>Стоимость улучшения: '+costLabel(price)+'</p>')+button(job?"Строится…":"⬆️ Улучшить",!!job||level>=999||!canAfford(price));
  act=()=>build(id);
  } else if(type==="construction"){
  const job=data.construction.find(j=>j.slot===slot);
@@ -1303,7 +1303,9 @@ function render(){
  for(const name of Object.keys(data.resources))$("res-"+name).textContent=format(data.resources[name]);
  const need=utilityDemand();
  const ready=utilitiesOperational();
- $("utilitySummary").textContent=(ready?"✅":"⛔")+" Снабжение заводов · 💧 "+format(data.resources.water)+" (+"+utilitySupply("water")+" / −"+need.water+" в мин) · ⚡ "+format(data.resources.electricity)+" (+"+utilitySupply("electricity")+" / −"+need.electricity+" в мин)";
+ const serviced=definitions.reduce((sum,def)=>sum+factoryServedLevels(def.id),0);
+ const roadLevel=definitions.reduce((sum,def)=>sum+factoryActiveLevels(def.id),0);
+ $("utilitySummary").textContent=(ready&&serviced===roadLevel?"✅":"⛔")+" Подключено к сетям "+serviced+"/"+roadLevel+" уровней заводов · 💧 "+format(data.resources.water)+" (+"+utilitySupply("water")+" / −"+need.water+" в мин) · ⚡ "+format(data.resources.electricity)+" (+"+utilitySupply("electricity")+" / −"+need.electricity+" в мин)";
  $("marketSummary").textContent="🏪 Торговый центр · уровень "+data.marketLevel+" · заработано "+format(data.tradeEarned)+" 🪙 · "+(data.marketLevel?"продажа каждые 10 минут":"ещё не построен");
  $("waterMode").textContent=(lineMode==="water"?"✓ ":"")+"💧 Трубы · 8 🔩";
  $("powerMode").textContent=(lineMode==="electricity"?"✓ ":"")+"⚡ Кабели · 12 🔩";
